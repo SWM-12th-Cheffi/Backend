@@ -1,7 +1,7 @@
 from neo4j import GraphDatabase
 import csv
 
-f = open('RecipeResult2.csv', 'r', encoding='utf-8')
+f = open('/Users/dongsikga/Code/Cheffi/cheffi_backend/python/DataCrawling/RecipeResult2.csv', 'r', encoding='utf-8')
 recipeList = csv.reader(f)
 
 neoAuth = ("neo4j","r6qEpV4t") # ID, PW

@@ -2,7 +2,7 @@ import * as express from "express";
 
 const app: express.Application = express();
 
-app.get(
+app.post(
   "/",
   (req: express.Request, res: express.Response, next: express.NextFunction) => {
       res.send({name: "jjkjdkjkjdkjkjdjkd"});

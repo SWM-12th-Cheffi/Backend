@@ -1,11 +1,11 @@
 from neo4j import GraphDatabase
 import csv
 
-f = open('RecipeResult2.csv', 'r', encoding='utf-8')
+f = open('/Users/dongsikga/Code/Cheffi/cheffi_backend/python/DataCrawling/RecipeResult2.csv', 'r', encoding='utf-8')
 recipeList = csv.reader(f)
 
-neoAuth = ("neo4j","s3cr3t") # ID, PW
-driver = GraphDatabase.driver("bolt://172.17.0.2:7687", auth=neoAuth)
+neoAuth = ("neo4j","r6qEpV4t") # ID, PW
+driver = GraphDatabase.driver("bolt://18.220.121.204:7687", auth=neoAuth)
 
 session = driver.session()
 for i in recipeList:

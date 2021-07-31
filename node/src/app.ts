@@ -1,7 +1,7 @@
 import www from "./www";
 import {createServer} from "http";
 
-const port: number = Number(process.env.PORT) || 2002;
+const port: number = Number(process.env.PORT) || 2001;
 
 const server = createServer(www);
 

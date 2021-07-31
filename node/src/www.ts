@@ -1,8 +1,15 @@
 import * as express from "express";
 import { addAbortSignal } from "stream";
 
-
 var bodyParser = require('body-parser');
+var mysql = require('mysql');
+var mysql_connection = mysql.createConnection({
+  host:     'localhost',
+  user:     'user',
+  password: 'password',
+  database: 'database'
+});
+
 //import AddIG from "./func/AddIG"
 
 const app: express.Application = express();
@@ -11,7 +18,7 @@ app.use(bodyParser.json());
 app.get(
   '/', 
   function (req, res) {
-  res.send('Connecting GET Test Is OK!!');
+  res.send('Connecting GET Test Is OK');
 })
 
 // Connecting Test ( Check Post Communication with json {"title": "connecting succesful"} )
@@ -27,9 +34,24 @@ app.post(
 app.post(
   '/AddIG', 
   function (req, res) {
-  console.log(req.body.title);
+  let postIngreData: string = req.body.title;
+  let results: string = AddIG(postIngreData);
+  //console.log(ingre);
   res.send('Connecting POST Test Is OK, Title Value is ' + req.body.title);
 })
+
+function AddIG(ingre: string){
+  mysql_connection.connect();
+  mysql_connection.query('queryquery', function(error: string, results: string, fields: string){
+    if (error) console.log(error);
+    //results로 함수 구현
+    //https://berkbach.com/node-js에서-mysql-사용하기-1-b4b69ce7433f
+  })
+
+  mysql_connection.end();
+  let results: string = "test"; 
+  return results;
+}
 
 // 재료를 통해 만들 수 있는 레시피 개수를 반환하는 기능
 app.post(

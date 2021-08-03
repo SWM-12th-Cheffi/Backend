@@ -3,6 +3,8 @@ import { addAbortSignal } from "stream";
 import {NumPossiRP, ListPossiRP, ShowRPInspect} from "./func/function";
 
 const app: express.Application = express();
+var bodyParser = require('body-parser');
+app.use(bodyParser.json());
 
 app.get(
   '/', 

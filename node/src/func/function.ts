@@ -10,7 +10,7 @@ export function NumPossiRP(ingre: string[], postres: any){
         .then(function (res: any) {
           let ret: string = res.records[0].get('count').low;
           //console.log(ret);
-          postres.send("The number of Recipe what you can make: " + String(ret));
+          postres.send(String(ret));
         })
         .catch(function (error: string) {
           console.log(error)

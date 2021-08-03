@@ -1,12 +1,8 @@
 import * as express from "express";
 import { addAbortSignal } from "stream";
-
-
-var bodyParser = require('body-parser');
-//import AddIG from "./func/AddIG"
+import {NumPossiRP, ListPossiRP, ShowRPInspect} from "./func/function";
 
 const app: express.Application = express();
-app.use(bodyParser.json());
 
 app.get(
   '/', 
@@ -22,7 +18,7 @@ app.post(
   res.send('Connecting POST Test Is OK, Title Value is ' + req.body.title);
 })
 
-
+/*
 // 냉장고에 재료를 추가하는 기능
 app.post(
   '/AddIG', 
@@ -30,29 +26,39 @@ app.post(
   console.log(req.body.title);
   res.send('Connecting POST Test Is OK, Title Value is ' + req.body.title);
 })
+*/
 
 // 재료를 통해 만들 수 있는 레시피 개수를 반환하는 기능
 app.post(
   '/NumPossiRP', 
   function (req, res) {
-  console.log(req.body.title);
-  res.send('Connecting POST Test Is OK, Title Value is ' + req.body.title);
+  let postIngreData: string[] = req.body.ingre;
+  for(let i in postIngreData){
+      postIngreData[i] = "'" + postIngreData[i] + "'";
+  }
+  //console.log(postIngreData);
+  NumPossiRP(postIngreData, res)
 })
 
 // 재료를 통해 만들 수 있는 레시피 목록을 반환하는 기능
 app.post(
   '/ListPossiRP', 
   function (req, res) {
-  console.log(req.body.title);
-  res.send('Connecting POST Test Is OK, Title Value is ' + req.body.title);
+  let postIngreData: string[] = req.body.ingre;
+  for(let i in postIngreData){
+    postIngreData[i] = "'" + postIngreData[i] + "'";
+  }
+  //console.log(postIngreData);
+  ListPossiRP(postIngreData, res)
 })
 
 // 특정 레시피의 정보를 반환하는 기능
 app.post(
   '/ShowRPInspect', 
   function (req, res) {
-  console.log(req.body.title);
-  res.send('Connecting POST Test Is OK, Title Value is ' + req.body.title);
+  //console.log(req.body.id);
+  ShowRPInspect(req.body.id, res);
+  //res.send('Connecting POST Test Is OK, Title Value is ' + req.body.id);
 })
 
 // 해당 요리를 끝마쳤다는 정보를 받은 뒤 추천 반영

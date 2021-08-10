@@ -1,5 +1,5 @@
 var neo4j = require('neo4j-driver')
-var driver = neo4j.driver('neo4j://18.220.121.204:7687', neo4j.auth.basic('neo4j', 'r6qEpV4t'))
+var driver = neo4j.driver('neo4j://172.17.0.6:7687', neo4j.auth.basic('neo4j', 'r6qEpV4t'))
 var session = driver.session()
 
 export function NumPossiRP(ingre: string[], postres: any){

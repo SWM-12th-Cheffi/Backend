@@ -2,7 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import urllib.request
 
-for i in range(1, 100):
+for i in range(1, 2):
     Url = 'https://haemukja.com/recipes?page=' + str(i)
     r = requests.get(Url, allow_redirects=False)
     serverStatus = True if r.status_code == 200 else False

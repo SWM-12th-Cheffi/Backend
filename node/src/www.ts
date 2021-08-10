@@ -87,4 +87,30 @@ app.post(
   res.send('Connecting POST Test Is OK, Title Value is ' + req.body.title);
 })
 
+app.post(
+  '/PythonTest', 
+  function (req, res) {
+  res.send(
+    fetch("http://localhost:3001/recc", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        title: "Test",
+        body: "I am testing!",
+        userId: 1,
+      }),
+    })
+    .then((data)=>{
+      if(data.error) {
+        console.log(data.error);
+      }
+      else{
+        console.log(data.title);
+      }
+    })
+  );
+})
+
 export default app;

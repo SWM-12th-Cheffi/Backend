@@ -20,8 +20,8 @@ app = Flask(__name__)
 
 @app.route('/recc', methods=['POST'])
 def recc():
-    #input_data = json.loads(request.get_json())
-    return ("hello!")
+    input_data = request.get_json()
+    return (input_data)
 '''
 def dfmaking():
     file = "Id2Recipe.csv"
@@ -129,4 +129,4 @@ def get_recommend_by_userVector(df, vector, possible_recipe_id_list, top=20):
 if __name__ == "__main__":
     #df = calculate_vector_Recipe(dfmaking()) # preprocessing
     #print(get_recommend_by_userVector(df, np.array(Recipe_cate_ingre_vector[373]) , [0,1,2,3,4,5,100],top=20).id) #input = instead of np.array(...), userVector 
-    app.run(debug=True, host='0.0.0.0', port=80)
+    app.run(debug=True, host='0.0.0.0', port=3001)

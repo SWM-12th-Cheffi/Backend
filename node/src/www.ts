@@ -1,6 +1,7 @@
 import * as express from "express";
 import { addAbortSignal } from "stream";
 import {NumPossiRP, ListPossiRP, ShowRPInspect} from "./func/function";
+import axios from "axios";
 
 const app: express.Application = express();
 var bodyParser = require('body-parser');
@@ -87,30 +88,19 @@ app.post(
   res.send('Connecting POST Test Is OK, Title Value is ' + req.body.title);
 })
 
+
+var reccdata = {firstName: 'Fred', lastName: 'Flintstone'}
 app.post(
   '/PythonTest', 
   function (req, res) {
-  res.send(
-    fetch("http://localhost:3001/recc", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        title: "Test",
-        body: "I am testing!",
-        userId: 1,
-      }),
-    })
-    .then((data)=>{
-      if(data.error) {
-        console.log(data.error);
-      }
-      else{
-        console.log(data.title);
-      }
-    })
-  );
+    axios({
+      method: 'post',
+      url: 'http://172.17.0.3:3001/recc',
+      data: reccdata
+    }).then(function(response){
+      res.send('Connecting POST Test Is OK, Title Value is ' + req.body.title);
+    });
+  
 })
 
 export default app;

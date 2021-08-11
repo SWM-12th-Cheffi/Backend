@@ -96,9 +96,9 @@ app.post(
     axios({
       method: 'post',
       url: 'http://172.17.0.3:3001/recc',
-      data: reccdata
+      data: req.body
     }).then(function(response){
-      res.send('Connecting POST Test Is OK, Title Value is ' + req.body.title);
+      res.send(response.data);
     });
   
 })

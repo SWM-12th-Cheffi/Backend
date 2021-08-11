@@ -3,3 +3,5 @@ node/build/
 .DS_Store
 node/node/
 python/python
+
+python/Craw_Algo/Data/

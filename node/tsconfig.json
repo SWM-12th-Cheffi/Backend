@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "lib": ["es5", "es6"],                          
+    "lib": ["es5", "es6", "DOM"],                          
     "target": "es6",                                
     "module": "commonjs",
     "moduleResolution": "node", 
@@ -13,7 +13,7 @@
     "removeComments": true,
     "importHelpers": true,
     "types": ["node"],
-    "typeRoots": ["../node_modules/@types"]
+    "typeRoots": ["../node_modules/@types"],
   },
   "exclude" : ["./node_modules"],
   "include" : ["./src/app.ts"]

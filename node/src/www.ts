@@ -88,14 +88,12 @@ app.post(
   res.send('Connecting POST Test Is OK, Title Value is ' + req.body.title);
 })
 
-
-var reccdata = {firstName: 'Fred', lastName: 'Flintstone'}
 app.post(
-  '/PythonTest', 
+  '/Recc', 
   function (req, res) {
     axios({
       method: 'post',
-      url: 'http://172.17.0.3:3001/recc',
+      url: 'http://172.17.0.2:3001/recc',
       data: req.body
     }).then(function(response){
       res.send(response.data);

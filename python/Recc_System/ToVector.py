@@ -50,8 +50,7 @@ def calculate_similarity_vectors(vector1, vector2):
     return 1 - spatial.distance.cosine(vector1.tolist(), vector2.tolist())
 
 
-def generateUserPreferenceVector(df,preferenceJSON):
-    likeList = preferenceJSON['like']
+def generateUserPreferenceVector(df,likeList):
     likeList = list(filter(lambda x : x!= None,likeList))
     vector = np.zeros(661)
     df1 =  df[df["recipe"].isin(likeList)]
@@ -126,9 +125,10 @@ def calculate_vector_Recipe(df):
     df['vector'] = pd.DataFrame([np.array(Recipe_cate_ingre_vector[i])] for i in range(length))
     return df
 
-def get_recommend_by_userVector(df, possible_recipe_id_list, top=20,JSON = {"like":["짜장면","짬뽕"]}):
-    df1 = df[df['id'].isin(list(map(lambda x: str(x),possible_recipe_id_list)))]
-    vector = generateUserPreferenceVector(df,JSON)
+def get_recommend_by_userVector(df, req_JSON, top=20):
+    print(req_JSON['id'])
+    df1 = df[df['id'].isin(list(map(lambda x: str(x),req_JSON['id'])))]
+    vector = generateUserPreferenceVector(df,req_JSON['like'])
     df1['similarity'] = df1['vector'].apply(lambda x : calculate_similarity_vectors(vector, x))
     df1 = df1.sort_values(by='similarity',ascending=False)
     #return df1[:top]
@@ -137,7 +137,7 @@ def get_recommend_by_userVector(df, possible_recipe_id_list, top=20,JSON = {"lik
     for i in range(size):
         retId.append(df1.iloc[i].id)
     return json.dumps({"id":retId})
-df = calculate_vector_Recipe(dfmaking()) # preprocessing
+#df = calculate_vector_Recipe(dfmaking()) # preprocessing
 #print(get_recommend_by_userVector(df, np.array(Recipe_cate_ingre_vector[373]) , [0,1,2,3,4,5,100],top=20).id) #input = instead of np.array(...), userVector 
-print(get_recommend_by_userVector(df,  [5394,5657,5797,5842,5406],top=20))
+#print(get_recommend_by_userVector(df,  [5394,5657,5797,5842,5406],top=20))
 

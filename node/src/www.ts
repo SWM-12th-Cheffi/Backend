@@ -1,11 +1,12 @@
 import * as express from "express";
 import { addAbortSignal } from "stream";
-import {NumPossiRP, ListPossiRP, ShowRPInspect} from "./func/function";
+import {NumPossiRP, ListPossiRP, ListPossiRPWithRecc, ShowRPInspect} from "./func/function";
 import axios from "axios";
 
 const app: express.Application = express();
 var bodyParser = require('body-parser');
 app.use(bodyParser.json());
+var UserLikeInfo: string[] = ["짜장면", "짬뽕"];
 
 app.get(
   '/', 
@@ -53,6 +54,29 @@ app.post(
   }
   //console.log(postIngreData);
   ListPossiRP(postIngreData, res)
+})
+
+app.post( // Front에서 ingre 목록을 줌.
+  '/ListPossiRPWithRecc', 
+  function (req, res) {
+  let postIngreData: string[] = req.body.ingre;
+  for(let i in postIngreData){
+    postIngreData[i] = "'" + postIngreData[i] + "'";
+  }
+  //console.log(postIngreData);
+  ListPossiRPWithRecc(postIngreData, UserLikeInfo, res)
+})
+
+app.post( // 좋아하는 음식을 저장
+  '/SaveLikeDemo', 
+  function (req, res) {
+  let postLikeData: string[] = req.body.like;
+  for(let i in postLikeData){
+    postLikeData[i] = "'" + postLikeData[i] + "'";
+  }
+  UserLikeInfo = postLikeData;
+  res.send(UserLikeInfo);
+  //console.log(postIngreData);
 })
 
 // 특정 레시피의 정보를 반환하는 기능

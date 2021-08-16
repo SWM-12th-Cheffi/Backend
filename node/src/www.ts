@@ -71,9 +71,6 @@ app.post( // 좋아하는 음식을 저장
   '/SaveLikeDemo', 
   function (req, res) {
   let postLikeData: string[] = req.body.like;
-  for(let i in postLikeData){
-    postLikeData[i] = "'" + postLikeData[i] + "'";
-  }
   UserLikeInfo = postLikeData;
   res.send(UserLikeInfo);
   //console.log(postIngreData);

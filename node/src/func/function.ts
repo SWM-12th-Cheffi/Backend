@@ -51,7 +51,7 @@ export function ListPossiRPWithRecc(ingre: string[], userlike: string[],postres:
         var member = Object()
         member.id = [];
         for(let i in res.records){
-          member.id.push(res.records[i].get('recipe'));
+          member.id.push(Number(res.records[i].get('recipe')));
         }
         member.like = userlike
         axios({

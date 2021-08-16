@@ -71,22 +71,35 @@ export function ListPossiRPWithRecc(ingre: string[], userlike: string[],postres:
   }) 
 }
 
-function ShowRecipeWithID(id: string[], postres: any){
-  for(let i in id){
-    id[i] = "'"+ id[i] + "'";
+function ShowRecipeWithID(sendId: string[], postres: any){
+  //console.log(sendId);
+  let modId: string[] = sendId.slice()
+  for(let i in modId){
+    modId[i] = "'"+ modId[i] + "'";
   }
+  //console.log(sendId);
   session.readTransaction(function (tx: any) {
     return tx.run(
-      "MATCH (n:Recipe) WHERE n.id in [" + id + "] return n as recipe"
+      "MATCH (n:Recipe) WHERE n.id in [" + modId + "] return n as recipe"
     )
       .then(function (res: any) {
-        let retlist:object[] = [];
+        let reccResult:any[] = [];
+        let reccLen:number = res.records.length;
         for(let i in res.records){
-          retlist.push(res.records[i].get('recipe').properties);
+          reccResult.push(res.records[i].get('recipe').properties);
         }
-        //console.log(retlist);
+        let retlist:object[] = [];
+        for(let i in sendId){
+            for(let j in reccResult){
+              if(String(reccResult[j].id) == sendId[i]){
+                retlist.push(reccResult[j]);
+                break;
+              }
+            }
+        }
         postres.send(retlist);
-      })
+        }
+      )
       .catch(function (error: string) {
         console.log(error)
       })

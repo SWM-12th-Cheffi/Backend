@@ -16,16 +16,16 @@ import etcRouter from "./api/etc";
 
 
 
-const server = createServer((request, response)=> {
-    app.use(json());
-    app.use('/recipe', recipeRouter);
-    app.use('/', testRouter);
-    app.use('/user', userRouter);
-    app.use('/etc', etcRouter);
-});
-
+const server = createServer(app);
 server.listen(port, () => {
     console.log(`${port}포트 서버 대기 중!`);
 });
+
+app.use(json());
+
+app.use('/', testRouter);
+app.use('/recipe', recipeRouter);
+app.use('/user', userRouter);
+app.use('/etc', etcRouter);
 
 module.exports = server

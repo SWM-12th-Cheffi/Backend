@@ -17,8 +17,8 @@ etcRouter.post('/OrderByFavorite', function (req, res) {
         method: 'post',
         url: 'http://172.17.0.2:3001/recc',
         data: req.body
-      }).then(function(response){
-        res.send(response.data);
+      }).then(function(resPy){
+        res.send(resPy.data);
       });
     
   })

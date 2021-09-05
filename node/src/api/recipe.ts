@@ -16,6 +16,7 @@ var UserLikeInfo: string[] = ["짜장면", "짬뽕"];
 // 재료를 통해 만들 수 있는 레시피 개수를 반환하는 기능
 recipeRouter.post('/NumPossiRP', function (req, res) {
     let postIngreData: string[] = req.body.ingre;
+
     for(let i in postIngreData){
         postIngreData[i] = "'" + postIngreData[i] + "'";
     }
@@ -24,9 +25,9 @@ recipeRouter.post('/NumPossiRP', function (req, res) {
         return tx.run(
         "MATCH (r:Recipe)<-[:USEDIN]-(i:Ingredient) WITH r, COLLECT(i.name) AS ingredient_col WHERE ALL(ing IN ingredient_col WHERE ing IN [" + postIngreData + "]) RETURN count(r.title) AS count"
         )
-        .then(function (res: any) {
-            let ret: string = res.records[0].get('count').low;
-            //console.log(ret);
+        .then(function (resNeo: any) {
+            let ret: string = resNeo.records[0].get('count').low;
+            console.log(ret);
             res.send(String(ret));
         })
         .catch(function (error: string) {
@@ -46,10 +47,10 @@ recipeRouter.post('/NumPossiRP', function (req, res) {
         return tx.run(
         "MATCH (r:Recipe)<-[:USEDIN]-(i:Ingredient) WITH r, COLLECT(i.name) AS ingredient_col WHERE ALL(ing IN ingredient_col WHERE ing IN [" + postIngreData + "]) RETURN r AS recipe"
         )
-        .then(function (res: any) {
+        .then(function (resNeo: any) {
             let retlist:object[] = [];
-            for(let i in res.records){
-            retlist.push(res.records[i].get('recipe').properties);
+            for(let i in resNeo.records){
+            retlist.push(resNeo.records[i].get('recipe').properties);
             }
             //console.log(retlist);
             res.send(retlist);
@@ -66,17 +67,16 @@ recipeRouter.post('/NumPossiRP', function (req, res) {
     for(let i in postIngreData){
       postIngreData[i] = "'" + postIngreData[i] + "'";
     }
-    postres:any = res;// python res랑 어캐 구분해서 사용하지...
 
     session.readTransaction(function (tx: any) {
         return tx.run(
         "MATCH (r:Recipe)<-[:USEDIN]-(i:Ingredient) WITH r, COLLECT(i.name) AS ingredient_col WHERE ALL(ing IN ingredient_col WHERE ing IN [" + postIngreData + "]) RETURN r.id AS recipe"
         )
-        .then(function (res: any) {
+        .then(function (resNeo: any) {
             var member = Object()
             member.id = [];
-            for(let i in res.records){
-            member.id.push(Number(res.records[i].get('recipe')));
+            for(let i in resNeo.records){
+            member.id.push(Number(resNeo.records[i].get('recipe')));
             }
             member.like = UserLikeInfo
             axios({
@@ -86,8 +86,8 @@ recipeRouter.post('/NumPossiRP', function (req, res) {
             //server
             url: 'http://172.17.0.2:3001/recc',
             data: member
-            }).then(function(response){
-            ShowRecipeWithID(response.data.id, postres);
+            }).then(function(resPy){
+            ShowRecipeWithID(resPy.data.id, res);
             });
         })
         .catch(function (error: string) {
@@ -103,9 +103,9 @@ recipeRouter.post('/NumPossiRP', function (req, res) {
         return tx.run(
         "MATCH (r:Recipe{id:'"+ req.body.id +"'})<-[:USEDIN]-(i:Ingredient) WITH r, COLLECT(i.name) AS ingredient RETURN r as recipe, ingredient"
         )
-        .then(function (res: any) {
-            let ret: any = res.records[0].get('recipe').properties;
-            ret.ingredient = res.records[0].get('ingredient');;
+        .then(function (resNeo: any) {
+            let ret: any = resNeo.records[0].get('recipe').properties;
+            ret.ingredient = resNeo.records[0].get('ingredient');;
             res.send(ret);
             //console.log(ret);
         })

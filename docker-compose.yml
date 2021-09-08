@@ -1,0 +1,63 @@
+version: "3.8"
+services:
+ node:
+  build:
+   context: ./node
+  ports:
+   - "2001:2001"
+  networks:
+   - backend
+  volumes:
+   - server:/usr/src
+  restart: always
+  depends_on:
+   - neo4j
+   - mongo
+ python:
+  build:
+   context: ./python
+  ports:
+   - "3001:3001"
+  networks:
+   - backend
+  volumes:
+   - server:/usr/src
+  restart: always
+  depends_on:
+   - neo4j
+   - mongo
+ neo4j:
+  image: neo4j:4.3.2-community
+  ports:
+   - "7474:7474"
+   - "7687:7687"
+  networks:
+   - backend
+  volumes:
+   - neo4j:/data
+  restart: always
+ mongo:
+  image: mongo:5.0.2
+  ports:
+   - "27017:27017"
+  networks:
+   - backend
+  volumes:
+   - mongo:/data/db
+  restart: always
+ nginx:
+  image: nginx:1.21
+  ports:
+   - "8080:80"
+  networks:
+   - backend
+  volumes:
+   - nginx:/etc/nginx
+  restart: always
+networks:
+ backend: {}
+volumes:
+ mongo:
+ neo4j:
+ server:
+ nginx:

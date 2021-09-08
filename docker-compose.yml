@@ -26,6 +26,7 @@ services:
   depends_on:
    - neo4j
    - mongo
+   - node
  neo4j:
   image: neo4j:4.3.2-community
   ports:

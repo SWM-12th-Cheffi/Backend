@@ -14,6 +14,10 @@ import testRouter from "./api/test";
 import userRouter from "./api/user";
 import etcRouter from "./api/etc";
 
+// swagger Setting
+import * as swaggerUi from 'swagger-ui-express';
+import swaggerJson from './swagger'
+app.use('/api-json', swaggerUi.serve, swaggerUi.setup(swaggerJson));
 
 
 const server = createServer(app);

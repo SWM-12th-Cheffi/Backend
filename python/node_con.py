@@ -1,6 +1,6 @@
 from flask import Flask, request
 from flask_restx import Resource, Api
-import Recc_System.ToVector as RC
+import ToVector as RC
 
 df = RC.calculate_vector_Recipe(RC.dfmaking()) # preprocessing
 #print(get_recommend_by_userVector(df, np.array(Recipe_cate_ingre_vector[373]) , [0,1,2,3,4,5,100],top=20).id) #input = instead of np.array(...), userVector 

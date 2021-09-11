@@ -23,7 +23,7 @@ recipeRouter.post('/NumPossiRP', function (req, res) {
 
     session.readTransaction(function (tx: any) {
         return tx.run(
-        "MATCH (r:Recipe)<-[:USEDIN]-(i:Ingredient) WITH r, COLLECT(i.name) AS ingredient_col WHERE ALL(ing IN ingredient_col WHERE ing IN [" + postIngreData + "]) RETURN count(r.title) AS count"
+        "MATCH (r:Recipe)<-[:USEDIN]-(i:Ingredient) WITH r, COLLECT(i.name) AS ingredient_col WHERE ALL(ing IN ingredient_col WHERE ing IN [" + postIngreData + "]) RETURN count(r) AS count"
         )
         .then(function (resNeo: any) {
             let ret: string = resNeo.records[0].get('count').low;

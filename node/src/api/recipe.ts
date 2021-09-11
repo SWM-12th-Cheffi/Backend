@@ -6,7 +6,7 @@ var neo4j = require('neo4j-driver')
 //local
 //var driver = neo4j.driver('neo4j://18.220.121.204:7687', neo4j.auth.basic('neo4j', 'r6qEpV4t'))
 //server
-var driver = neo4j.driver('neo4j://172.17.0.6:7687', neo4j.auth.basic('neo4j', 'r6qEpV4t'))
+var driver = neo4j.driver('neo4j://172.29.0.4:7687', neo4j.auth.basic('neo4j', 'r6qEpV4t'))
 var session = driver.session()
 import axios from "axios";
 
@@ -15,8 +15,8 @@ var UserLikeInfo: string[] = ["짜장면", "짬뽕"];
 
 // 재료를 통해 만들 수 있는 레시피 개수를 반환하는 기능
 recipeRouter.post('/NumPossiRP', function (req, res) {
+    console.log("NumPossiRP Function is Request")
     let postIngreData: string[] = req.body.ingre;
-
     for(let i in postIngreData){
         postIngreData[i] = "'" + postIngreData[i] + "'";
     }
@@ -38,6 +38,7 @@ recipeRouter.post('/NumPossiRP', function (req, res) {
   
   // 재료를 통해 만들 수 있는 레시피 목록을 반환하는 기능
   recipeRouter.post('/ListPossiRP', function (req, res) {
+    console.log("ListPossiRP Function is Request")
     let postIngreData: string[] = req.body.ingre;
     for(let i in postIngreData){
       postIngreData[i] = "'" + postIngreData[i] + "'";
@@ -63,6 +64,7 @@ recipeRouter.post('/NumPossiRP', function (req, res) {
   
   // Front에서 ingre 목록을 줌.
   recipeRouter.post( '/ListPossiRPWithRecc', function (req, res) {
+    console.log("ListPossiRPWithRecc Function is Request")
     let postIngreData: string[] = req.body.ingre;
     for(let i in postIngreData){
       postIngreData[i] = "'" + postIngreData[i] + "'";
@@ -99,6 +101,7 @@ recipeRouter.post('/NumPossiRP', function (req, res) {
   
   // 특정 레시피의 정보를 반환하는 기능
   recipeRouter.post('/ShowRPInspect', function (req, res) {
+    console.log("ShowRPInspect Function is Request")
     session.readTransaction(function (tx: any) {
         return tx.run(
         "MATCH (r:Recipe{id:'"+ req.body.id +"'})<-[:USEDIN]-(i:Ingredient) WITH r, COLLECT(i.name) AS ingredient RETURN r as recipe, ingredient"
@@ -153,6 +156,6 @@ function ShowRecipeWithID(sendId: string[], postres: any){
     }) 
   }
 
- 
+
   
   export default recipeRouter;

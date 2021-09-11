@@ -1,3 +1,5 @@
+require('console-stamp')(console, 'yyyy/mm/dd HH:MM:ss.l');
+
 // http 세팅
 import {createServer} from "http";
 //import { hostname } from "os";

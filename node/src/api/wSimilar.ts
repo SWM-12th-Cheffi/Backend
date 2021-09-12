@@ -1,6 +1,6 @@
 //router 세팅
 import * as express from 'express';
-const recipeRouter = express.Router();
+const wSimilarRouter = express.Router();
 
 var neo4j = require('neo4j-driver');
 //local
@@ -13,23 +13,15 @@ import axios from 'axios';
 // Test InputData
 var UserLikeInfo: string[] = ['짜장면', '짬뽕'];
 
-// 재료를 통해 만들 수 있는 레시피 개수를 반환하는 기능
-recipeRouter.post('/NumPossiRP', function (req, res) {
-  console.log('NumPossiRP Function is Request');
+// 재료를 통해 만들 수 있는 레시피 개수를 유사한 재료를 포함하여 반환하는 기능
+wSimilarRouter.post('/NumPossiRP', function (req, res) {
+  console.log('NumPossiRP with Similar Function is Request');
   let postIngreData: string[] = req.body.ingre;
   for (let i in postIngreData) {
     postIngreData[i] = "'" + postIngreData[i] + "'";
   }
 
   session.readTransaction(function (tx: any) {
-    tx.run(
-      'MATCH (i:Ingredient)-[:SIMILAR]->(r:Ingredient) WHERE i.name in [' +
-        postIngreData +
-        '] RETURN COLLECT(r.name) AS similar',
-    ).then(function (resNeo: any) {
-      let ret: string = resNeo.records[0].get('similar');
-      console.log(ret);
-    });
     return tx
       .run(
         'MATCH (r:Recipe)<-[:USEDIN]-(i:Ingredient) WITH r, COLLECT(i.name) AS ingredient_col WHERE ALL(ing IN ingredient_col WHERE ing IN [' +
@@ -47,51 +39,9 @@ recipeRouter.post('/NumPossiRP', function (req, res) {
   });
 });
 
-// 재료를 통해 만들 수 있는 레시피 개수를 반환하는 기능
-recipeRouter.post('/NumPossiRPSimIngre', function (req, res) {
-  console.log('NumPossiRP Function is Request');
-  let postIngreData: string[] = req.body.ingre;
-
-  for (let i in postIngreData) {
-    postIngreData[i] = "'" + postIngreData[i] + "'";
-  }
-  let ret: string[];
-
-  session.readTransaction(function (tx: any) {
-    return tx
-      .run(
-        'MATCH (i:Ingredient)-[:SIMILAR]->(r:Ingredient) WHERE i.name in [' +
-          postIngreData +
-          '] RETURN COLLECT(r.name) AS similar',
-      )
-      .then(function (similar: any) {
-        ret = similar.records[0].get('similar');
-        for (let i in ret) {
-          ret[i] = "'" + ret[i] + "'";
-        }
-
-        return tx.run(
-          'MATCH (r:Recipe)<-[:USEDIN]-(i:Ingredient) WITH r, COLLECT(i.name) AS ingredient_col WHERE ALL(ing IN ingredient_col WHERE ing IN [' +
-            postIngreData +
-            ',' +
-            ret +
-            ']) RETURN count(r) AS count',
-        );
-      })
-      .then(function (resNeo: any) {
-        let ret: string = resNeo.records[0].get('count').low;
-        console.log(ret);
-        res.send(String(ret));
-      })
-      .catch(function (error: string) {
-        console.log(error);
-      });
-  });
-});
-
 // 재료를 통해 만들 수 있는 레시피 목록을 반환하는 기능
-recipeRouter.post('/ListPossiRP', function (req, res) {
-  console.log('ListPossiRP Function is Request');
+wSimilarRouter.post('/ListPossiRP', function (req, res) {
+  console.log('ListPossiRP with Similar Function is Request');
   let postIngreData: string[] = req.body.ingre;
   for (let i in postIngreData) {
     postIngreData[i] = "'" + postIngreData[i] + "'";
@@ -119,8 +69,8 @@ recipeRouter.post('/ListPossiRP', function (req, res) {
 });
 
 // Front에서 ingre 목록을 줌.
-recipeRouter.post('/ListPossiRPWithRecc', function (req, res) {
-  console.log('ListPossiRPWithRecc Function is Request');
+wSimilarRouter.post('/ListPossiRPWithRecc', function (req, res) {
+  console.log('ListPossiRPWithRecc with Similar Function is Request');
   let postIngreData: string[] = req.body.ingre;
   for (let i in postIngreData) {
     postIngreData[i] = "'" + postIngreData[i] + "'";
@@ -158,8 +108,8 @@ recipeRouter.post('/ListPossiRPWithRecc', function (req, res) {
 });
 
 // 특정 레시피의 정보를 반환하는 기능
-recipeRouter.post('/ShowRPInspect', function (req, res) {
-  console.log('ShowRPInspect Function is Request');
+wSimilarRouter.post('/ShowRPInspect', function (req, res) {
+  console.log('ShowRPInspect with Similar Function is Request');
   session.readTransaction(function (tx: any) {
     return tx
       .run(
@@ -212,4 +162,4 @@ function ShowRecipeWithID(sendId: string[], postres: any) {
   });
 }
 
-export default recipeRouter;
+export default wSimilarRouter;

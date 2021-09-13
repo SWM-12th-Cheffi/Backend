@@ -8,8 +8,13 @@ var neo4j = require('neo4j-driver');
 //server
 var driver = neo4j.driver('neo4j://172.29.0.4:7687', neo4j.auth.basic('neo4j', 'r6qEpV4t'));
 var session = driver.session();
+
+//Recc 세팅
 import axios from 'axios';
-import { convertCompilerOptionsFromJson } from 'typescript';
+//local
+//var pyAddr: string = 'http://172.17.0.2:3001/recc';
+//server
+var pyAddr: string = 'http://172.29.0.2:3001/recc';
 
 // Test InputData
 var UserLikeInfo: string[] = ['짜장면', '짬뽕'];
@@ -93,7 +98,7 @@ recipeRouter.post('/ListPossiRP', function (req, res) {
         return axios({
           method: 'post',
           //server
-          url: 'http://172.17.0.2:3001/recc',
+          url: pyAddr,
           data: reccObj,
         });
       })

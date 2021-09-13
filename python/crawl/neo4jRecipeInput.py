@@ -12,7 +12,7 @@ session = driver.session()
 query = ""
 j = 0
 for i in recipeList:
-    id = i[0].split('"id":')[-1][:4]
+    id = i[3]
     query += "create (:Recipe{id: '" + id + "'}) "
     j += 1
     #create (n:Recipe{id: '1234', title: '맛있는 테이블', time: '30분', scrap: '252', calories: '847.3kcal'})

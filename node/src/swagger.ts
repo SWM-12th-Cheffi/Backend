@@ -65,9 +65,71 @@ var swaggerJson = {
     '/recipe/NumPossiRP': {
       post: {
         tags: ['Recipe'],
-        summary: '만들 수 있는 레시피의 개수를 반환합니다.',
+        summary: '재료를 통해 만들 수 있는 레시피 개수를 반환하는 기능(유사재료 검색 미포함)',
         description:
           '재료 목록을 input으로 주게 된다면 해당 목록을 기반으로 만들 수 있는 레시피의 개수를 반환해줍니다.',
+        consumes: ['application/json'],
+        produces: ['application/json'],
+        parameters: [
+          {
+            in: 'body',
+            name: 'body',
+            description: '재료의 목록을 입력해주세요.',
+            required: true,
+            schema: {
+              type: 'object',
+              properties: {
+                ingre: {
+                  type: 'array',
+                  example: [
+                    '당근',
+                    '소금',
+                    '양파',
+                    '후추',
+                    '쪽파',
+                    '설탕',
+                    '대파',
+                    '계란',
+                    '달걀',
+                    '마늘',
+                    '다진마늘',
+                    '간장',
+                    '밥',
+                    '배추김치',
+                    '김치',
+                    '고춧가루',
+                    '식용유',
+                    '두부',
+                    '물',
+                    '식초',
+                    '무',
+                    '꿀',
+                    '오징어',
+                    '밀가루',
+                    '콩나물',
+                  ],
+                },
+              },
+            },
+          },
+        ],
+        responses: {
+          '200': {
+            description: 'Connecting Success!',
+          },
+          '405': {
+            description: 'Invalid input',
+          },
+        },
+      },
+    },
+
+    '/recipe/NumPossiRP_Sim': {
+      post: {
+        tags: ['Recipe'],
+        summary: '재료를 통해 만들 수 있는 레시피 개수를 반환하는 기능(유사재료 검색 포함)',
+        description:
+          '재료 목록을 input으로 주게 된다면 유사재료를 포함한 재료의 목록을 기반으로 만들 수 있는 레시피의 개수를 반환해줍니다.(유사재료를 Neo4j에서 가져오기 때문에 시간이 좀 걸립니다.)',
         consumes: ['application/json'],
         produces: ['application/json'],
         parameters: [
@@ -127,9 +189,9 @@ var swaggerJson = {
     '/recipe/ListPossiRP': {
       post: {
         tags: ['Recipe'],
-        summary: '만들 수 있는 레시피의 목록을 반환합니다.',
+        summary: '재료를 통해 만들 수 있는 레시피 번호 리스트를 반환하는 함수 (유사재료 검색 미포함)',
         description:
-          '재료 목록을 input으로 주게 된다면 해당 목록을 기반으로 만들 수 있는 레시피의 목록를 반환해줍니다.',
+          '재료 목록을 input으로 주게 된다면 해당 목록을 기반으로 만들 수 있는 레시피의 목록를 추천순으로 정렬하여 반환해줍니다.',
         consumes: ['application/json'],
         produces: ['application/json'],
         parameters: [
@@ -186,12 +248,12 @@ var swaggerJson = {
       },
     },
 
-    '/recipe/ListPossiRPWithRecc': {
+    '/recipe/ListPossiRP_Recc': {
       post: {
         tags: ['Recipe'],
-        summary: '추천 알고리즘을 거쳐서 만들 수 있는 레시피의 목록을 반환합니다.',
+        summary: '재료를 통해 만들 수 있는 레시피 번호 리스트를 반환하는 함수 (유사재료 검색 포함)',
         description:
-          '재료 목록을 입력하면, 만들 수 있는 레시피의 목록을 파이썬의 추천 알고리즘을 거쳐서 추천순으로 나타냅니다.',
+          '재료 목록을 입력하면, 대체재료를 고려하여 만들 수 있는 레시피의 목록을 파이썬의 추천 알고리즘을 거쳐서 추천순으로 나타냅니다.',
         consumes: ['application/json'],
         produces: ['application/json'],
         parameters: [
@@ -251,7 +313,7 @@ var swaggerJson = {
     '/recipe/ShowRPInspect': {
       post: {
         tags: ['Recipe'],
-        summary: '레시피의 자세한 정보를 가져옵니다.',
+        summary: '레시피의 자세한 정보를 가져옵니다.(db 미구현상태)',
         description: '레시피의 번호를 입력하면 해당 레시피의 자세한 정보를 불러와서 반환해줍니다.',
         consumes: ['application/json'],
         produces: ['application/json'],

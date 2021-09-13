@@ -248,7 +248,7 @@ var swaggerJson = {
       },
     },
 
-    '/recipe/ListPossiRP_Recc': {
+    '/recipe/ListPossiRP_Sim': {
       post: {
         tags: ['Recipe'],
         summary: '재료를 통해 만들 수 있는 레시피 번호 리스트를 반환하는 함수 (유사재료 검색 포함)',

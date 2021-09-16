@@ -21,7 +21,7 @@ import authRouter from './api/auth';
 import * as swaggerUi from 'swagger-ui-express';
 import swaggerJson from './swagger';
 app.use('/api-json', swaggerUi.serve, swaggerUi.setup(swaggerJson));
-
+/*
 // mongo Setting
 var mongoose = require('mongoose');
 // local
@@ -43,7 +43,7 @@ var RecipeSchema = new Schema({
 var UserSchema = new Schema({
   UserID: ObjectID,
 });
-
+*/
 const server = createServer(app);
 server.listen(port, () => {
   console.log(`${port}포트 서버 대기 중!`);

@@ -15,6 +15,7 @@ authRouter.post('/google', function (req, res) {
     const ticket = await client.verifyIdToken({
       idToken: req.body.it,
     });
+    console.log(req.body.it);
     const payload = ticket.getPayload();
     const userid = payload['sub']; // userid: 21자리의 Google 회원 id 번호
 

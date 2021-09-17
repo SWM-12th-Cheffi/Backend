@@ -21,29 +21,18 @@ import authRouter from './api/auth';
 import * as swaggerUi from 'swagger-ui-express';
 import swaggerJson from './swagger';
 app.use('/api-json', swaggerUi.serve, swaggerUi.setup(swaggerJson));
-/*
+
 // mongo Setting
 var mongoose = require('mongoose');
+
 // local
 var mongoAddr: string = 'mongodb://18.220.121.204:27017/';
 // server
 //var mongoAddr: string = 'mongodb://172.29.0.5:27017/';
 
-var recipe = mongoose.createConnection(mongoAddr + 'recipe');
-var user = mongoose.createConnection(mongoAddr + 'user');
-var Schema = mongoose.Schema,
-  ObjectID = Schema.ObjectID;
-var RecipeSchema = new Schema({
-  recipeID: ObjectID,
-  title: String,
-  scrap: String,
-  time: String,
-  kcal: String,
-});
-var UserSchema = new Schema({
-  UserID: ObjectID,
-});
-*/
+mongoose.createConnection(mongoAddr + 'recipe');
+mongoose.createConnection(mongoAddr + 'user');
+
 const server = createServer(app);
 server.listen(port, () => {
   console.log(`${port}포트 서버 대기 중!`);

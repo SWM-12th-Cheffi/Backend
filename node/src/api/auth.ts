@@ -1,10 +1,12 @@
+const Recipe = require('../model/recipe');
+const User = require('../model/user');
+
 //router 세팅
 import * as express from 'express';
 const authRouter = express.Router();
 
 var { OAuth2Client } = require('google-auth-library');
 const Client_ID = '79925141410-m12cesgdqn3sksv9a49sgk57ij0p3jmn.apps.googleusercontent.com';
-const jwt = require('jsonwebtoken');
 
 authRouter.post('/google', function (req, res) {
   // Google oAuth Setting

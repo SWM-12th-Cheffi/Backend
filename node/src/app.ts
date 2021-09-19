@@ -21,7 +21,7 @@ import authRouter from './api/auth';
 import * as swaggerUi from 'swagger-ui-express';
 import swaggerJson from './swagger';
 app.use('/api-json', swaggerUi.serve, swaggerUi.setup(swaggerJson));
-
+/*
 // mongo Setting
 var mongoose = require('mongoose');
 
@@ -32,7 +32,7 @@ var mongoAddr: string = 'mongodb://18.220.121.204:27017/';
 
 mongoose.createConnection(mongoAddr + 'recipe');
 mongoose.createConnection(mongoAddr + 'user');
-
+*/
 const server = createServer(app);
 server.listen(port, () => {
   console.log(`${port}포트 서버 대기 중!`);

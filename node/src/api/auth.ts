@@ -8,7 +8,6 @@ const authRouter = express.Router();
 
 var { OAuth2Client } = require('google-auth-library');
 const Client_ID = '79925141410-m12cesgdqn3sksv9a49sgk57ij0p3jmn.apps.googleusercontent.com';
-
 authRouter.post('/google', function (req, res) {
   // Google oAuth Setting
   var client = new OAuth2Client(Client_ID);
@@ -23,6 +22,7 @@ authRouter.post('/google', function (req, res) {
     var userid = payload['sub']; // userid: 21자리의 Google 회원 id 번호
 
     console.log(userid);
+    res.send('Success Find User, ' + userid);
 
     /*connection.execute('SELECT `TOKEN` FROM `innoboost_user` WHERE `ID`= ?', [userid], (err, results) => {
       if (err) throw err;
@@ -48,7 +48,7 @@ authRouter.post('/google', function (req, res) {
 });
 
 authRouter.post('/kakao', function (req, res) {
-  var accessToken = req.body.accessToken;
+  var accessToken = req.body.at;
   let kakao_profile;
 
   async function verify() {
@@ -58,8 +58,10 @@ authRouter.post('/kakao', function (req, res) {
         'Content-Type': 'application/json',
       },
     });
-    console.log(req.body.it);
-    console.log(kakao_profile);
+    console.log(req.body.accessToken);
+    console.log(kakao_profile.data.id);
+    console.log(kakao_profile.data.kakao_account.has_age_range);
+    res.send('Success Find User, ' + kakao_profile.data.id);
     /*connection.execute('SELECT `TOKEN` FROM `innoboost_user` WHERE `ID`= ?', [userid], (err, results) => {
       if (err) throw err;
       let token = '';
@@ -80,7 +82,14 @@ authRouter.post('/kakao', function (req, res) {
   }
   verify()
     .then(() => {})
-    .catch(console.error);
+    .catch((error) => kakaoErrorChecking(error));
 });
+
+function kakaoErrorChecking(err: any) {
+  if (err.response.status == 401) {
+    console.log('No Authentication');
+  }
+  console.log(err.response.status);
+}
 
 export default authRouter;

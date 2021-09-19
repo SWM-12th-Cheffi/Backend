@@ -24,6 +24,10 @@ var swaggerJson = {
       name: 'etc',
       description: 'It could be used one day',
     },
+    {
+      name: 'Auth',
+      description: 'Google, Kakao Authentication Setting',
+    },
   ],
   schemes: ['http', 'https'],
   paths: {
@@ -514,6 +518,73 @@ var swaggerJson = {
           },
           '405': {
             description: 'Invalid input',
+          },
+        },
+      },
+    },
+    '/Auth/google': {
+      post: {
+        tags: ['Auth'],
+        summary: 'Google Authentication을 위해서 사용합니다.',
+        description:
+          'Google ID_Token을 인자로 입력하면 확인 결과와 id를 반환합니다. Token의 Expiration 시간은 1시간입니다.',
+        consumes: ['application/json'],
+        produces: ['application/json'],
+        parameters: [
+          {
+            in: 'body',
+            name: 'body',
+            description: 'Input Id_Token',
+            required: true,
+            schema: {
+              type: 'object',
+              properties: {
+                it: {
+                  type: 'string',
+                  example: '예시는 없습니다... 겁나 깁니다...',
+                },
+              },
+            },
+          },
+        ],
+        responses: {
+          '200': {
+            description: 'Connecting Success!',
+          },
+          '405': {
+            description: 'Invalid input',
+          },
+        },
+      },
+    },
+    '/Auth/kakao': {
+      post: {
+        tags: ['Auth'],
+        summary: 'Kakao Authentication을 위해서 사용합니다.',
+        description:
+          'Kakao AccessToken을 인자로 입력하면 확인 결과와 id를 반환합니다. Token의 Expiration 시간은 24시간입니다.',
+        consumes: ['application/json'],
+        produces: ['application/json'],
+        parameters: [
+          {
+            in: 'body',
+            name: 'body',
+            description: 'Input AccessToken',
+            required: true,
+            schema: {
+              type: 'object',
+              properties: {
+                at: {
+                  type: 'string',
+                  example: '예시는 없습니다... .google보다는 짧습니다.',
+                },
+              },
+            },
+          },
+        ],
+        responses: {
+          '401': {
+            description: 'Access Token에 해당하는 사용자의 정보가 없습니다.',
           },
         },
       },

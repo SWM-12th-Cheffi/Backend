@@ -1,4 +1,4 @@
-//const Recipe = require('../model/recipe');
+const Recipe = require('../model/recipeModel');
 //const User = require('../model/user');
 var axios = require('axios');
 

@@ -1,10 +1,9 @@
 var mongoose = require('mongoose');
 
-var Schema = mongoose.Schema,
-  ObjectID = Schema.ObjectID;
+var Schema = mongoose.Schema;
 
 var RecipeSchema = new Schema({
-  id: { type: ObjectID, require: true, unique: true },
+  id: Schema.Types.ObjectID,
   recipeId: { type: Number, require: true, unique: true },
   title: { type: String, require: true },
   scrap: { type: String, require: false },

@@ -1,10 +1,9 @@
 var mongoose = require('mongoose');
 
-var Schema = mongoose.Schema,
-  ObjectID = Schema.ObjectID;
+var Schema = mongoose.Schema;
 
 var UserSchema = new Schema({
-  id: { type: ObjectID, require: true, unique: true },
+  id: Schema.Types.ObjectID,
   nickname: { type: String, require: true, unique: true },
   prefVector: { type: Array, require: true },
   ingredient: { type: Array, require: false },

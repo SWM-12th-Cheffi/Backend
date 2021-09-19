@@ -1,5 +1,5 @@
-const Recipe = require('../model/recipe');
-const User = require('../model/user');
+//const Recipe = require('../model/recipe');
+//const User = require('../model/user');
 var axios = require('axios');
 
 //router 세팅

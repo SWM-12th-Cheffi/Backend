@@ -1,5 +1,5 @@
-const Recipe = require('../model/recipe');
-const User = require('../model/user');
+//const Recipe = require('../model/recipe');
+//const User = require('../model/user');
 
 //router 세팅
 import * as express from 'express';

@@ -1,5 +1,6 @@
 const Recipe = require('../model/recipe');
 const User = require('../model/user');
+var axios = require('axios');
 
 //router 세팅
 import * as express from 'express';
@@ -14,15 +15,51 @@ authRouter.post('/google', function (req, res) {
 
   // 인증 함수
   async function verify() {
-    const ticket = await client.verifyIdToken({
+    var ticket = await client.verifyIdToken({
       idToken: req.body.it,
     });
     console.log(req.body.it);
-    const payload = ticket.getPayload();
-    const userid = payload['sub']; // userid: 21자리의 Google 회원 id 번호
+    var payload = ticket.getPayload();
+    var userid = payload['sub']; // userid: 21자리의 Google 회원 id 번호
 
     console.log(userid);
 
+    /*connection.execute('SELECT `TOKEN` FROM `innoboost_user` WHERE `ID`= ?', [userid], (err, results) => {
+      if (err) throw err;
+      let token = '';
+      if (results.length > 0) {
+        console.log('DB에 있는 유저', results);
+        token = updateToken(payload);
+      } else {
+        console.log('DB에 없는 유저');
+        //새로 유저를 만들면 jwt 토큰값을 받아온다.
+        token = insertUserIntoDB(payload);
+      }
+      res.send({
+        token,
+      });
+      
+    });
+    */
+  }
+  verify()
+    .then(() => {})
+    .catch(console.error);
+});
+
+authRouter.post('/kakao', function (req, res) {
+  var accessToken = req.body.accessToken;
+  let kakao_profile;
+
+  async function verify() {
+    kakao_profile = await axios.get('https://kapi.kakao.com/v2/user/me', {
+      headers: {
+        Authorization: 'Bearer ' + accessToken,
+        'Content-Type': 'application/json',
+      },
+    });
+    console.log(req.body.it);
+    console.log(kakao_profile);
     /*connection.execute('SELECT `TOKEN` FROM `innoboost_user` WHERE `ID`= ?', [userid], (err, results) => {
       if (err) throw err;
       let token = '';

@@ -1,5 +1,6 @@
-const Recipe = require('../model/recipeModel');
-//const User = require('../model/user');
+//mongoDB 설정
+const User = require('../model/user');
+
 var axios = require('axios');
 
 //router 세팅

@@ -1,5 +1,3 @@
-import { builtinModules } from 'module';
-
 var mongoose = require('mongoose');
 var mongoAddr: string = String(process.env.MONGO_ADDR);
 const recipe_db = mongoose.createConnection(mongoAddr + 'recipe');
@@ -35,16 +33,9 @@ HaemukSchema.statics.create = function (payload: any) {
   return recipe.save();
 };
 
-// Find All
-HaemukSchema.statics.findAll = function () {
-  // return promise
-  // V4부터 exec() 필요없음
-  return this.find({});
-};
-
-// Find One by recipeid
-HaemukSchema.statics.findOneByRecipeid = function (recipeid: number) {
-  return this.findOne({ recipeid });
+// Find by recipeid
+HaemukSchema.statics.findByRecipeid = function (recipeid: number[]) {
+  return this.find({ recipeid });
 };
 
 // Update by recipeid

@@ -13,13 +13,17 @@ var Schema = mongoose.Schema;
 
 var UserSchema = new Schema({
   id: Schema.Types.ObjectID,
+  email: { type: String, require: true, unique: true },
   nickname: { type: String, require: true, unique: true },
-  prefVector: { type: Array, require: true },
-  ingredient: { type: Array, require: false },
   statusMessage: { type: String, require: false },
-  historyRecipe: { type: Array, require: false },
-  scrapRecipe: { type: Array, require: false },
-  uneatable: { type: Array, require: false },
+  photo: { type: String, require: false },
+  dislikeIngredient: { type: Array, require: false },
+  scrapRecipesId: { type: Array, require: false },
+  likeRecipesId: { type: Array, require: false },
+  historyRecipesId: { type: Array, require: false },
+  refriger: { type: Array, require: false },
+
+  preferenceVector: { type: Array, require: false },
   token: { type: String, require: true, unique: true },
 });
 

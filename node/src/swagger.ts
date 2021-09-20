@@ -2,7 +2,7 @@ var swaggerJson = {
   swagger: '2.0',
   info: {
     description: 'Api Documentation.',
-    version: '1.0.0',
+    version: '1.1.0',
     title: 'Cheffi Api',
   },
   host: '18.220.121.204:2001',
@@ -318,39 +318,36 @@ var swaggerJson = {
       },
     },
 
-    '/recipe/ShowRPInspect': {
+    '/recipe/find/haemuk': {
       post: {
         tags: ['Recipe'],
-        summary: '레시피의 자세한 정보를 가져옵니다.(db 미구현상태)',
-        description: '레시피의 번호를 입력하면 해당 레시피의 자세한 정보를 불러와서 반환해줍니다.',
+        summary: '레시피 번호에 해당하는 정보 반환',
+        description:
+          '레시피 번호에 해당하는 정보를 반환한다. 레시피 번호를 배열로 입력하면 여러개의 정보가 모두 나온다.',
         consumes: ['application/json'],
         produces: ['application/json'],
         parameters: [
           {
             in: 'body',
             name: 'body',
-            description: '레시피의 번호를 입력해주세요.',
+            description: '레시피 번호를 입력',
             required: true,
             schema: {
               type: 'object',
               properties: {
                 id: {
-                  type: 'integer',
-                  format: 'int32',
-                  example: 5980,
+                  type: 'array',
+                  items: {
+                    type: 'integer',
+                    format: 'int32',
+                  },
+                  example: [5977, 5979],
                 },
               },
             },
           },
         ],
-        responses: {
-          '200': {
-            description: 'Connecting Success!',
-          },
-          '405': {
-            description: 'Invalid input',
-          },
-        },
+        responses: {},
       },
     },
 
@@ -612,7 +609,7 @@ var swaggerJson = {
           {
             in: 'body',
             name: 'body',
-            description: 'Input AccessToken',
+            description: 'Input Recipe Inspection',
             required: true,
             schema: {
               type: 'object',

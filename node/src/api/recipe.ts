@@ -2,6 +2,9 @@
 import * as express from 'express';
 const recipeRouter = express.Router();
 
+//mongoDB 설정
+const Haemuk = require('../model/haemukModel');
+
 var neo4j = require('neo4j-driver');
 var driver = neo4j.driver(String(process.env.NEO_ADDR), neo4j.auth.basic('neo4j', 'r6qEpV4t'));
 var session = driver.session();
@@ -155,10 +158,16 @@ recipeRouter.post('/ListPossiRP_Sim', function (req, res) {
   });
 });
 
-// 특정 레시피의 정보를 반환하는 기능
-recipeRouter.post('/ShowRPInspect', function (req, res) {
-  console.log('ShowRPInspect Function is Request');
-  // mongodb에 데이터 저장후 사용 예정
+// 레시피의 정보를 해먹에서 반환하는 기능
+recipeRouter.post('/find/haemuk', function (req, res) {
+  console.time('findHaemuk');
+  Haemuk.findByRecipeid(req.body.id)
+    .then((result: any) => {
+      if (!result) return res.status(404).send({ err: 'Todo not found' });
+      res.send(result);
+      console.timeEnd('findHaemuk');
+    })
+    .catch((err: any) => res.status(500).send(err));
 });
 
 function CoverWithQuotation(list: string[]) {

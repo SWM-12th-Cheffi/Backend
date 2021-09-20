@@ -9,45 +9,61 @@ const authRouter = express.Router();
 
 var { OAuth2Client } = require('google-auth-library');
 authRouter.post('/google', function (req, res) {
+  console.log('Authentication Google');
+  console.time('google');
   // Google oAuth Setting
   var client = new OAuth2Client(String(process.env.GOOGLE_CLIENT_ID));
 
   // 인증 함수
   async function verify() {
-    var ticket = await client.verifyIdToken({
-      idToken: req.body.it,
+    let token = req.body.it;
+    let ticket = await client.verifyIdToken({
+      idToken: token,
     });
-    console.log(req.body.it);
-    var payload = ticket.getPayload();
+    let payload = ticket.getPayload();
     var userid = payload['sub']; // userid: 21자리의 Google 회원 id 번호
-
-    console.log(userid);
-    res.send('Success Find User, ' + userid);
-
-    /*connection.execute('SELECT `TOKEN` FROM `innoboost_user` WHERE `ID`= ?', [userid], (err, results) => {
-      if (err) throw err;
-      let token = '';
-      if (results.length > 0) {
-        console.log('DB에 있는 유저', results);
-        token = updateToken(payload);
-      } else {
-        console.log('DB에 없는 유저');
-        //새로 유저를 만들면 jwt 토큰값을 받아온다.
-        token = insertUserIntoDB(payload);
-      }
-      res.send({
-        token,
+    let newUser: boolean;
+    let Userinfo = { email: payload['email'], userid: userid, platform: 'Google', token: token };
+    User.findOneByUserid(userid)
+      .then((result: any) => {
+        if (!result) {
+          newUser = true;
+          return User.create(Userinfo);
+        } else {
+          newUser = false;
+          return User.findOneByUserid(userid);
+        }
+      })
+      .then((result: any) => {
+        if (!result._id)
+          res.send({
+            auth: {
+              newUser: newUser,
+              token: result.token,
+            },
+          });
+        else
+          res.send({
+            auth: {
+              newUser: newUser,
+              token: result.token,
+            },
+          });
       });
-      
-    });
-    */
   }
   verify()
-    .then(() => {})
-    .catch(console.error);
+    .then(() => {
+      console.timeEnd('google');
+    })
+    .catch((err) => {
+      console.error(err);
+      console.timeEnd('google');
+    });
 });
 
 authRouter.post('/kakao', function (req, res) {
+  console.log('Authentication Kakao');
+  console.time('kakao');
   var accessToken = req.body.at;
   let kakao_profile;
 
@@ -81,7 +97,9 @@ authRouter.post('/kakao', function (req, res) {
     */
   }
   verify()
-    .then(() => {})
+    .then(() => {
+      console.timeEnd('kakao');
+    })
     .catch((error) => kakaoErrorChecking(error));
 });
 
@@ -90,6 +108,7 @@ function kakaoErrorChecking(err: any) {
     console.log('No Authentication');
   }
   console.log(err.response.status);
+  console.timeEnd('kakao');
 }
 
 export default authRouter;

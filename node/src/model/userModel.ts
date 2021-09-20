@@ -11,23 +11,28 @@ user_db.once('open', handleOpen);
 
 var Schema = mongoose.Schema;
 
-var UserSchema = new Schema({
-  id: Schema.Types.ObjectID,
-  email: { type: String, require: true, unique: true },
-  nickname: { type: String, require: true, unique: true },
-  statusMessage: { type: String, require: false },
-  photo: { type: String, require: false },
-  dislikeIngredient: { type: Array, require: false },
-  scrapRecipesId: { type: Array, require: false },
-  likeRecipesId: { type: Array, require: false },
-  historyRecipesId: { type: Array, require: false },
-  refriger: { type: Array, require: false },
+var UserSchema = new Schema(
+  {
+    id: Schema.Types.ObjectID,
+    email: { type: String, require: true, unique: true },
+    nickname: { type: String, require: false },
+    statusMessage: { type: String, require: false },
+    photo: { type: String, require: false },
+    dislikeIngredient: { type: Array, require: false },
+    scrapRecipesId: { type: Array, require: false },
+    likeRecipesId: { type: Array, require: false },
+    historyRecipesId: { type: Array, require: false },
+    refriger: { type: Array, require: false },
 
-  preferenceVector: { type: Array, require: false },
-  token: { type: String, require: true, unique: true },
-});
-
-const User = user_db.model('user', UserSchema);
+    preferenceVector: { type: Array, require: false },
+    userid: { type: String, require: true, unique: true },
+    token: { type: String, require: true },
+    platform: { type: String, require: true },
+  },
+  {
+    versionKey: false,
+  },
+);
 
 // Create new user document
 UserSchema.statics.create = function (payload: any) {

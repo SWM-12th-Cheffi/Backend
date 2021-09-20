@@ -1,23 +1,14 @@
-//const Recipe = require('../model/recipe');
-//const User = require('../model/user');
-
 //router 세팅
 import * as express from 'express';
 const recipeRouter = express.Router();
 
 var neo4j = require('neo4j-driver');
-//local
-//var driver = neo4j.driver('neo4j://18.220.121.204:7687', neo4j.auth.basic('neo4j', 'r6qEpV4t'));
-//server
-var driver = neo4j.driver('neo4j://172.29.0.4:7687', neo4j.auth.basic('neo4j', 'r6qEpV4t'));
+var driver = neo4j.driver(String(process.env.NEO_ADDR), neo4j.auth.basic('neo4j', 'r6qEpV4t'));
 var session = driver.session();
 
 //Recc 세팅
 import axios from 'axios';
-//local
-//var pyAddr: string = 'http://172.17.0.2:3001/recc';
-//server
-var pyAddr: string = 'http://172.29.0.2:3001/recc';
+var pyAddr: string = String(process.env.PYTHON_ADDR);
 
 // Test InputData
 var UserLikeInfo: string[] = ['짜장면', '짬뽕'];

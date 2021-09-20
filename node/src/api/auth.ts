@@ -1,5 +1,5 @@
 //mongoDB 설정
-const User = require('../model/user');
+const User = require('../model/userModel');
 
 var axios = require('axios');
 
@@ -8,10 +8,9 @@ import * as express from 'express';
 const authRouter = express.Router();
 
 var { OAuth2Client } = require('google-auth-library');
-const Client_ID = '79925141410-m12cesgdqn3sksv9a49sgk57ij0p3jmn.apps.googleusercontent.com';
 authRouter.post('/google', function (req, res) {
   // Google oAuth Setting
-  var client = new OAuth2Client(Client_ID);
+  var client = new OAuth2Client(String(process.env.GOOGLE_CLIENT_ID));
 
   // 인증 함수
   async function verify() {

@@ -2,7 +2,7 @@ var swaggerJson = {
   swagger: '2.0',
   info: {
     description: 'Api Documentation.',
-    version: '1.0.0',
+    version: '1.1.0',
     title: 'Cheffi Api',
   },
   host: '18.220.121.204:2001',
@@ -23,6 +23,14 @@ var swaggerJson = {
     {
       name: 'etc',
       description: 'It could be used one day',
+    },
+    {
+      name: 'Auth',
+      description: 'Google, Kakao Authentication Setting',
+    },
+    {
+      name: 'admin',
+      description: 'Function for Admin',
     },
   ],
   schemes: ['http', 'https'],
@@ -310,41 +318,39 @@ var swaggerJson = {
       },
     },
 
-    '/recipe/ShowRPInspect': {
+    '/recipe/find/haemuk': {
       post: {
         tags: ['Recipe'],
-        summary: '레시피의 자세한 정보를 가져옵니다.(db 미구현상태)',
-        description: '레시피의 번호를 입력하면 해당 레시피의 자세한 정보를 불러와서 반환해줍니다.',
+        summary: '레시피 번호에 해당하는 정보 반환',
+        description:
+          '레시피 번호에 해당하는 정보를 반환한다. 레시피 번호를 배열로 입력하면 여러개의 정보가 모두 나온다.',
         consumes: ['application/json'],
         produces: ['application/json'],
         parameters: [
           {
             in: 'body',
             name: 'body',
-            description: '레시피의 번호를 입력해주세요.',
+            description: '레시피 번호를 입력',
             required: true,
             schema: {
               type: 'object',
               properties: {
                 id: {
-                  type: 'integer',
-                  format: 'int32',
-                  example: 5980,
+                  type: 'array',
+                  items: {
+                    type: 'integer',
+                    format: 'int32',
+                  },
+                  example: [5977, 5979],
                 },
               },
             },
           },
         ],
-        responses: {
-          '200': {
-            description: 'Connecting Success!',
-          },
-          '405': {
-            description: 'Invalid input',
-          },
-        },
+        responses: {},
       },
     },
+
     '/user/SaveLikeDemo': {
       post: {
         tags: ['User'],
@@ -379,6 +385,7 @@ var swaggerJson = {
         },
       },
     },
+
     '/user/FineCook': {
       post: {
         tags: ['User'],
@@ -414,6 +421,7 @@ var swaggerJson = {
         },
       },
     },
+
     '/user/ShowIGDynamic': {
       post: {
         tags: ['User'],
@@ -448,6 +456,7 @@ var swaggerJson = {
         },
       },
     },
+
     '/etc/OrderByFavorite': {
       post: {
         tags: ['etc'],
@@ -483,6 +492,7 @@ var swaggerJson = {
         },
       },
     },
+
     '/etc/Recc': {
       post: {
         tags: ['etc'],
@@ -514,6 +524,138 @@ var swaggerJson = {
           },
           '405': {
             description: 'Invalid input',
+          },
+        },
+      },
+    },
+
+    '/Auth/google': {
+      post: {
+        tags: ['Auth'],
+        summary: 'Google Authentication을 위해서 사용합니다.',
+        description:
+          'Google ID_Token을 인자로 입력하면 새로운 유저인지 확인하고, 암호화된 token을 반환합니다. Token의 Expiration 시간은 1시간입니다.',
+        consumes: ['application/json'],
+        produces: ['application/json'],
+        parameters: [
+          {
+            in: 'body',
+            name: 'body',
+            description: 'Input Id_Token',
+            required: true,
+            schema: {
+              type: 'object',
+              properties: {
+                it: {
+                  type: 'string',
+                  example: '예시는 없습니다... 겁나 깁니다...',
+                },
+              },
+            },
+          },
+        ],
+        responses: {
+          '200': {
+            description: 'Connecting Success!',
+          },
+          '405': {
+            description: 'Invalid input',
+          },
+        },
+      },
+    },
+
+    '/Auth/kakao': {
+      post: {
+        tags: ['Auth'],
+        summary: 'Kakao Authentication을 위해서 사용합니다.',
+        description:
+          'Kakao AccessToken을 인자로 입력하면 새로운 유저인지 확인하고, 암호화된 토큰을 반환합니다. Token의 Expiration 시간은 24시간입니다.',
+        consumes: ['application/json'],
+        produces: ['application/json'],
+        parameters: [
+          {
+            in: 'body',
+            name: 'body',
+            description: 'Input AccessToken',
+            required: true,
+            schema: {
+              type: 'object',
+              properties: {
+                at: {
+                  type: 'string',
+                  example: '예시는 없습니다... .google보다는 짧습니다.',
+                },
+              },
+            },
+          },
+        ],
+        responses: {
+          '401': {
+            description: 'Access Token에 해당하는 사용자의 정보가 없습니다.',
+          },
+        },
+      },
+    },
+
+    '/admin/insert/haemuk': {
+      post: {
+        tags: ['admin'],
+        summary: 'recipe 데이터를 mongo에 추가하기 위해서 사용합니다.',
+        description: 'json 배열로 주어지면 데이터가 입력됩니다.',
+        consumes: ['application/json'],
+        produces: ['application/json'],
+        parameters: [
+          {
+            in: 'body',
+            name: 'body',
+            description: 'Input Recipe Inspection',
+            required: true,
+            schema: {
+              type: 'object',
+              properties: {
+                recipe: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      scrap: {
+                        type: 'integer',
+                        format: 'int32',
+                        example: 42,
+                      },
+                      time: {
+                        type: 'string',
+                        example: '30분',
+                      },
+                      calories: {
+                        type: 'number',
+                        format: 'float',
+                        example: 132.4,
+                      },
+                      recipeid: {
+                        type: 'integer',
+                        format: 'int32',
+                        example: 10000,
+                      },
+                      title: {
+                        type: 'string',
+                        example: '테스트레시피',
+                      },
+                      test: {
+                        type: 'boolean',
+                        example: 'true',
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        ],
+        responses: {
+          '401': {
+            description: 'Access Token에 해당하는 사용자의 정보가 없습니다.',
           },
         },
       },

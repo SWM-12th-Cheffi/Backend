@@ -11,23 +11,27 @@ user_db.once('open', handleOpen);
 
 var Schema = mongoose.Schema;
 
-var UserSchema = new Schema({
-  id: Schema.Types.ObjectID,
-  email: { type: String, require: true, unique: true },
-  nickname: { type: String, require: true, unique: true },
-  statusMessage: { type: String, require: false },
-  photo: { type: String, require: false },
-  dislikeIngredient: { type: Array, require: false },
-  scrapRecipesId: { type: Array, require: false },
-  likeRecipesId: { type: Array, require: false },
-  historyRecipesId: { type: Array, require: false },
-  refriger: { type: Array, require: false },
+var UserSchema = new Schema(
+  {
+    id: Schema.Types.ObjectID,
+    nickname: { type: String, require: false },
+    statusMessage: { type: String, require: false },
+    photo: { type: String, require: false },
+    dislikeIngredient: { type: Array, require: false },
+    scrapRecipesId: { type: Array, require: false },
+    likeRecipesId: { type: Array, require: false },
+    historyRecipesId: { type: Array, require: false },
+    refriger: { type: Array, require: false },
 
-  preferenceVector: { type: Array, require: false },
-  token: { type: String, require: true, unique: true },
-});
-
-const User = user_db.model('user', UserSchema);
+    preferenceVector: { type: Array, require: false },
+    userid: { type: String, require: true, unique: true },
+    token: { type: String, require: true },
+    platform: { type: String, require: true },
+  },
+  {
+    versionKey: false,
+  },
+);
 
 // Create new user document
 UserSchema.statics.create = function (payload: any) {
@@ -45,14 +49,13 @@ UserSchema.statics.findAll = function () {
 };
 
 // Find One by userid
-UserSchema.statics.findOneByUserid = function (userid: number) {
+UserSchema.statics.findOneByUserid = function (userid: string) {
   return this.findOne({ userid });
 };
 
 // Update by userid
-UserSchema.statics.updateByUserid = function (userid: number, payload: any) {
-  // { new: true }: return the modified document rather than the original. defaults to false
-  return this.findOneAndUpdate({ userid }, payload, { new: true });
+UserSchema.statics.updateByUserid = function (userid: string, payload: string) {
+  return this.findOneAndUpdate({ userid: userid }, { token: payload });
 };
 
 // Create Model & Export

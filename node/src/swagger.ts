@@ -534,7 +534,7 @@ var swaggerJson = {
         tags: ['Auth'],
         summary: 'Google Authentication을 위해서 사용합니다.',
         description:
-          'Google ID_Token을 인자로 입력하면 확인 결과와 id를 반환합니다. Token의 Expiration 시간은 1시간입니다.',
+          'Google ID_Token을 인자로 입력하면 새로운 유저인지 확인하고, 암호화된 token을 반환합니다. Token의 Expiration 시간은 1시간입니다.',
         consumes: ['application/json'],
         produces: ['application/json'],
         parameters: [
@@ -570,7 +570,7 @@ var swaggerJson = {
         tags: ['Auth'],
         summary: 'Kakao Authentication을 위해서 사용합니다.',
         description:
-          'Kakao AccessToken을 인자로 입력하면 확인 결과와 id를 반환합니다. Token의 Expiration 시간은 24시간입니다.',
+          'Kakao AccessToken을 인자로 입력하면 새로운 유저인지 확인하고, 암호화된 토큰을 반환합니다. Token의 Expiration 시간은 24시간입니다.',
         consumes: ['application/json'],
         produces: ['application/json'],
         parameters: [

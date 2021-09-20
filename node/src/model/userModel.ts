@@ -14,7 +14,6 @@ var Schema = mongoose.Schema;
 var UserSchema = new Schema(
   {
     id: Schema.Types.ObjectID,
-    email: { type: String, require: true, unique: true },
     nickname: { type: String, require: false },
     statusMessage: { type: String, require: false },
     photo: { type: String, require: false },
@@ -50,14 +49,13 @@ UserSchema.statics.findAll = function () {
 };
 
 // Find One by userid
-UserSchema.statics.findOneByUserid = function (userid: number) {
+UserSchema.statics.findOneByUserid = function (userid: string) {
   return this.findOne({ userid });
 };
 
 // Update by userid
-UserSchema.statics.updateByUserid = function (userid: number, payload: any) {
-  // { new: true }: return the modified document rather than the original. defaults to false
-  return this.findOneAndUpdate({ userid }, payload, { new: true });
+UserSchema.statics.updateByUserid = function (userid: string, payload: string) {
+  return this.findOneAndUpdate({ userid: userid }, { token: payload });
 };
 
 // Create Model & Export

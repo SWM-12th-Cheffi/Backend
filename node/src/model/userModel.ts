@@ -1,5 +1,14 @@
 var mongoose = require('mongoose');
 
+var mongoAddr: string = String(process.env.MONGO_ADDR);
+const user_db = mongoose.createConnection(mongoAddr + 'user');
+
+var handleOpen = () => {
+  console.log(`Connected to user_db`);
+};
+
+user_db.once('open', handleOpen);
+
 var Schema = mongoose.Schema;
 
 var UserSchema = new Schema({
@@ -14,7 +23,7 @@ var UserSchema = new Schema({
   token: { type: String, require: true, unique: true },
 });
 
-const User = mongoose.model('user', UserSchema);
+const User = user_db.model('user', UserSchema);
 
 // Create new user document
 UserSchema.statics.create = function (payload: any) {
@@ -32,15 +41,15 @@ UserSchema.statics.findAll = function () {
 };
 
 // Find One by userid
-UserSchema.statics.findOneByuserid = function (userid: number) {
+UserSchema.statics.findOneByUserid = function (userid: number) {
   return this.findOne({ userid });
 };
 
 // Update by userid
-UserSchema.statics.updateByuserid = function (userid: number, payload: any) {
+UserSchema.statics.updateByUserid = function (userid: number, payload: any) {
   // { new: true }: return the modified document rather than the original. defaults to false
   return this.findOneAndUpdate({ userid }, payload, { new: true });
 };
 
 // Create Model & Export
-module.exports = mongoose.model('user', UserSchema);
+module.exports = user_db.model('user', UserSchema);

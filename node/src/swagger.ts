@@ -28,6 +28,10 @@ var swaggerJson = {
       name: 'Auth',
       description: 'Google, Kakao Authentication Setting',
     },
+    {
+      name: 'admin',
+      description: 'Function for Admin',
+    },
   ],
   schemes: ['http', 'https'],
   paths: {
@@ -349,6 +353,7 @@ var swaggerJson = {
         },
       },
     },
+
     '/user/SaveLikeDemo': {
       post: {
         tags: ['User'],
@@ -383,6 +388,7 @@ var swaggerJson = {
         },
       },
     },
+
     '/user/FineCook': {
       post: {
         tags: ['User'],
@@ -418,6 +424,7 @@ var swaggerJson = {
         },
       },
     },
+
     '/user/ShowIGDynamic': {
       post: {
         tags: ['User'],
@@ -452,6 +459,7 @@ var swaggerJson = {
         },
       },
     },
+
     '/etc/OrderByFavorite': {
       post: {
         tags: ['etc'],
@@ -487,6 +495,7 @@ var swaggerJson = {
         },
       },
     },
+
     '/etc/Recc': {
       post: {
         tags: ['etc'],
@@ -522,6 +531,7 @@ var swaggerJson = {
         },
       },
     },
+
     '/Auth/google': {
       post: {
         tags: ['Auth'],
@@ -557,6 +567,7 @@ var swaggerJson = {
         },
       },
     },
+
     '/Auth/kakao': {
       post: {
         tags: ['Auth'],
@@ -577,6 +588,69 @@ var swaggerJson = {
                 at: {
                   type: 'string',
                   example: '예시는 없습니다... .google보다는 짧습니다.',
+                },
+              },
+            },
+          },
+        ],
+        responses: {
+          '401': {
+            description: 'Access Token에 해당하는 사용자의 정보가 없습니다.',
+          },
+        },
+      },
+    },
+
+    '/admin/insert/haemuk': {
+      post: {
+        tags: ['admin'],
+        summary: 'recipe 데이터를 mongo에 추가하기 위해서 사용합니다.',
+        description: 'json 배열로 주어지면 데이터가 입력됩니다.',
+        consumes: ['application/json'],
+        produces: ['application/json'],
+        parameters: [
+          {
+            in: 'body',
+            name: 'body',
+            description: 'Input AccessToken',
+            required: true,
+            schema: {
+              type: 'object',
+              properties: {
+                recipe: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      scrap: {
+                        type: 'integer',
+                        format: 'int32',
+                        example: 42,
+                      },
+                      time: {
+                        type: 'string',
+                        example: '30분',
+                      },
+                      calories: {
+                        type: 'number',
+                        format: 'float',
+                        example: 132.4,
+                      },
+                      recipeid: {
+                        type: 'integer',
+                        format: 'int32',
+                        example: 10000,
+                      },
+                      title: {
+                        type: 'string',
+                        example: '테스트레시피',
+                      },
+                      test: {
+                        type: 'boolean',
+                        example: 'true',
+                      },
+                    },
+                  },
                 },
               },
             },

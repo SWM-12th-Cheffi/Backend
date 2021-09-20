@@ -1,12 +1,11 @@
 require('console-stamp')(console, 'yyyy/mm/dd HH:MM:ss.l');
 require('dotenv').config();
 
-// http 세팅
+// http setting
 import { createServer } from 'http';
-//import { hostname } from "os";
 const port: number = Number(process.env.PORT);
 
-// router 세팅
+// router setting
 import * as express from 'express';
 const app: express.Application = express();
 import { json } from 'body-parser';
@@ -17,18 +16,12 @@ import testRouter from './api/test';
 import userRouter from './api/user';
 import etcRouter from './api/etc';
 import authRouter from './api/auth';
+import adminRouter from './api/admin';
 
 // swagger Setting
 import * as swaggerUi from 'swagger-ui-express';
 import swaggerJson from './swagger';
 app.use('/api-json', swaggerUi.serve, swaggerUi.setup(swaggerJson));
-
-// mongo Setting
-var mongoose = require('mongoose');
-var mongoAddr: string = String(process.env.MONGO_ADDR);
-
-mongoose.createConnection(mongoAddr + 'recipe');
-mongoose.createConnection(mongoAddr + 'user');
 
 const server = createServer(app);
 server.listen(port, () => {
@@ -42,5 +35,6 @@ app.use('/Auth', authRouter);
 app.use('/recipe', recipeRouter);
 app.use('/user', userRouter);
 app.use('/etc', etcRouter);
+app.use('/admin', adminRouter);
 
 module.exports = server;

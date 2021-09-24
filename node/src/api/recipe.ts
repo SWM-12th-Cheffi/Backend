@@ -164,7 +164,7 @@ recipeRouter.post('/find/haemuk', function (req, res) {
   console.time('findHaemuk');
   Haemuk.findByRecipeid(req.body.id)
     .then((result: any) => {
-      if (!result) return res.status(404).send({ err: 'Todo not found' });
+      if (!result) return res.status(404).send({ err: 'Recipe not found' });
       res.send(result);
       console.timeEnd('findHaemuk');
     })

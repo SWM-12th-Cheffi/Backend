@@ -14,13 +14,13 @@ var Schema = mongoose.Schema;
 var UserSchema = new Schema(
   {
     id: Schema.Types.ObjectID,
-    nickname: { type: String, require: false },
-    statusMessage: { type: String, require: false },
-    photo: { type: String, require: false },
-    dislikeIngredient: { type: Array, require: false, default: undefined },
-    scrapRecipesId: { type: Array, require: false, default: undefined },
-    likeRecipesId: { type: Array, require: false, default: undefined },
-    historyRecipesId: { type: Array, require: false, default: undefined },
+    nickname: { type: String, require: false, default: '' },
+    statusMessage: { type: String, require: false, default: '' },
+    photo: { type: String, require: false, default: '' },
+    dislikeIngredient: { type: Array, require: false },
+    scrapRecipesId: { type: Array, require: false },
+    likeRecipesId: { type: Array, require: false },
+    historyRecipesId: { type: Array, require: false },
     refriger: { type: Array, require: false },
 
     preferenceVector: { type: Array, require: false },

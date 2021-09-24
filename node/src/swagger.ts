@@ -351,7 +351,37 @@ var swaggerJson = {
         responses: {},
       },
     },
+    //fin
+    '/recipe/randomRecipeList': {
+      post: {
+        tags: ['Recipe'],
+        summary: '랜덤으로 레시피 데이터를 가져옵니다.',
+        description: '원하는 레시피의 개수를 입력하면 해당하는 개수만큼 레시피의 id값과 title값을 가져옵니다.',
+        consumes: ['application/json'],
+        produces: ['application/json'],
+        parameters: [
+          {
+            in: 'body',
+            name: 'body',
+            description: '원하는 레시피의 수를 입력',
+            required: true,
+            schema: {
+              type: 'object',
+              properties: {
+                num: {
+                  type: 'integer',
+                  format: 'int32',
+                  example: 13,
+                },
+              },
+            },
+          },
+        ],
+        responses: {},
+      },
+    },
 
+    //fin
     '/user/addLikeRecipe': {
       post: {
         tags: ['User'],
@@ -392,6 +422,7 @@ var swaggerJson = {
       },
     },
 
+    // 일단 빼고 진행
     '/user/FineCook': {
       post: {
         tags: ['User'],

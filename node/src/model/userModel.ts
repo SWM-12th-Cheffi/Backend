@@ -50,7 +50,11 @@ UserSchema.statics.findAll = function () {
 
 // Find One by userid
 UserSchema.statics.findOneByUserid = function (userid: string) {
-  return this.findOne({ userid });
+  return this.findOne({ userid: userid });
+};
+
+UserSchema.statics.findOneByUserToken = function (token: string) {
+  return this.findOne({ token: token });
 };
 
 // Update by userid

@@ -1,6 +1,6 @@
 //mongoDB 설정
-const User = require('../model/userModel');
-const crypto = require('crypto');
+var User = require('../model/userModel');
+var crypto = require('crypto');
 var axios = require('axios');
 
 //router 세팅
@@ -107,5 +107,26 @@ function kakaoErrorChecking(err: any) {
   console.log(err.response.status);
   console.timeEnd('kakao');
 }
+
+authRouter.post('/info', function (req, res) {
+  console.log('Post User Info to Front');
+  console.time('info');
+
+  let token = req.body.token;
+  User.findOneByUserToken(token).then((result: any) => {
+    let openedInfo = {
+      nickname: result.nickname,
+      statusMessage: result.statusMessage,
+      photo: result.photo,
+      dislikeIngredient: result.dislikeIngredient,
+      scrapRecipesId: result.scrapRecipesId,
+      likeRecipesId: result.likeRecipesId,
+      historyRecipesId: result.historyRecipesId,
+      refriger: result.refriger,
+    };
+    res.send(openedInfo);
+    console.timeEnd('info');
+  });
+});
 
 export default authRouter;

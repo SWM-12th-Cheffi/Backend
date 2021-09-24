@@ -1,5 +1,5 @@
 //mongoDB 설정
-const Haemuk = require('../model/haemukModel');
+var Haemuk = require('../model/haemukModel');
 
 //router 세팅
 import * as express from 'express';

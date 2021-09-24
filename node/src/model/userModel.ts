@@ -17,10 +17,10 @@ var UserSchema = new Schema(
     nickname: { type: String, require: false },
     statusMessage: { type: String, require: false },
     photo: { type: String, require: false },
-    dislikeIngredient: { type: Array, require: false },
-    scrapRecipesId: { type: Array, require: false },
-    likeRecipesId: { type: Array, require: false },
-    historyRecipesId: { type: Array, require: false },
+    dislikeIngredient: { type: Array, require: false, default: undefined },
+    scrapRecipesId: { type: Array, require: false, default: undefined },
+    likeRecipesId: { type: Array, require: false, default: undefined },
+    historyRecipesId: { type: Array, require: false, default: undefined },
     refriger: { type: Array, require: false },
 
     preferenceVector: { type: Array, require: false },
@@ -58,8 +58,13 @@ UserSchema.statics.findOneByUserToken = function (token: string) {
 };
 
 // Update by userid
-UserSchema.statics.updateByUserid = function (userid: string, payload: string) {
+UserSchema.statics.updateTokenByUserid = function (userid: string, payload: string) {
   return this.findOneAndUpdate({ userid: userid }, { token: payload });
+};
+
+// 좋아하는 레시피라고 클릭했을 때 몽고에 추가함. 1개씩 가능
+UserSchema.statics.addLikeRecipesByToken = function (token: string, likeRecipe: string) {
+  return this.updateOne({ token }, { $addToSet: { likeRecipesId: likeRecipe } });
 };
 
 // Create Model & Export

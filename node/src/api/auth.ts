@@ -33,7 +33,7 @@ authRouter.post('/google', function (req, res) {
           return User.create(Userinfo);
         } else {
           newUser = false;
-          return User.updateByUserid(userid, token);
+          return User.updateTokenByUserid(userid, token);
         }
       })
       .then(() => {
@@ -80,7 +80,7 @@ authRouter.post('/kakao', function (req, res) {
           return User.create(Userinfo);
         } else {
           newUser = false;
-          return User.updateByUserid(userid, token);
+          return User.updateTokenByUserid(userid, token);
         }
       })
       .then(() => {

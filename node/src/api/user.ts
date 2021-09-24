@@ -1,15 +1,28 @@
 //router 세팅
 import * as express from 'express';
 const userRouter = express.Router();
+var User = require('../model/userModel');
 
-// Test InputData
-var UserLikeInfo: string[] = ['짜장면', '짬뽕'];
-
-// 좋아하는 음식을 저장
-userRouter.post('/SaveLikeDemo', function (req, res) {
-  let postLikeData: string[] = req.body.like;
-  UserLikeInfo = postLikeData;
-  res.send(UserLikeInfo);
+// 좋아하는 음식의 레시피 번호를 저장
+userRouter.post('/addLikeRecipe', function (req, res) {
+  console.log('SaveLikeRecipes');
+  console.time('SaveLikeRecipes');
+  let token = req.body.token;
+  let RecipeId: string = req.body.likeRecipeId;
+  User.addLikeRecipesByToken(token, RecipeId).then((result: any) => {
+    // 정상적으로 작업을 마침
+    if (result.matchedCount)
+      res.send({
+        status: 201,
+        likeRecipesId: RecipeId,
+      });
+    // token으로 정보를 찾을 수 없음
+    else
+      res.send({
+        status: 404,
+        message: 'No Matched Information.',
+      });
+  });
 });
 
 // 해당 요리를 끝마쳤다는 정보를 받은 뒤 추천 반영

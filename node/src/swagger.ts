@@ -2,7 +2,7 @@ var swaggerJson = {
   swagger: '2.0',
   info: {
     description: 'Api Documentation.',
-    version: '1.1.0',
+    version: '0.1.1',
     title: 'Cheffi Api',
   },
   host: '18.220.121.204:2001',
@@ -352,11 +352,12 @@ var swaggerJson = {
       },
     },
 
-    '/user/SaveLikeDemo': {
+    '/user/addLikeRecipe': {
       post: {
         tags: ['User'],
-        summary: '좋아하는 음식을 저장합니다. (처음 입력했을 때)',
-        description: '좋아하는 음식의 목록을 저장합니다.',
+        summary: '좋아하는 음식의 id 값을 추가합니다.',
+        description:
+          '처음 데이터를 입력할 때에는 아니고, 레시피를 탐색하다가 아 이건 내가 좋아하는 레시피야 하는것들을 저장할 때 사용합니다. 한번에 하나씩 추가할 수 있습니다.',
         consumes: ['application/json'],
         produces: ['application/json'],
         parameters: [
@@ -368,17 +369,21 @@ var swaggerJson = {
             schema: {
               type: 'object',
               properties: {
-                id: {
-                  type: 'array',
-                  example: ['짬뽕', '짜장면'],
+                token: {
+                  type: 'string',
+                  example: 'Hb37ZdQXZ7Pbvk4QMrqtwsd4rdoVRGmBxtf1XGZT4/Nc41V8OQiZQNApC0Enz1f6W+YccLSc1F44Lf1TRv41gQ==',
+                },
+                likeRecipeId: {
+                  type: 'string',
+                  example: '5480',
                 },
               },
             },
           },
         ],
         responses: {
-          '200': {
-            description: 'Connecting Success!',
+          '404': {
+            description: 'token에 해당하는 유저가 없습니다.',
           },
           '405': {
             description: 'Invalid input',

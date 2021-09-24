@@ -179,6 +179,13 @@ function CoverWithQuotation(list: string[]) {
   return tmp;
 }
 
+// 처음 사용자 데이터 받을 때 보여줄 랜덤 레시피
+recipeRouter.post('/randomRecipeList', function (req, res) {
+  Haemuk.randomRecipe(req.body.num).then((result: number) => {
+    res.send({ recipe: result });
+  });
+});
+
 function ShowRecipeWithID(sendId: string[], postres: any) {
   //console.log(sendId);
   let modId: string[] = sendId.slice();

@@ -26,6 +26,13 @@ userRouter.post('/addLikeRecipe', function (req, res) {
 });
 
 // 해당 요리를 끝마쳤다는 정보를 받은 뒤 추천 반영
+userRouter.post('/initInfo', function (req, res) {
+  console.time('initInfo');
+  console.log(req.body.title);
+  res.send('Connecting POST Test Is OK, Title Value is ' + req.body.title);
+});
+
+// 해당 요리를 끝마쳤다는 정보를 받은 뒤 추천 반영
 userRouter.post('/FineCook', function (req, res) {
   console.log(req.body.title);
   res.send('Connecting POST Test Is OK, Title Value is ' + req.body.title);

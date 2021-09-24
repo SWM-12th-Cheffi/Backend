@@ -181,9 +181,11 @@ function CoverWithQuotation(list: string[]) {
 
 // 처음 사용자 데이터 받을 때 보여줄 랜덤 레시피
 recipeRouter.post('/randomRecipeList', function (req, res) {
+  console.time('randomRecipeList');
   Haemuk.randomRecipe(req.body.num).then((result: number) => {
     res.send({ recipe: result });
   });
+  console.timeEnd('randomRecipeList');
 });
 
 function ShowRecipeWithID(sendId: string[], postres: any) {
@@ -193,7 +195,7 @@ function ShowRecipeWithID(sendId: string[], postres: any) {
     modId[i] = "'" + modId[i] + "'";
   }
   //console.log(sendId);
-  session.readTranㄴsaction(function (tx: any) {
+  session.readTransaction(function (tx: any) {
     return tx
       .run('MATCH (n:Recipe) WHERE n.id in [' + modId + '] return n as recipe')
       .then(function (res: any) {

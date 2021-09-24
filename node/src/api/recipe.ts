@@ -17,7 +17,7 @@ var pyAddr: string = String(process.env.PYTHON_ADDR);
 // Test InputData
 var UserLikeInfo: string[] = ['짜장면', '짬뽕'];
 
-// 재료를 통해 만들 수 있는 레시피 개수를 반환하는 기능(유사재료 검색 미포함)
+// 재료를 통해 만들 수 있는 레시피 개수를 반환하는 기능(유사재료 검색 미포함) fin
 recipeRouter.post('/NumPossiRP', function (req, res) {
   console.time('NumPossiRP');
   let ingreData: string[] = req.body.ingre;
@@ -41,7 +41,7 @@ recipeRouter.post('/NumPossiRP', function (req, res) {
   });
 });
 
-// 재료를 통해 만들 수 있는 레시피 개수를 반환하는 기능(유사재료 검색 포함)
+// 재료를 통해 만들 수 있는 레시피 개수를 반환하는 기능(유사재료 검색 포함) fin
 recipeRouter.post('/NumPossiRP_Sim', function (req, res) {
   console.time('NumPossiRP_Sim');
   let ingreData: string[] = req.body.ingre;
@@ -76,7 +76,7 @@ recipeRouter.post('/NumPossiRP_Sim', function (req, res) {
   });
 });
 
-// 재료를 통해 만들 수 있는 레시피 번호 리스트를 반환하는 함수 (유사재료 검색 미포함)
+// 재료를 통해 만들 수 있는 레시피 번호 리스트를 반환하는 함수 (유사재료 검색 미포함) fin
 recipeRouter.post('/ListPossiRP', function (req, res) {
   console.time('ListPossiRP');
   let ingreData: string[] = req.body.ingre;
@@ -112,7 +112,7 @@ recipeRouter.post('/ListPossiRP', function (req, res) {
   });
 });
 
-// 재료를 통해 만들 수 있는 레시피 번호 리스트를 반환하는 함수 (유사재료 검색 포함)
+// 재료를 통해 만들 수 있는 레시피 번호 리스트를 반환하는 함수 (유사재료 검색 포함) fin
 recipeRouter.post('/ListPossiRP_Sim', function (req, res) {
   console.time('ListPossiRP_Sim');
   let ingreData: string[] = req.body.ingre;
@@ -159,7 +159,7 @@ recipeRouter.post('/ListPossiRP_Sim', function (req, res) {
   });
 });
 
-// 레시피의 정보를 해먹에서 반환하는 기능
+// 레시피의 정보를 해먹에서 반환하는 기능 fin
 recipeRouter.post('/find/haemuk', function (req, res) {
   console.time('findHaemuk');
   Haemuk.findByRecipeid(req.body.id)

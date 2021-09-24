@@ -35,6 +35,7 @@ var swaggerJson = {
   ],
   schemes: ['http', 'https'],
   paths: {
+    //fin
     '/': {
       post: {
         tags: ['Test'],
@@ -69,7 +70,7 @@ var swaggerJson = {
         },
       },
     },
-
+    //fin
     '/recipe/NumPossiRP': {
       post: {
         tags: ['Recipe'],
@@ -131,7 +132,7 @@ var swaggerJson = {
         },
       },
     },
-
+    //fin
     '/recipe/NumPossiRP_Sim': {
       post: {
         tags: ['Recipe'],
@@ -193,7 +194,7 @@ var swaggerJson = {
         },
       },
     },
-
+    //fin
     '/recipe/ListPossiRP': {
       post: {
         tags: ['Recipe'],
@@ -255,7 +256,7 @@ var swaggerJson = {
         },
       },
     },
-
+    //fin
     '/recipe/ListPossiRP_Sim': {
       post: {
         tags: ['Recipe'],
@@ -317,7 +318,7 @@ var swaggerJson = {
         },
       },
     },
-
+    //fin
     '/recipe/find/haemuk': {
       post: {
         tags: ['Recipe'],
@@ -593,6 +594,39 @@ var swaggerJson = {
         responses: {
           '401': {
             description: 'Access Token에 해당하는 사용자의 정보가 없습니다.',
+          },
+        },
+      },
+    },
+
+    '/Auth/info': {
+      post: {
+        tags: ['Auth'],
+        summary: '사용자의 정보를 가져오기 위해서 사용합니다.',
+        description:
+          '암호화된 token을 post로 보내면 그 token에 해당하는 사용자의 정보를 가져옵니다. 없는 정보는 가져오지 않습니다.',
+        consumes: ['application/json'],
+        produces: ['application/json'],
+        parameters: [
+          {
+            in: 'body',
+            name: 'body',
+            description: 'Input Crypto Token',
+            required: true,
+            schema: {
+              type: 'object',
+              properties: {
+                token: {
+                  type: 'string',
+                  example: 'TS1yEpy6QB2fc5wzDNDPNhLZnGJaU9SsDxtDx33v/831UdIR78r0qZPkbANu00SwQuk4eTUxJY788aWYOOBqIw==',
+                },
+              },
+            },
+          },
+        ],
+        responses: {
+          '401': {
+            description: ' Token에 해당하는 사용자의 정보가 없습니다.',
           },
         },
       },

@@ -1,15 +1,16 @@
-//router 세팅
+//router setting
 import * as express from 'express';
 const recipeRouter = express.Router();
 
-//mongoDB 설정
-const Haemuk = require('../model/haemukModel');
+//mongoDB setting
+var Haemuk = require('../model/haemukModel');
 
+//neo4j setting
 var neo4j = require('neo4j-driver');
 var driver = neo4j.driver(String(process.env.NEO_ADDR), neo4j.auth.basic('neo4j', 'r6qEpV4t'));
 var session = driver.session();
 
-//Recc 세팅
+//Recc setting
 import axios from 'axios';
 var pyAddr: string = String(process.env.PYTHON_ADDR);
 
@@ -163,7 +164,7 @@ recipeRouter.post('/find/haemuk', function (req, res) {
   console.time('findHaemuk');
   Haemuk.findByRecipeid(req.body.id)
     .then((result: any) => {
-      if (!result) return res.status(404).send({ err: 'Todo not found' });
+      if (!result) return res.status(404).send({ err: 'Recipe not found' });
       res.send(result);
       console.timeEnd('findHaemuk');
     })

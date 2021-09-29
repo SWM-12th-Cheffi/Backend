@@ -1,14 +1,31 @@
 var mongoose = require('mongoose');
 
 var mongoAddr: string = String(process.env.MONGO_ADDR);
-const user_db = mongoose.createConnection(mongoAddr + 'user');
+export const user_db = mongoose.createConnection(mongoAddr + 'user');
 
+var collectionSet = new Set();
 var handleOpen = () => {
   console.log(`Connected to user_db`);
+  user_db.db.listCollections().toArray(function (err: any, names: any) {
+    for (let i in names) {
+      collectionSet.add(names[i].name);
+    }
+    console.log(collectionSet);
+  });
 };
 
-user_db.once('open', handleOpen);
+function createUserHistoryCollection(id) {
+  if (!collectionSet.has(id)) {
+    var history = new Schema({
+      time: { type: Date, default: Date.now, require: true },
+      recipeId: { type: Number, require: true },
+    });
+    collectionSet[id] = mongoose.model(id, history);
+  }
+  return collectionSet[id];
+}
 
+user_db.once('open', handleOpen);
 var Schema = mongoose.Schema;
 
 var UserSchema = new Schema(
@@ -60,6 +77,19 @@ UserSchema.statics.findOneByUserToken = function (token: string) {
 // Update by userid
 UserSchema.statics.updateTokenByUserid = function (userid: string, payload: string) {
   return this.findOneAndUpdate({ userid: userid }, { token: payload });
+};
+
+// 초기설정
+UserSchema.statics.initUserInfo = function (reqData: any) {
+  return this.updateOne(
+    { token: reqData.token },
+    {
+      nickname: reqData.nickname,
+      dislikeIngredient: reqData.dislike,
+      likeRecipesId: reqData.like,
+      photo: reqData.photo,
+    },
+  );
 };
 
 // 좋아하는 레시피라고 클릭했을 때 몽고에 추가함. 1개씩 가능

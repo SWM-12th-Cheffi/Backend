@@ -2,7 +2,7 @@ from neo4j import GraphDatabase
 import json # import json module
 
 # with statement
-with open('/server/python/crawl/recipe10000_0929.json') as json_file:
+with open('/usr/src/python/crawl/recipe10000_0929.json') as json_file:
     json_data = json.load(json_file)
 query = ""
 neoAuth = ("neo4j","r6qEpV4t") # ID, PW

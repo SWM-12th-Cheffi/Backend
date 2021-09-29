@@ -13,7 +13,7 @@ var handleOpen = () => {
     console.log(collectionSet);
   });
 };
-
+/*
 function createUserHistoryCollection(id) {
   if (!collectionSet.has(id)) {
     var history = new Schema({
@@ -24,7 +24,7 @@ function createUserHistoryCollection(id) {
   }
   return collectionSet[id];
 }
-
+*/
 user_db.once('open', handleOpen);
 var Schema = mongoose.Schema;
 

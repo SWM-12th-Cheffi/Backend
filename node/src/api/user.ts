@@ -26,7 +26,7 @@ userRouter.post('/addLikeRecipe', function (req, res) {
   });
 });
 
-// 해당 요리를 끝마쳤다는 정보를 받은 뒤 추천 반영
+// 사용자 정보 초기설정
 userRouter.post('/initInfo', function (req, res) {
   console.time('initInfo');
   User.initInfo(req.body).then((result: any) => {
@@ -43,6 +43,28 @@ userRouter.post('/initInfo', function (req, res) {
         message: 'No Matched Information.',
       });
     console.timeEnd('initInfo');
+  });
+});
+
+// 사용자 정보 불러오기
+userRouter.post('/info', function (req, res) {
+  console.log('Post User Info to Front');
+  console.time('info');
+
+  let token = req.body.token;
+  User.findOneByUserToken(token).then((result: any) => {
+    let openedInfo = {
+      nickname: result.nickname,
+      statusMessage: result.statusMessage,
+      photo: result.photo,
+      dislikeIngredient: result.dislikeIngredient,
+      scrapRecipesId: result.scrapRecipesId,
+      likeRecipesId: result.likeRecipesId,
+      historyRecipesId: result.historyRecipesId,
+      refriger: result.refriger,
+    };
+    res.send(openedInfo);
+    console.timeEnd('info');
   });
 });
 

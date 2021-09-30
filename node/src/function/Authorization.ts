@@ -20,21 +20,26 @@ export default async function authorization(
         else return { status: 403, message: "Can't Find token Property" };
       } else return { status: 403, message: 'Incorrect platform Property' };
     case 2: // Can Access When Verify Success
+      let newUser: boolean = false;
       if (platform && platform == 'google') {
         try {
           const authRes = await verify_google(token, init);
-          console.log(authRes);
-          return { status: 200, message: 'Access Success', init: init, token: token };
+          if (Object.entries(authRes).length == 6) newUser = true;
+          else if (Object.entries(authRes).length == 7) newUser = false;
+          else return { status: 400, message: 'Mongo Error' };
+          return { status: 200, message: 'Access Success', newUser: newUser, token: token };
         } catch (err) {
-          return { status: 400, message: 'Invalid token Signature' };
+          return { status: 400, message: err };
         }
       } else if (platform && platform == 'kakao') {
         try {
           const authRes = await verify_kakao(token, init);
-          console.log(authRes);
-          return { status: 200, message: 'Access Success', init: init, token: token };
+          if (Object.entries(authRes).length == 6) newUser = true;
+          else if (Object.entries(authRes).length == 7) newUser = false;
+          else return { status: 400, message: 'Mongo Error' };
+          return { status: 200, message: 'Access Success', newUser: newUser, token: token };
         } catch (err) {
-          return { status: 400, message: 'Invalid token Signature' };
+          return { status: 400, message: err };
         }
       } else return { status: 400, message: 'Incorrect platform Property' };
     default:
@@ -52,19 +57,17 @@ async function verify_google(token: string, init: boolean) {
   let securityTk = crypto.createHash('sha512').update(token).digest('base64');
   if (init) {
     // 처음 로그인할 때
-    let newUser: boolean;
     let Userinfo = { userid: userid, platform: 'Google', token: securityTk };
     return User.findOneByUserid(userid).then((result: object) => {
       if (!result) {
-        newUser = true;
         return User.create(Userinfo);
       } else {
-        newUser = false;
         return User.updateTokenByUserid(userid, securityTk);
       }
     });
   } else {
     // 이후 권한 확인할 때
+    return User.findOneByUserid(userid);
   }
 }
 
@@ -93,5 +96,6 @@ async function verify_kakao(token: string, init: boolean) {
     });
   } else {
     // 이후 권한 확인할 때
+    return User.findOneByUserid(userid);
   }
 }

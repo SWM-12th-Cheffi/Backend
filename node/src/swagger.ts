@@ -2,7 +2,7 @@ var swaggerJson = {
   swagger: '2.0',
   info: {
     description: 'Api Documentation.',
-    version: '0.1.1',
+    version: '0.1.2',
     title: 'Cheffi Api',
   },
   host: '18.220.121.204:2001',
@@ -35,7 +35,6 @@ var swaggerJson = {
   ],
   schemes: ['http', 'https'],
   paths: {
-    //fin
     '/': {
       post: {
         tags: ['Test'],
@@ -70,7 +69,7 @@ var swaggerJson = {
         },
       },
     },
-    //fin
+
     '/recipe/NumPossiRP': {
       post: {
         tags: ['Recipe'],
@@ -132,7 +131,6 @@ var swaggerJson = {
         },
       },
     },
-    //fin
     '/recipe/NumPossiRP_Sim': {
       post: {
         tags: ['Recipe'],
@@ -194,7 +192,6 @@ var swaggerJson = {
         },
       },
     },
-    //fin
     '/recipe/ListPossiRP': {
       post: {
         tags: ['Recipe'],
@@ -256,7 +253,6 @@ var swaggerJson = {
         },
       },
     },
-    //fin
     '/recipe/ListPossiRP_Sim': {
       post: {
         tags: ['Recipe'],
@@ -318,7 +314,6 @@ var swaggerJson = {
         },
       },
     },
-    //fin
     '/recipe/find/haemuk': {
       post: {
         tags: ['Recipe'],
@@ -351,7 +346,6 @@ var swaggerJson = {
         responses: {},
       },
     },
-    //fin
     '/recipe/randomRecipeList': {
       post: {
         tags: ['Recipe'],
@@ -381,7 +375,6 @@ var swaggerJson = {
       },
     },
 
-    //fin
     '/user/addLikeRecipe': {
       post: {
         tags: ['User'],
@@ -421,91 +414,18 @@ var swaggerJson = {
         },
       },
     },
-
-    // 일단 빼고 진행
-    '/user/FineCook': {
-      post: {
-        tags: ['User'],
-        summary: '사용자가 요리를 마쳤음을 확인',
-        description: '레시피의 번호를 입력하면 해당 레시피의 자세한 정보를 불러와서 반환해줍니다.',
-        consumes: ['application/json'],
-        produces: ['application/json'],
-        parameters: [
-          {
-            in: 'body',
-            name: 'body',
-            description: '레시피의 번호를 입력해주세요.',
-            required: true,
-            schema: {
-              type: 'object',
-              properties: {
-                id: {
-                  type: 'integer',
-                  format: 'int32',
-                  example: 5980,
-                },
-              },
-            },
-          },
-        ],
-        responses: {
-          '200': {
-            description: 'Connecting Success!',
-          },
-          '405': {
-            description: 'Invalid input',
-          },
-        },
-      },
-    },
-
-    '/user/ShowIGDynamic': {
-      post: {
-        tags: ['User'],
-        summary: '재료 목록을 동적으로 불러와서 완성',
-        description: '레시피의 번호를 입력하면 해당 레시피의 자세한 정보를 불러와서 반환해줍니다.',
-        consumes: ['application/json'],
-        produces: ['application/json'],
-        parameters: [
-          {
-            in: 'body',
-            name: 'body',
-            description: '레시피의 번호를 입력해주세요.',
-            required: true,
-            schema: {
-              type: 'object',
-              properties: {
-                id: {
-                  type: 'string',
-                  example: '양',
-                },
-              },
-            },
-          },
-        ],
-        responses: {
-          '200': {
-            description: 'Connecting Success!',
-          },
-          '405': {
-            description: 'Invalid input',
-          },
-        },
-      },
-    },
-
     '/user/info': {
       post: {
         tags: ['user'],
         summary: '사용자의 정보를 가져오기 위해서 사용합니다.',
-        description: '암호화된 token과 platform을 post로 보내면 그 token에 해당하는 사용자의 정보를 가져옵니다. 인증이',
+        description: 'token과, platform을 적으면 해당되는 사용자의 정보를 불러옵니다.',
         consumes: ['application/json'],
         produces: ['application/json'],
         parameters: [
           {
             in: 'body',
             name: 'body',
-            description: 'Input Crypto Token',
+            description: 'Input Token, platform',
             required: true,
             schema: {
               type: 'object',
@@ -532,74 +452,44 @@ var swaggerJson = {
         },
       },
     },
-
-    '/etc/OrderByFavorite': {
+    '/user/refriger': {
       post: {
-        tags: ['etc'],
-        summary: '레시피의 자세한 정보를 가져옵니다.',
-        description: '레시피의 번호를 입력하면 해당 레시피의 자세한 정보를 불러와서 반환해줍니다.',
+        tags: ['user'],
+        summary: '사용자의 냉장고 정보를 저장하기 위해서 사용합니다.',
+        description:
+          'token, platform, refriger 정보를 전송하면 해당되는 사용자의 refriger에 데이터를 저장합니다. 덮어씌우기 되는 것으로 []을 refriger에 보내면 빈 냉장고로 변경됩니다.',
         consumes: ['application/json'],
         produces: ['application/json'],
         parameters: [
           {
             in: 'body',
             name: 'body',
-            description: '레시피의 번호를 입력해주세요.',
+            description: 'Input token, platform, refriger',
             required: true,
             schema: {
               type: 'object',
               properties: {
-                id: {
-                  type: 'integer',
-                  format: 'int32',
-                  example: 5980,
+                token: {
+                  type: 'string',
+                  example: 'wuLkMiCXCOXWSpQKTfq3_oTEawDAAU8IO_quUAopb1QAAAF8NXns2g',
+                },
+                platform: {
+                  type: 'string',
+                  example: 'kakao',
+                },
+                refriger: {
+                  type: 'array',
                 },
               },
             },
           },
         ],
         responses: {
-          '200': {
-            description: 'Connecting Success!',
+          '401': {
+            description: ' OAuth 인증에 실패했습니다. 잘못된 정보가 없는지 확인해주세요.',
           },
-          '405': {
-            description: 'Invalid input',
-          },
-        },
-      },
-    },
-
-    '/etc/Recc': {
-      post: {
-        tags: ['etc'],
-        summary: '레시피의 자세한 정보를 가져옵니다.',
-        description: '레시피의 번호를 입력하면 해당 레시피의 자세한 정보를 불러와서 반환해줍니다.',
-        consumes: ['application/json'],
-        produces: ['application/json'],
-        parameters: [
-          {
-            in: 'body',
-            name: 'body',
-            description: '레시피의 번호를 입력해주세요.',
-            required: true,
-            schema: {
-              type: 'object',
-              properties: {
-                id: {
-                  type: 'integer',
-                  format: 'int32',
-                  example: 5980,
-                },
-              },
-            },
-          },
-        ],
-        responses: {
-          '200': {
-            description: 'Connecting Success!',
-          },
-          '405': {
-            description: 'Invalid input',
+          '404': {
+            description: 'Data를 찾을 수 없습니다. 로그인 해주세요.',
           },
         },
       },

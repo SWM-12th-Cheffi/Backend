@@ -22,7 +22,7 @@ export default async function authorization(
           else return { status: 400, message: 'Mongo Error' };
           return { status: 200, message: 'Login Success', newUser: newUser, token: token };
         } catch (err) {
-          return { status: 400, message: err };
+          return { status: 401, message: err };
         }
       } else if (platform && platform == 'kakao') {
         try {
@@ -32,34 +32,37 @@ export default async function authorization(
           else return { status: 400, message: 'Mongo Error' };
           return { status: 200, message: 'Login Success', newUser: newUser, token: token };
         } catch (err) {
-          return { status: 400, message: err };
+          return { status: 401, message: err };
         }
-      } else return { status: 400, message: 'Incorrect platform Property' };
+      } else return { status: 401, message: 'Incorrect platform Property' };
     case 0: // All Access
       return { status: 200, message: 'Access Success' };
     case 1: // Can Access When Input Token
       if (platform && (platform == 'google' || platform == 'kakao')) {
         if (token) return { status: 200, message: 'Access Success' };
-        else return { status: 403, message: "Can't Find token Property" };
-      } else return { status: 403, message: 'Incorrect platform Property' };
+        else return { status: 401, message: "Can't Find token Property" };
+      } else return { status: 401, message: 'Incorrect platform Property' };
     case 2: // Can Access When Verify Success
       if (platform && platform == 'google') {
         try {
           const authRes = await verify_google(token, false);
+          if (!authRes) throw { response: { status: 404, statusText: "Cant' find Data" } }; // mongo에 데이터가 없을 때
           return { status: 200, message: 'Access Success', securityTk: authRes.token };
-        } catch (err) {
-          return { status: 400, message: err };
+        } catch (err: any) {
+          if (err.hasOwnProperty('response')) return { status: err.response.status, message: err.response.statusText };
+          else return { status: 401, message: String(err).split(':')[1] };
         }
       } else if (platform && platform == 'kakao') {
         try {
           const authRes = await verify_kakao(token, false);
+          if (!authRes) throw { response: { status: 404, statusText: "Cant' find Data" } }; // mongo에 데이터가 없을 때
           return { status: 200, message: 'Access Success', securityTk: authRes.token };
         } catch (err: any) {
           return { status: err.response.status, message: err.response.statusText };
         }
-      } else return { status: 400, message: 'Incorrect platform Property' };
+      } else return { status: 401, message: 'Incorrect platform Property' };
     default:
-      return { status: 400, message: 'Api Authorization Error (Security Number Error)' };
+      return { status: 401, message: 'Api Authorization Error (Security Number Error)' };
   }
 }
 

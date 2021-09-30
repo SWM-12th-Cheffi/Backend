@@ -494,6 +494,45 @@ var swaggerJson = {
       },
     },
 
+    '/user/info': {
+      post: {
+        tags: ['user'],
+        summary: '사용자의 정보를 가져오기 위해서 사용합니다.',
+        description: '암호화된 token과 platform을 post로 보내면 그 token에 해당하는 사용자의 정보를 가져옵니다. 인증이',
+        consumes: ['application/json'],
+        produces: ['application/json'],
+        parameters: [
+          {
+            in: 'body',
+            name: 'body',
+            description: 'Input Crypto Token',
+            required: true,
+            schema: {
+              type: 'object',
+              properties: {
+                token: {
+                  type: 'string',
+                  example: 'wuLkMiCXCOXWSpQKTfq3_oTEawDAAU8IO_quUAopb1QAAAF8NXns2g',
+                },
+                platform: {
+                  type: 'string',
+                  example: 'kakao',
+                },
+              },
+            },
+          },
+        ],
+        responses: {
+          '401': {
+            description: ' OAuth 인증에 실패했습니다. 잘못된 정보가 없는지 확인해주세요.',
+          },
+          '404': {
+            description: 'Data를 찾을 수 없습니다. 로그인 해주세요.',
+          },
+        },
+      },
+    },
+
     '/etc/OrderByFavorite': {
       post: {
         tags: ['etc'],
@@ -566,26 +605,30 @@ var swaggerJson = {
       },
     },
 
-    '/Auth/google': {
+    '/Auth': {
       post: {
         tags: ['Auth'],
-        summary: 'Google Authentication을 위해서 사용합니다.',
+        summary: '주어진 token과 platform을 사용하여 로그인을 진행합니다.',
         description:
-          'Google ID_Token을 인자로 입력하면 새로운 유저인지 확인하고, 암호화된 token을 반환합니다. Token의 Expiration 시간은 1시간입니다.',
+          '각 플랫폼의 token과 "google", "kakao" 플랫폼의 데이터를 입력하면 해당하는 플랫폼으로 로그인을 진행합니다.',
         consumes: ['application/json'],
         produces: ['application/json'],
         parameters: [
           {
             in: 'body',
             name: 'body',
-            description: 'Input Id_Token',
+            description: 'token과 platform을 입력해주세요.',
             required: true,
             schema: {
               type: 'object',
               properties: {
-                it: {
+                token: {
                   type: 'string',
                   example: '예시는 없습니다... 겁나 깁니다...',
+                },
+                platform: {
+                  type: 'string',
+                  example: 'google or kakao',
                 },
               },
             },
@@ -593,76 +636,13 @@ var swaggerJson = {
         ],
         responses: {
           '200': {
-            description: 'Connecting Success!',
+            description: 'Login Success',
           },
-          '405': {
-            description: 'Invalid input',
+          '400': {
+            description: 'Mongo Error입니다. 관리자에게 문의주세요.',
           },
-        },
-      },
-    },
-
-    '/Auth/kakao': {
-      post: {
-        tags: ['Auth'],
-        summary: 'Kakao Authentication을 위해서 사용합니다.',
-        description:
-          'Kakao AccessToken을 인자로 입력하면 새로운 유저인지 확인하고, 암호화된 토큰을 반환합니다. Token의 Expiration 시간은 24시간입니다.',
-        consumes: ['application/json'],
-        produces: ['application/json'],
-        parameters: [
-          {
-            in: 'body',
-            name: 'body',
-            description: 'Input AccessToken',
-            required: true,
-            schema: {
-              type: 'object',
-              properties: {
-                at: {
-                  type: 'string',
-                  example: '예시는 없습니다... .google보다는 짧습니다.',
-                },
-              },
-            },
-          },
-        ],
-        responses: {
           '401': {
-            description: 'Access Token에 해당하는 사용자의 정보가 없습니다.',
-          },
-        },
-      },
-    },
-
-    '/Auth/info': {
-      post: {
-        tags: ['Auth'],
-        summary: '사용자의 정보를 가져오기 위해서 사용합니다.',
-        description:
-          '암호화된 token을 post로 보내면 그 token에 해당하는 사용자의 정보를 가져옵니다. 없는 정보는 가져오지 않습니다.',
-        consumes: ['application/json'],
-        produces: ['application/json'],
-        parameters: [
-          {
-            in: 'body',
-            name: 'body',
-            description: 'Input Crypto Token',
-            required: true,
-            schema: {
-              type: 'object',
-              properties: {
-                token: {
-                  type: 'string',
-                  example: 'TS1yEpy6QB2fc5wzDNDPNhLZnGJaU9SsDxtDx33v/831UdIR78r0qZPkbANu00SwQuk4eTUxJY788aWYOOBqIw==',
-                },
-              },
-            },
-          },
-        ],
-        responses: {
-          '401': {
-            description: ' Token에 해당하는 사용자의 정보가 없습니다.',
+            description: '잘못된 입력입니다.',
           },
         },
       },

@@ -49,7 +49,7 @@ userRouter.post('/initInfo', function (req, res) {
 
 // 사용자 정보 불러오기
 userRouter.post('/info', async function (req, res) {
-  console.log('Post User Info to Front');
+  console.log('/user/info Api Called');
   const authzRes = await authz(req.body.token, req.body.platform, 2);
   if (authzRes.status == 200)
     User.findOneByUserToken(authzRes.securityTk)

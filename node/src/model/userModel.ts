@@ -79,6 +79,11 @@ UserSchema.statics.updateTokenByUserid = function (userid: string, payload: stri
   return this.findOneAndUpdate({ userid: userid }, { token: payload });
 };
 
+// Update by userid
+UserSchema.statics.updateRefrigerByUserid = function (userid: string, fridge: object) {
+  return this.findOneAndUpdate({ userid: userid }, { refriger: fridge });
+};
+
 // 초기설정
 UserSchema.statics.initUserInfo = function (reqData: any) {
   return this.updateOne(

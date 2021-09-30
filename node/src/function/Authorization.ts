@@ -47,7 +47,7 @@ export default async function authorization(
         try {
           const authRes = await verify_google(token, false);
           if (!authRes) throw { response: { status: 404, statusText: "Cant' find Data" } }; // mongo에 데이터가 없을 때
-          return { status: 200, message: 'Access Success', securityTk: authRes.token };
+          return { status: 200, message: 'Access Success', securityId: authRes.userid };
         } catch (err: any) {
           if (err.hasOwnProperty('response')) return { status: err.response.status, message: err.response.statusText };
           else return { status: 401, message: String(err).split(':')[1] };
@@ -56,7 +56,7 @@ export default async function authorization(
         try {
           const authRes = await verify_kakao(token, false);
           if (!authRes) throw { response: { status: 404, statusText: "Cant' find Data" } }; // mongo에 데이터가 없을 때
-          return { status: 200, message: 'Access Success', securityTk: authRes.token };
+          return { status: 200, message: 'Access Success', securityId: authRes.userid };
         } catch (err: any) {
           return { status: err.response.status, message: err.response.statusText };
         }

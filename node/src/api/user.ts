@@ -52,7 +52,7 @@ userRouter.post('/info', async function (req, res) {
   console.log('/user/info Api Called');
   const authzRes = await authz(req.body.token, req.body.platform, 2);
   if (authzRes.status == 200)
-    User.findOneByUserToken(authzRes.securityTk)
+    User.findOneByUserId(authzRes.securityId)
       .then((result: any) => {
         let openedInfo = {
           status: 200,
@@ -67,6 +67,19 @@ userRouter.post('/info', async function (req, res) {
           refriger: result.refriger,
         };
         res.send(openedInfo);
+      })
+      .catch(console.log);
+  else res.send(authzRes);
+});
+
+// 사용자 정보 불러오기
+userRouter.post('/refriger', async function (req, res) {
+  console.log('/user/refriger Api Called');
+  const authzRes = await authz(req.body.token, req.body.platform, 2);
+  if (authzRes.status == 200)
+    User.updateRefrigerByUserid(authzRes.securityId, req.body.refriger)
+      .then(() => {
+        res.send({ status: 200, message: 'refriger Save Success' });
       })
       .catch(console.log);
   else res.send(authzRes);

@@ -3,15 +3,38 @@ var crypto = require('crypto');
 var axios = require('axios');
 var User = require('../model/userModel');
 
-//0: all access, 1: access when input token, 2: access when verify success
+//-1: Login,  0: all access, 1: access when input token, 2: access when verify success
 export default async function authorization(
   token: string,
   platform: string,
   security: number = 0,
   init: boolean = false,
 ) {
-  console.log('Authorization ' + platform + ' level: ' + security + ', init: ' + init);
+  console.log('Authorization ' + platform + ' level: ' + security);
   switch (security) {
+    case -1: // For Login
+      let newUser: boolean = false;
+      if (platform && platform == 'google') {
+        try {
+          const authRes = await verify_google(token, true);
+          if (Object.entries(authRes).length == 6) newUser = true;
+          else if (Object.entries(authRes).length == 7) newUser = false;
+          else return { status: 400, message: 'Mongo Error' };
+          return { status: 200, message: 'Login Success', newUser: newUser, token: token };
+        } catch (err) {
+          return { status: 400, message: err };
+        }
+      } else if (platform && platform == 'kakao') {
+        try {
+          const authRes = await verify_kakao(token, true);
+          if (Object.entries(authRes).length == 6) newUser = true;
+          else if (Object.entries(authRes).length == 7) newUser = false;
+          else return { status: 400, message: 'Mongo Error' };
+          return { status: 200, message: 'Login Success', newUser: newUser, token: token };
+        } catch (err) {
+          return { status: 400, message: err };
+        }
+      } else return { status: 400, message: 'Incorrect platform Property' };
     case 0: // All Access
       return { status: 200, message: 'Access Success' };
     case 1: // Can Access When Input Token
@@ -20,26 +43,19 @@ export default async function authorization(
         else return { status: 403, message: "Can't Find token Property" };
       } else return { status: 403, message: 'Incorrect platform Property' };
     case 2: // Can Access When Verify Success
-      let newUser: boolean = false;
       if (platform && platform == 'google') {
         try {
-          const authRes = await verify_google(token, init);
-          if (Object.entries(authRes).length == 6) newUser = true;
-          else if (Object.entries(authRes).length == 7) newUser = false;
-          else return { status: 400, message: 'Mongo Error' };
-          return { status: 200, message: 'Access Success', newUser: newUser, token: token };
+          const authRes = await verify_google(token, false);
+          return { status: 200, message: 'Access Success', securityTk: authRes.token };
         } catch (err) {
           return { status: 400, message: err };
         }
       } else if (platform && platform == 'kakao') {
         try {
-          const authRes = await verify_kakao(token, init);
-          if (Object.entries(authRes).length == 6) newUser = true;
-          else if (Object.entries(authRes).length == 7) newUser = false;
-          else return { status: 400, message: 'Mongo Error' };
-          return { status: 200, message: 'Access Success', newUser: newUser, token: token };
-        } catch (err) {
-          return { status: 400, message: err };
+          const authRes = await verify_kakao(token, false);
+          return { status: 200, message: 'Access Success', securityTk: authRes.token };
+        } catch (err: any) {
+          return { status: err.response.status, message: err.response.statusText };
         }
       } else return { status: 400, message: 'Incorrect platform Property' };
     default:
@@ -59,11 +75,8 @@ async function verify_google(token: string, init: boolean) {
     // 처음 로그인할 때
     let Userinfo = { userid: userid, platform: 'Google', token: securityTk };
     return User.findOneByUserid(userid).then((result: object) => {
-      if (!result) {
-        return User.create(Userinfo);
-      } else {
-        return User.updateTokenByUserid(userid, securityTk);
-      }
+      if (!result) return User.create(Userinfo);
+      else return User.updateTokenByUserid(userid, securityTk);
     });
   } else {
     // 이후 권한 확인할 때
@@ -83,16 +96,10 @@ async function verify_kakao(token: string, init: boolean) {
   let securityTk = crypto.createHash('sha512').update(String(token)).digest('base64');
   if (init) {
     // 처음 로그인할 때
-    let newUser: boolean;
     let Userinfo = { userid: userid, platform: 'Kakao', token: securityTk };
     return User.findOneByUserid(userid).then((result: object) => {
-      if (!result) {
-        newUser = true;
-        return User.create(Userinfo);
-      } else {
-        newUser = false;
-        return User.updateTokenByUserid(userid, securityTk);
-      }
+      if (!result) return User.create(Userinfo);
+      else return User.updateTokenByUserid(userid, securityTk);
     });
   } else {
     // 이후 권한 확인할 때

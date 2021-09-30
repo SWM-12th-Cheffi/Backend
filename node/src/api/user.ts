@@ -2,6 +2,7 @@
 import * as express from 'express';
 const userRouter = express.Router();
 var User = require('../model/userModel');
+import authz from '../function/Authorization';
 
 // 좋아하는 음식의 레시피 번호를 저장
 userRouter.post('/addLikeRecipe', function (req, res) {
@@ -47,25 +48,28 @@ userRouter.post('/initInfo', function (req, res) {
 });
 
 // 사용자 정보 불러오기
-userRouter.post('/info', function (req, res) {
+userRouter.post('/info', async function (req, res) {
   console.log('Post User Info to Front');
-  console.time('info');
-
-  let token = req.body.token;
-  User.findOneByUserToken(token).then((result: any) => {
-    let openedInfo = {
-      nickname: result.nickname,
-      statusMessage: result.statusMessage,
-      photo: result.photo,
-      dislikeIngredient: result.dislikeIngredient,
-      scrapRecipesId: result.scrapRecipesId,
-      likeRecipesId: result.likeRecipesId,
-      historyRecipesId: result.historyRecipesId,
-      refriger: result.refriger,
-    };
-    res.send(openedInfo);
-    console.timeEnd('info');
-  });
+  const authzRes = await authz(req.body.token, req.body.platform, 2);
+  if (authzRes.status == 200)
+    User.findOneByUserToken(authzRes.securityTk)
+      .then((result: any) => {
+        let openedInfo = {
+          status: 200,
+          message: 'Information Load Success',
+          nickname: result.nickname,
+          statusMessage: result.statusMessage,
+          photo: result.photo,
+          dislikeIngredient: result.dislikeIngredient,
+          scrapRecipesId: result.scrapRecipesId,
+          likeRecipesId: result.likeRecipesId,
+          historyRecipesId: result.historyRecipesId,
+          refriger: result.refriger,
+        };
+        res.send(openedInfo);
+      })
+      .catch(console.log);
+  else res.send(authzRes);
 });
 
 // 해당 요리를 끝마쳤다는 정보를 받은 뒤 추천 반영

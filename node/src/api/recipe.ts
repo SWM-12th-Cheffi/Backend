@@ -4,7 +4,7 @@ import CoverWithQuotation from '../function/CoverWithQuotation';
 const recipeRouter = express.Router();
 
 //mongoDB setting
-var Haemuk = require('../model/haemukModel');
+var Recipe = require('../model/RecipeModel');
 
 //neo4j setting
 var neo4j = require('neo4j-driver');
@@ -97,13 +97,13 @@ recipeRouter.post('/ListPossiRP', function (req, res) {
 });
 
 // 레시피의 정보를 해먹에서 반환하는 기능 fin
-recipeRouter.post('/find/haemuk', function (req, res) {
-  console.time('findHaemuk');
-  Haemuk.findByRecipeid(req.body.id)
+recipeRouter.post('/find/Recipe', function (req, res) {
+  console.time('findRecipe');
+  Recipe.findByRecipeid(req.body.id)
     .then((result: any) => {
       if (!result) return res.status(404).send({ err: 'Recipe not found' });
       res.send(result);
-      console.timeEnd('findHaemuk');
+      console.timeEnd('findRecipe');
     })
     .catch((err: any) => res.status(500).send(err));
 });
@@ -111,7 +111,7 @@ recipeRouter.post('/find/haemuk', function (req, res) {
 // 처음 사용자 데이터 받을 때 보여줄 랜덤 레시피
 recipeRouter.post('/randomRecipeList', function (req, res) {
   console.time('randomRecipeList');
-  Haemuk.randomRecipe(req.body.num).then((result: number) => {
+  Recipe.randomRecipe(req.body.num).then((result: number) => {
     res.send({ recipe: result });
   });
   console.timeEnd('randomRecipeList');

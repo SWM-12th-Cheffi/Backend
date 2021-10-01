@@ -15,9 +15,12 @@ var RecipeSchema = new Schema(
     id: Schema.Types.ObjectID,
     recipeid: { type: Number, require: true, unique: true },
     title: { type: String, require: true },
-    scrap: { type: Number, require: false }, // 만개의 레시피에는 없음
+    scrap: { type: Number, require: false, default: null }, // 만개의 레시피에는 없음
     time: { type: String, require: false },
-    calories: { type: Number, require: false },
+    calories: { type: Number, require: false, default: null }, // 만개의 레시피에는 없음
+    size: { type: Number, require: false, default: null }, // 해먹에는 없음
+    difficulty: { type: String, require: false, default: '' }, // 해먹에는 없음
+    ingredient: { type: Array, require: false, default: [] }, // 해먹 재료 데이터 업데이트 필요
     test: { type: Boolean, require: false },
   },
   {
@@ -50,4 +53,4 @@ RecipeSchema.statics.updateByRecipeid = function (recipeid: number, payload: any
 };
 
 // Create Model & Export
-module.exports = recipe_db.model('recipe', RecipeSchema);
+module.exports = recipe_db.model('haemuk', RecipeSchema);

@@ -20,7 +20,7 @@ var UserLikeInfo: string[] = ['짜장면', '짬뽕'];
 
 // 재료를 통해 만들 수 있는 레시피 개수를 반환하는 기능  fin
 recipeRouter.post('/NumPossiRP', function (req, res) {
-  console.time('NumPossiRP_Sim');
+  console.time('NumPossiRP');
   let ingreData: string[] = req.body.ingre;
   let query: string =
     'MATCH (i:Input)-[:ELEMENT]->(r:Ingredient) WHERE i.name in [' +
@@ -41,7 +41,7 @@ recipeRouter.post('/NumPossiRP', function (req, res) {
       .then(function (resNeo: any) {
         let ret: string = resNeo.records[0].get('count').low;
         console.log('반환값: ' + ret); // 10
-        res.send(String(ret));
+        res.send({ num: String(ret) });
         console.timeEnd('NumPossiRP_Sim');
       })
       .catch(function (error: string) {
@@ -53,7 +53,7 @@ recipeRouter.post('/NumPossiRP', function (req, res) {
 
 // 재료를 통해 만들 수 있는 레시피 번호 리스트를 반환하는 함수  fin
 recipeRouter.post('/ListPossiRP', function (req, res) {
-  console.time('ListPossiRP_Sim');
+  console.time('ListPossiRP');
   let ingreData: string[] = req.body.ingre;
   let query: string =
     'MATCH (i:Input)-[:ELEMENT]->(r:Ingredient) WHERE i.name in [' +

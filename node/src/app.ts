@@ -16,7 +16,7 @@ import testRouter from './api/test';
 import userRouter from './api/user';
 import etcRouter from './api/etc';
 import authRouter from './api/auth';
-import adminRouter from './api/admin';
+//import adminRouter from './api/admin';
 
 // swagger Setting
 import * as swaggerUi from 'swagger-ui-express';
@@ -35,6 +35,6 @@ app.use('/Auth', authRouter);
 app.use('/recipe', recipeRouter);
 app.use('/user', userRouter);
 app.use('/etc', etcRouter);
-app.use('/admin', adminRouter);
+//app.use('/admin', adminRouter);
 
 module.exports = server;

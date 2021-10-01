@@ -4,7 +4,7 @@ var axios = require('axios');
 var User = require('../model/userModel');
 
 //-1: Login,  0: all access, 1: access when input token, 2: access when verify success
-export default async function authorization(
+export default async function Authorization(
   token: string,
   platform: string,
   security: number = 0,
@@ -58,6 +58,7 @@ export default async function authorization(
           if (!authRes) throw { response: { status: 404, statusText: "Cant' find Data" } }; // mongo에 데이터가 없을 때
           return { status: 200, message: 'Access Success', securityId: authRes.userid };
         } catch (err: any) {
+          console.log(err);
           return { status: err.response.status, message: err.response.statusText };
         }
       } else return { status: 401, message: 'Incorrect platform Property' };

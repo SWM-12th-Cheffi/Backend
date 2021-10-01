@@ -2,7 +2,8 @@
 import * as express from 'express';
 const userRouter = express.Router();
 var User = require('../model/userModel');
-import authz from '../function/Authorization';
+import Authz from '../function/Authorization';
+import IngreMapping from '../function/IngreMap';
 
 // 좋아하는 음식의 레시피 번호를 저장
 userRouter.post('/addLikeRecipe', function (req, res) {
@@ -50,9 +51,9 @@ userRouter.post('/initInfo', function (req, res) {
 // 사용자 정보 불러오기
 userRouter.post('/info', async function (req, res) {
   console.log('/user/info Api Called');
-  const authzRes = await authz(req.body.token, req.body.platform, 2);
+  const authzRes = await Authz(req.body.token, req.body.platform, 2);
   if (authzRes.status == 200)
-    User.findOneByUserId(authzRes.securityId)
+    User.findOneByUserid(authzRes.securityId)
       .then((result: any) => {
         let openedInfo = {
           status: 200,
@@ -72,14 +73,27 @@ userRouter.post('/info', async function (req, res) {
   else res.send(authzRes);
 });
 
-// 사용자 정보 불러오기
+// 냉장고 정보 저장
 userRouter.post('/refriger', async function (req, res) {
   console.log('/user/refriger Api Called');
-  const authzRes = await authz(req.body.token, req.body.platform, 2);
+  const authzRes = await Authz(req.body.token, req.body.platform, 2);
   if (authzRes.status == 200)
     User.updateRefrigerByUserid(authzRes.securityId, req.body.refriger)
       .then(() => {
         res.send({ status: 200, message: 'refriger Save Success' });
+      })
+      .catch(console.log);
+  else res.send(authzRes);
+});
+
+// 저장된 냉장고 데이터로 만들 수 있는 레시피 수 카운트
+userRouter.post('/recipeCount', async function (req, res) {
+  console.log('/user/recipeCount Api Called');
+  const authzRes = await Authz(req.body.token, req.body.platform, 2);
+  if (authzRes.status == 200)
+    User.findOneByUserid(authzRes.securityId)
+      .then((result: any) => {
+        IngreMapping(result.refriger);
       })
       .catch(console.log);
   else res.send(authzRes);

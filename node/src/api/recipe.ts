@@ -4,7 +4,7 @@ import CoverWithQuotation from '../function/CoverWithQuotation';
 const recipeRouter = express.Router();
 
 //mongoDB setting
-var Haemuk = require('../model/haemukModel');
+var Recipe = require('../model/RecipeModel');
 
 //neo4j setting
 var neo4j = require('neo4j-driver');
@@ -20,7 +20,7 @@ var UserLikeInfo: string[] = ['짜장면', '짬뽕'];
 
 // 재료를 통해 만들 수 있는 레시피 개수를 반환하는 기능  fin
 recipeRouter.post('/NumPossiRP', function (req, res) {
-  console.time('NumPossiRP_Sim');
+  console.time('NumPossiRP');
   let ingreData: string[] = req.body.ingre;
   let query: string =
     'MATCH (i:Input)-[:ELEMENT]->(r:Ingredient) WHERE i.name in [' +
@@ -41,7 +41,7 @@ recipeRouter.post('/NumPossiRP', function (req, res) {
       .then(function (resNeo: any) {
         let ret: string = resNeo.records[0].get('count').low;
         console.log('반환값: ' + ret); // 10
-        res.send(String(ret));
+        res.send({ num: String(ret) });
         console.timeEnd('NumPossiRP_Sim');
       })
       .catch(function (error: string) {
@@ -53,7 +53,7 @@ recipeRouter.post('/NumPossiRP', function (req, res) {
 
 // 재료를 통해 만들 수 있는 레시피 번호 리스트를 반환하는 함수  fin
 recipeRouter.post('/ListPossiRP', function (req, res) {
-  console.time('ListPossiRP_Sim');
+  console.time('ListPossiRP');
   let ingreData: string[] = req.body.ingre;
   let query: string =
     'MATCH (i:Input)-[:ELEMENT]->(r:Ingredient) WHERE i.name in [' +
@@ -97,13 +97,13 @@ recipeRouter.post('/ListPossiRP', function (req, res) {
 });
 
 // 레시피의 정보를 해먹에서 반환하는 기능 fin
-recipeRouter.post('/find/haemuk', function (req, res) {
-  console.time('findHaemuk');
-  Haemuk.findByRecipeid(req.body.id)
+recipeRouter.post('/find/Recipe', function (req, res) {
+  console.time('findRecipe');
+  Recipe.findByRecipeid(req.body.id)
     .then((result: any) => {
       if (!result) return res.status(404).send({ err: 'Recipe not found' });
       res.send(result);
-      console.timeEnd('findHaemuk');
+      console.timeEnd('findRecipe');
     })
     .catch((err: any) => res.status(500).send(err));
 });
@@ -111,7 +111,7 @@ recipeRouter.post('/find/haemuk', function (req, res) {
 // 처음 사용자 데이터 받을 때 보여줄 랜덤 레시피
 recipeRouter.post('/randomRecipeList', function (req, res) {
   console.time('randomRecipeList');
-  Haemuk.randomRecipe(req.body.num).then((result: number) => {
+  Recipe.randomRecipe(req.body.num).then((result: number) => {
     res.send({ recipe: result });
   });
   console.timeEnd('randomRecipeList');

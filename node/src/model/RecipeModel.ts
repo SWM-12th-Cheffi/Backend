@@ -41,6 +41,15 @@ RecipeSchema.statics.randomRecipe = function (num: number) {
   return this.aggregate([{ $sample: { size: num } }, { $project: { _id: 0, recipeid: 1, title: 1 } }]);
 };
 
+// 입력받은 레시피 번호 배열로 각 레시피 정보를 받아옴.
+RecipeSchema.statics.ListPossiRP = function (num: number[]) {
+  return this.find({
+    $or: num.map((x) => {
+      return { recipeid: x };
+    }),
+  });
+};
+
 // Find by recipeid
 RecipeSchema.statics.findByRecipeid = function (recipeid: number[]) {
   return this.find({ recipeid });

@@ -7,23 +7,24 @@ const recipeRouter = express.Router();
 
 //mongoDB setting
 var Recipe = require('../model/RecipeModel');
-var User = require('../model/userModel');
+var User = require('../model/UserModel');
 
-// 재료를 통해 만들 수 있는 레시피 개수를 반환하는 기능  fin
-recipeRouter.post('/NumPossiRP', async function (req, res) {
+// 재료를 통해 만들 수 있는 레시피 개수를 반환하는 기능
+recipeRouter.post('/number', async function (req, res) {
   console.log('NumPossiRP');
   let ingreElement: string[] = await IngredElementOfInput(req.body.ingre);
   let returnStructure: object = { num: String(await NumberOfPossiRP(ingreElement)) };
   res.send(returnStructure);
 });
 
-// 재료를 통해 만들 수 있는 레시피 번호 리스트를 반환하는 함수  fin
-recipeRouter.post('/ListPossiRP', async function (req, res) {
+// 재료를 통해 만들 수 있는 레시피 번호 리스트를 반환하는 함수
+recipeRouter.post('/list', async function (req, res) {
   console.log('ListPossiRP');
+  let authorizationHeader: string = String(req.headers['Authorization']).split(' ')[1];
   let ingreElement: string[] = await IngredElementOfInput(req.body.ingre);
   let listRecipeid: any = await ListOfPossiRP(ingreElement);
   let reccReturnObject: any, reccRecipeList: number[];
-  const authzRes = await Authz(req.body.token, req.body.platform, 1);
+  const authzRes = await Authz(authorizationHeader, req.body.platform, 1);
   User.findOneByUserid(authzRes.securityId)
     .then(async function (userData: any) {
       reccReturnObject = await SortByRecc({
@@ -50,8 +51,8 @@ recipeRouter.post('/ListPossiRP', async function (req, res) {
     .catch((err: any) => res.status(500).send(err));
 });
 
-// 레시피의 정보를 해먹에서 반환하는 기능 fin
-recipeRouter.post('/find/Recipe', function (req, res) {
+// 레시피의 정보를 해먹에서 반환하는 기능
+recipeRouter.post('/info', function (req, res) {
   console.log('findRecipe');
 
   Recipe.findByRecipeid(req.body.id)
@@ -64,7 +65,7 @@ recipeRouter.post('/find/Recipe', function (req, res) {
 });
 
 // 처음 사용자 데이터 받을 때 보여줄 랜덤 레시피
-recipeRouter.post('/randomRecipeList', function (req, res) {
+recipeRouter.post('/random-list', function (req, res) {
   console.log('randomRecipeList');
   Recipe.randomRecipe(req.body.num).then((recipeInfo: object[]) => {
     let returnStructure: object = { recipe: recipeInfo };

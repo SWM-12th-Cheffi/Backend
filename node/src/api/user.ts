@@ -1,16 +1,15 @@
 //router 세팅
 import * as express from 'express';
 const userRouter = express.Router();
-var User = require('../model/userModel');
+var User = require('../model/UserModel');
 import Authz from '../function/Authorization';
 
 // 좋아하는 음식의 레시피 번호를 저장
-userRouter.post('/addLikeRecipe', function (req, res) {
+userRouter.get('/like', function (req, res) {
   console.log('SaveLikeRecipes');
-  console.time('SaveLikeRecipes');
-  let token = req.body.token;
-  let RecipeId: string = req.body.likeRecipeId;
-  User.addLikeRecipesByToken(token, RecipeId).then((result: any) => {
+  let authorizationHeader: string = String(req.headers['Authorization']).split(' ')[1];
+  let RecipeId = req.query.recipeid;
+  User.addLikeRecipesByToken(authorizationHeader, RecipeId).then((result: any) => {
     // 정상적으로 작업을 마침
     if (result.matchedCount)
       res.send({
@@ -23,13 +22,12 @@ userRouter.post('/addLikeRecipe', function (req, res) {
         status: 404,
         message: 'No Matched Information.',
       });
-    console.timeEnd('SaveLikeRecipes');
   });
 });
 
 // 사용자 정보 초기설정
-userRouter.post('/initInfo', function (req, res) {
-  console.time('initInfo');
+userRouter.post('/info/init', function (req, res) {
+  console.log('initInfo');
   User.initInfo(req.body).then((result: any) => {
     // 정상적으로 작업을 마침
     if (result.matchedCount)
@@ -43,14 +41,14 @@ userRouter.post('/initInfo', function (req, res) {
         status: 404,
         message: 'No Matched Information.',
       });
-    console.timeEnd('initInfo');
   });
 });
 
 // 사용자 정보 불러오기
 userRouter.post('/info', async function (req, res) {
   console.log('/user/info Api Called');
-  const authzRes = await Authz(req.body.token, req.body.platform, 2);
+  let authorizationHeader: string = String(req.headers['Authorization']).split(' ')[1];
+  const authzRes = await Authz(authorizationHeader, req.body.platform, 2);
   if (authzRes.status == 200)
     User.findOneByUserid(authzRes.securityId)
       .then((result: any) => {
@@ -75,7 +73,8 @@ userRouter.post('/info', async function (req, res) {
 // 냉장고 정보 저장
 userRouter.post('/refriger', async function (req, res) {
   console.log('/user/refriger Api Called');
-  const authzRes = await Authz(req.body.token, req.body.platform, 2);
+  let authorizationHeader: string = String(req.headers['Authorization']).split(' ')[1];
+  const authzRes = await Authz(authorizationHeader, req.body.platform, 2);
   if (authzRes.status == 200)
     User.updateRefrigerByUserid(authzRes.securityId, req.body.refriger)
       .then(() => {
@@ -86,9 +85,10 @@ userRouter.post('/refriger', async function (req, res) {
 });
 
 // 저장된 냉장고 데이터로 만들 수 있는 레시피 수 카운트
-userRouter.post('/recipeCount', async function (req, res) {
+userRouter.post('/recipe-count', async function (req, res) {
   console.log('/user/recipeCount Api Called');
-  const authzRes = await Authz(req.body.token, req.body.platform, 2);
+  let authorizationHeader: string = String(req.headers['Authorization']).split(' ')[1];
+  const authzRes = await Authz(authorizationHeader, req.body.platform, 2);
   if (authzRes.status == 200)
     User.findOneByUserid(authzRes.securityId)
       .then((result: any) => {})

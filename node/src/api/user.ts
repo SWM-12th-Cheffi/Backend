@@ -3,7 +3,6 @@ import * as express from 'express';
 const userRouter = express.Router();
 var User = require('../model/userModel');
 import Authz from '../function/Authorization';
-import IngreMapping from '../function/IngreMap';
 
 // 좋아하는 음식의 레시피 번호를 저장
 userRouter.post('/addLikeRecipe', function (req, res) {
@@ -92,23 +91,9 @@ userRouter.post('/recipeCount', async function (req, res) {
   const authzRes = await Authz(req.body.token, req.body.platform, 2);
   if (authzRes.status == 200)
     User.findOneByUserid(authzRes.securityId)
-      .then((result: any) => {
-        IngreMapping(result.refriger);
-      })
+      .then((result: any) => {})
       .catch(console.log);
   else res.send(authzRes);
-});
-
-// 해당 요리를 끝마쳤다는 정보를 받은 뒤 추천 반영
-userRouter.post('/FineCook', function (req, res) {
-  console.log(req.body.title);
-  res.send('Connecting POST Test Is OK, Title Value is ' + req.body.title);
-});
-
-// 재료를 검색할 때 동적으로 반응하여 보여주는 기능
-userRouter.post('/ShowIGDynamic', function (req, res) {
-  console.log(req.body.title);
-  res.send('Connecting POST Test Is OK, Title Value is ' + req.body.title);
 });
 
 export default userRouter;

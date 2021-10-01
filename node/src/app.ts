@@ -14,7 +14,6 @@ import { json } from 'body-parser';
 import recipeRouter from './api/recipe';
 import testRouter from './api/test';
 import userRouter from './api/user';
-import etcRouter from './api/etc';
 import authRouter from './api/auth';
 //import adminRouter from './api/admin';
 
@@ -34,7 +33,6 @@ app.use('/', testRouter);
 app.use('/Auth', authRouter);
 app.use('/recipe', recipeRouter);
 app.use('/user', userRouter);
-app.use('/etc', etcRouter);
 //app.use('/admin', adminRouter);
 
 module.exports = server;

@@ -1,6 +1,4 @@
 import authz from '../function/Authorization';
-
-//router 세팅
 import * as express from 'express';
 const authRouter = express.Router();
 

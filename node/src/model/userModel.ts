@@ -70,6 +70,11 @@ UserSchema.statics.findOneByUserid = function (userid: string) {
   return this.findOne({ userid: userid });
 };
 
+// Find One by userid
+UserSchema.statics.findRefrigerByUserid = function (userid: string) {
+  return this.findOne([{ userid: userid }, { $project: { _id: 0, refriger: 1 } }]);
+};
+
 UserSchema.statics.findOneByUserToken = function (token: string) {
   return this.findOne({ token: token });
 };

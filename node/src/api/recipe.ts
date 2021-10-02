@@ -9,6 +9,24 @@ const recipeRouter = express.Router();
 var Recipe = require('../model/RecipeModel');
 var User = require('../model/UserModel');
 
+// 전역 데이터 저장 변수
+type ingredientType = { title: string; data: string[] };
+type tmpUserIngredientType = { userid: string; ingredient: ingredientType[] };
+var tmpUserIngredient: tmpUserIngredientType[];
+
+// 재료를 통해 만들 수 있는 레시피 개수를 반환하는 기능 (tmp 저장방식)
+recipeRouter.post('/number', async function (req, res) {
+  console.log('NumPossiRP');
+  let authorizationHeader: string = String(req.headers['Authorization']).split(' ')[1];
+  const authzRes = await Authz(authorizationHeader, req.body.platform, 2);
+  if (authzRes.status == 200) {
+    let ingreElement: string[] = await IngredElementOfInput(req.body.ingre);
+    let returnStructure: object = { num: String(await NumberOfPossiRP(ingreElement)) };
+    res.send(returnStructure);
+  } else res.send(authzRes);
+});
+
+/*
 // 재료를 통해 만들 수 있는 레시피 개수를 반환하는 기능
 recipeRouter.post('/number', async function (req, res) {
   console.log('NumPossiRP');
@@ -16,6 +34,7 @@ recipeRouter.post('/number', async function (req, res) {
   let returnStructure: object = { num: String(await NumberOfPossiRP(ingreElement)) };
   res.send(returnStructure);
 });
+*/
 
 // 재료를 통해 만들 수 있는 레시피 번호 리스트를 반환하는 함수
 recipeRouter.post('/list', async function (req, res) {

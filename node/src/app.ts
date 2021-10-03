@@ -1,4 +1,3 @@
-require('console-stamp')(console, 'yyyy/mm/dd HH:MM:ss.l');
 require('dotenv').config();
 const debug = require('debug')('Cheffi:app');
 const logger = require('morgan');

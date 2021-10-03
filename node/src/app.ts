@@ -1,8 +1,11 @@
 require('console-stamp')(console, 'yyyy/mm/dd HH:MM:ss.l');
 require('dotenv').config();
+const debug = require('debug')('Cheffi:app');
+const logger = require('morgan');
 
 // http setting
 import { createServer } from 'http';
+
 const port: number = Number(process.env.PORT);
 
 // router setting
@@ -22,9 +25,11 @@ import * as swaggerUi from 'swagger-ui-express';
 import swaggerJson from './Swagger';
 app.use('/api-json', swaggerUi.serve, swaggerUi.setup(swaggerJson));
 
+app.use(logger('dev'));
+
 const server = createServer(app);
 server.listen(port, () => {
-  console.log(`${port}포트 서버 대기 중!`);
+  debug(`${port}포트 서버 대기 중!`);
 });
 
 app.use(json());

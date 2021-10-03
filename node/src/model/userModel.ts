@@ -2,15 +2,16 @@ var mongoose = require('mongoose');
 
 var mongoAddr: string = String(process.env.MONGO_ADDR);
 export const user_db = mongoose.createConnection(mongoAddr + 'user');
-
+const debug = require('debug')('Cheffi:Mongo');
 var collectionSet = new Set();
+
 var handleOpen = () => {
-  console.log(`Connected to user_db`);
+  debug(`Connected to user_db`);
   user_db.db.listCollections().toArray(function (err: any, names: any) {
     for (let i in names) {
       collectionSet.add(names[i].name);
     }
-    console.log(collectionSet);
+    debug(collectionSet);
   });
 };
 /*
@@ -103,8 +104,8 @@ UserSchema.statics.initUserInfo = function (reqData: any) {
 };
 
 // 좋아하는 레시피라고 클릭했을 때 몽고에 추가함. 1개씩 가능
-UserSchema.statics.addLikeRecipesByToken = function (token: string, likeRecipe: string) {
-  return this.updateOne({ token }, { $addToSet: { likeRecipesId: likeRecipe } });
+UserSchema.statics.addLikeRecipesByToken = function (userid: string, likeRecipe: string) {
+  return this.updateOne({ userid: userid }, { $addToSet: { likeRecipesId: likeRecipe } });
 };
 
 // Create Model & Export

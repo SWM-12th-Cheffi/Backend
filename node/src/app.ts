@@ -11,15 +11,15 @@ const app: express.Application = express();
 import { json } from 'body-parser';
 
 // router import
-import recipeRouter from './api/recipe';
-import testRouter from './api/test';
-import userRouter from './api/user';
-import authRouter from './api/auth';
+import recipeRouter from './api/Recipe';
+import testRouter from './api/Test';
+import userRouter from './api/User';
+import authRouter from './api/Auth';
 //import adminRouter from './api/admin';
 
 // swagger Setting
 import * as swaggerUi from 'swagger-ui-express';
-import swaggerJson from './swagger';
+import swaggerJson from './Swagger';
 app.use('/api-json', swaggerUi.serve, swaggerUi.setup(swaggerJson));
 
 const server = createServer(app);
@@ -30,7 +30,7 @@ server.listen(port, () => {
 app.use(json());
 
 app.use('/', testRouter);
-app.use('/Auth', authRouter);
+app.use('/auth', authRouter);
 app.use('/recipe', recipeRouter);
 app.use('/user', userRouter);
 //app.use('/admin', adminRouter);

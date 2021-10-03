@@ -2,28 +2,90 @@ import * as express from 'express';
 import { SortByRecc } from '../function/Python';
 import { IngredElementOfInput, ListOfPossiRP, NumberOfPossiRP } from '../function/Neo4j';
 import Authz from '../function/Authorization';
+import { RefrigerToIngredientList } from '../function/RecipeFunction';
 
 const recipeRouter = express.Router();
 
 //mongoDB setting
 var Recipe = require('../model/RecipeModel');
-var User = require('../model/userModel');
+var User = require('../model/UserModel');
 
-// 재료를 통해 만들 수 있는 레시피 개수를 반환하는 기능  fin
-recipeRouter.post('/NumPossiRP', async function (req, res) {
+// 전역 데이터 저장 변수
+type ingredientType = { title: string; data: string[] };
+const tmpUserIngredient: { [key: string]: ingredientType[] } = {};
+
+// 재료를 통해 만들 수 있는 레시피 개수를 반환하는 기능 (tmp 저장방식)
+recipeRouter.post('/number', async function (req, res) {
+  console.log('NumPossiRP');
+  let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
+  let authorizationPlatform: string = String(req.headers['platform']);
+  const authzRes = await Authz(authorizationToken, authorizationPlatform, 2);
+  if (authzRes.status == 200) {
+    tmpUserIngredient[authzRes.securityId] = req.body.ingre;
+    console.log(tmpUserIngredient[authzRes.securityId]);
+    let ingreElement: string[] = await IngredElementOfInput(RefrigerToIngredientList(req.body.ingre));
+    let returnStructure: object = { num: String(await NumberOfPossiRP(ingreElement)) };
+    res.send(returnStructure);
+  } else res.send(authzRes);
+});
+
+// 재료를 통해 만들 수 있는 레시피 번호 리스트를 반환하는 함수 (tmp 데이터를 db에 넣고 출력)
+recipeRouter.get('/list', async function (req, res) {
+  console.log('ListPossiRP');
+  let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
+  let authorizationPlatform: string = String(req.headers['platform']);
+  let reccReturnObject: any, reccRecipeList: number[];
+  const authzRes = await Authz(authorizationToken, authorizationPlatform, 1);
+  if (authzRes.status == 200) {
+    let ingreElement: string[] = await IngredElementOfInput(
+      RefrigerToIngredientList(tmpUserIngredient[authzRes.securityId]),
+    );
+    console.log(tmpUserIngredient[authzRes.securityId]);
+    let listRecipeid: any = await ListOfPossiRP(ingreElement);
+    User.findOneByUserid(authzRes.securityId)
+      .then(async function (userData: any) {
+        reccReturnObject = await SortByRecc({
+          id: listRecipeid,
+          like: { history: userData.historyRecipesId, like: userData.likeRecipesId, scrap: userData.scrapRecipesId },
+        });
+        reccRecipeList = reccReturnObject.data.id.map(Number);
+        return Recipe.ListPossiRP(reccRecipeList);
+      })
+      .then((resMon: any) => {
+        let resMonObjectbyRecc: any = {};
+        for (let i in resMon) {
+          resMonObjectbyRecc[resMon[i].recipeid] = resMon[i];
+        }
+        let resMonListbyRecc = [];
+        for (let i in reccRecipeList) {
+          resMonListbyRecc.push(resMonObjectbyRecc[reccRecipeList[i]]);
+        }
+
+        let returnStructure: object = { recipe: resMonListbyRecc };
+        res.send(returnStructure);
+      })
+      .catch((err: any) => res.status(500).send(err));
+  }
+});
+
+/*
+// 재료를 통해 만들 수 있는 레시피 개수를 반환하는 기능
+recipeRouter.post('/number', async function (req, res) {
   console.log('NumPossiRP');
   let ingreElement: string[] = await IngredElementOfInput(req.body.ingre);
   let returnStructure: object = { num: String(await NumberOfPossiRP(ingreElement)) };
   res.send(returnStructure);
 });
 
-// 재료를 통해 만들 수 있는 레시피 번호 리스트를 반환하는 함수  fin
-recipeRouter.post('/ListPossiRP', async function (req, res) {
+
+// 재료를 통해 만들 수 있는 레시피 번호 리스트를 반환하는 함수
+recipeRouter.post('/list', async function (req, res) {
   console.log('ListPossiRP');
+  let authorizationHeader: string = String(req.headers['Authorization']).split(' ')[1];
   let ingreElement: string[] = await IngredElementOfInput(req.body.ingre);
   let listRecipeid: any = await ListOfPossiRP(ingreElement);
   let reccReturnObject: any, reccRecipeList: number[];
-  const authzRes = await Authz(req.body.token, req.body.platform, 1);
+  const authzRes = await Authz(authorizationHeader, req.body.platform, 1);
   User.findOneByUserid(authzRes.securityId)
     .then(async function (userData: any) {
       reccReturnObject = await SortByRecc({
@@ -49,9 +111,10 @@ recipeRouter.post('/ListPossiRP', async function (req, res) {
     })
     .catch((err: any) => res.status(500).send(err));
 });
+*/
 
-// 레시피의 정보를 해먹에서 반환하는 기능 fin
-recipeRouter.post('/find/Recipe', function (req, res) {
+// 레시피의 정보를 해먹에서 반환하는 기능
+recipeRouter.post('/info', function (req, res) {
   console.log('findRecipe');
 
   Recipe.findByRecipeid(req.body.id)
@@ -64,7 +127,7 @@ recipeRouter.post('/find/Recipe', function (req, res) {
 });
 
 // 처음 사용자 데이터 받을 때 보여줄 랜덤 레시피
-recipeRouter.post('/randomRecipeList', function (req, res) {
+recipeRouter.post('/random-list', function (req, res) {
   console.log('randomRecipeList');
   Recipe.randomRecipe(req.body.num).then((recipeInfo: object[]) => {
     let returnStructure: object = { recipe: recipeInfo };

@@ -2,15 +2,16 @@ var mongoose = require('mongoose');
 
 var mongoAddr: string = String(process.env.MONGO_ADDR);
 export const user_db = mongoose.createConnection(mongoAddr + 'user');
-
+const debug = require('debug')('Cheffi:Mongo');
 var collectionSet = new Set();
+
 var handleOpen = () => {
-  console.log(`Connected to user_db`);
+  debug(`Connected to user_db`);
   user_db.db.listCollections().toArray(function (err: any, names: any) {
     for (let i in names) {
       collectionSet.add(names[i].name);
     }
-    console.log(collectionSet);
+    debug(collectionSet);
   });
 };
 /*

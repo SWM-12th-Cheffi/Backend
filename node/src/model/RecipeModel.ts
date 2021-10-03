@@ -1,9 +1,10 @@
 var mongoose = require('mongoose');
 var mongoAddr: string = String(process.env.MONGO_ADDR);
 const recipe_db = mongoose.createConnection(mongoAddr + 'recipe');
+const debug = require('debug')('Cheffi:Mongo');
 
 var handleOpen = () => {
-  console.log(`Connected to recipe_db`);
+  debug(`Connected to recipe_db`);
 };
 
 recipe_db.once('open', handleOpen);

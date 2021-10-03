@@ -6,51 +6,37 @@ const userRouter = express.Router();
 var User = require('../model/UserModel');
 import Authz from '../function/Authorization';
 
+const debug = require('debug')('Cheffi:User');
+
 // 좋아하는 음식의 레시피 번호를 저장
 userRouter.get('/like', async function (req, res) {
-  console.log('SaveLikeRecipes');
+  console.log('/like Api Called');
   let RecipeId = req.query.id; // $push 사용해서 몽고에 저장
   let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
   let authorizationPlatform: string = String(req.headers['platform']);
   const authzRes = await Authz(authorizationToken, authorizationPlatform, 2);
-  if (authzRes.status == 200)
-    User.addLikeRecipesByToken(authzRes.securityId, RecipeId).then((result: any) => {
+  if (authzRes.header.status == 200)
+    User.addLikeRecipesByToken(authzRes.auth?.securityId, RecipeId).then((result: any) => {
       // 정상적으로 작업을 마침
-      if (result.matchedCount)
-        res.send({
-          status: 200,
-          likeRecipesId: RecipeId,
-        });
+      if (result.matchedCount) res.status(200).json({ likeRecipesId: RecipeId });
       // token으로 정보를 찾을 수 없음
-      else
-        res.send({
-          status: 404,
-          message: 'No Matched Information.',
-        });
+      else res.status(404);
     });
   else res.send(authzRes);
 });
 
 // 사용자 정보 초기설정
 userRouter.post('/info/init', async function (req, res) {
-  console.log('initInfo');
+  console.log('/info/init Api Called');
   let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
   let authorizationPlatform: string = String(req.headers['platform']);
   const authzRes = await Authz(authorizationToken, authorizationPlatform, 2);
-  if (authzRes.status == 200)
+  if (authzRes.header.status == 200)
     User.initInfo(req.body.data).then((result: any) => {
       // 정상적으로 작업을 마침
-      if (result.matchedCount)
-        res.send({
-          status: 200,
-          result,
-        });
+      if (result.matchedCount) res.status(200).json(result);
       // token으로 정보를 찾을 수 없음
-      else
-        res.send({
-          status: 404,
-          message: 'No Matched Information.',
-        });
+      else res.status(404);
     });
   else res.send(authzRes);
 });
@@ -61,12 +47,10 @@ userRouter.get('/info', async function (req, res) {
   let authorizationToken: string = String(req.headers['Authorization']).split(' ')[1];
   let authorizationPlatform: string = String(req.headers['platform']);
   const authzRes = await Authz(authorizationToken, authorizationPlatform, 2);
-  if (authzRes.status == 200)
-    User.findOneByUserid(authzRes.securityId)
+  if (authzRes.header.status == 200)
+    User.findOneByUserid(authzRes.auth?.securityId)
       .then((result: any) => {
         let openedInfo = {
-          status: 201,
-          message: 'Information Load Success',
           nickname: result.nickname,
           statusMessage: result.statusMessage,
           photo: result.photo,
@@ -76,9 +60,10 @@ userRouter.get('/info', async function (req, res) {
           historyRecipesId: result.historyRecipesId,
           refriger: result.refriger,
         };
-        res.send(openedInfo);
+        res.statusMessage = 'Information Load Success';
+        res.status(201).json(openedInfo);
       })
-      .catch(console.log);
+      .catch(debug);
   else res.send(authzRes);
 });
 
@@ -88,12 +73,12 @@ userRouter.put('/refriger', async function (req, res) {
   let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
   let authorizationPlatform: string = String(req.headers['platform']);
   const authzRes = await Authz(authorizationToken, authorizationPlatform, 2);
-  if (authzRes.status == 200)
-    User.updateRefrigerByUserid(authzRes.securityId, req.body.refriger)
+  if (authzRes.header.status == 200)
+    User.updateRefrigerByUserid(authzRes.auth?.securityId, req.body.refriger)
       .then(() => {
         res.send({ status: 200, message: 'Save Refriger Data In Mongo' });
       })
-      .catch(console.log);
+      .catch(debug);
   else res.send(authzRes);
 });
 
@@ -103,8 +88,8 @@ userRouter.get('/recipe-count', async function (req, res) {
   let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
   let authorizationPlatform: string = String(req.headers['platform']);
   const authzRes = await Authz(authorizationToken, authorizationPlatform, 2);
-  if (authzRes.status == 200)
-    User.findOneByUserid(authzRes.securityId)
+  if (authzRes.header.status == 200)
+    User.findOneByUserid(authzRes.auth?.securityId)
       .then(async (result: any) => {
         let ingreElement: string[] = await IngredElementOfInput(RefrigerToIngredientList(result.refriger));
         let returnStructure: object = {
@@ -114,7 +99,7 @@ userRouter.get('/recipe-count', async function (req, res) {
         };
         res.send(returnStructure);
       })
-      .catch(console.log);
+      .catch(debug);
   else res.send(authzRes);
 });
 

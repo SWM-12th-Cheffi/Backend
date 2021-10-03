@@ -4,12 +4,7 @@ var axios = require('axios');
 var User = require('../model/userModel');
 
 //-1: Login,  0: all access, 1: access when input token, 2: access when verify success
-export default async function Authorization(
-  token: string,
-  platform: string,
-  security: number = 0,
-  init: boolean = false,
-) {
+export default async function Authorization(token: string, platform: string, security: number = 0) {
   console.log('Authorization ' + platform + ' level: ' + security);
   switch (security) {
     case -1: // For Login
@@ -19,51 +14,51 @@ export default async function Authorization(
           const authRes = await verify_google(token, true);
           if (Object.entries(authRes).length == 6) newUser = true;
           else if (Object.entries(authRes).length == 7) newUser = false;
-          else return { status: 500, message: 'Mongo Error' };
-          return { status: 200, message: 'Login Success', newUser: newUser, token: token };
+          else return { header: { status: 500, message: 'Mongo Error' }, auth: {} };
+          return { header: { status: 200, message: 'Login Success' }, auth: { newUser: newUser, token: token } };
         } catch (err) {
-          return { status: 401, message: err };
+          return { header: { status: 401, message: err }, auth: {} };
         }
       } else if (platform && platform == 'kakao') {
         try {
           const authRes = await verify_kakao(token, true);
           if (Object.entries(authRes).length == 6) newUser = true;
           else if (Object.entries(authRes).length == 7) newUser = false;
-          else return { status: 500, message: 'Mongo Error' };
-          return { status: 200, message: 'Login Success', newUser: newUser, token: token };
+          else return { header: { status: 500, message: 'Mongo Error' }, auth: {} };
+          return { header: { status: 200, message: 'Login Success' }, auth: { newUser: newUser, token: token } };
         } catch (err) {
-          return { status: 401, message: err };
+          return { header: { status: 401, message: err }, auth: {} };
         }
-      } else return { status: 401, message: 'Incorrect platform Property' };
+      } else return { header: { status: 401, message: 'Incorrect platform Property' }, auth: {} };
     case 0: // All Access
-      return { status: 200, message: 'Access Success' };
+      return { header: { status: 200, message: 'Access Success' } };
     case 1: // Can Access When Input Token
       if (platform && (platform == 'google' || platform == 'kakao')) {
-        if (token) return { status: 200, message: 'Access Success' };
-        else return { status: 401, message: "Can't Find token Property" };
-      } else return { status: 401, message: 'Incorrect platform Property' };
+        if (token) return { header: { status: 200, message: 'Access Success' } };
+        else return { header: { status: 401, message: "Can't Find token Property" } };
+      } else return { header: { status: 401, message: 'Incorrect platform Property' } };
     case 2: // Can Access When Verify Success
       if (platform && platform == 'google') {
         try {
           const authRes = await verify_google(token, false);
           if (!authRes) throw { response: { status: 404, statusText: "Cant' find Data" } }; // mongo에 데이터가 없을 때
-          return { status: 200, message: 'Access Success', securityId: authRes.userid };
+          return { header: { status: 200, message: 'Access Success' }, auth: { securityId: String(authRes.userid) } };
         } catch (err: any) {
-          if (err.hasOwnProperty('response')) return { status: err.response.status, message: err.response.statusText };
-          else return { status: 401, message: String(err).split(':')[1] };
+          if (err.hasOwnProperty('response'))
+            return { header: { status: err.response.status, message: err.response.statusText } };
+          else return { header: { status: 401, message: String(err).split(':')[1] } };
         }
       } else if (platform && platform == 'kakao') {
         try {
           const authRes = await verify_kakao(token, false);
           if (!authRes) throw { response: { status: 404, statusText: "Cant' find Data" } }; // mongo에 데이터가 없을 때
-          return { status: 200, message: 'Access Success', securityId: authRes.userid };
+          return { header: { status: 200, message: 'Access Success' }, auth: { securityId: String(authRes.userid) } };
         } catch (err: any) {
-          console.log(err);
-          return { status: err.response.status, message: err.response.statusText };
+          return { header: { status: err.response.status, message: err.response.statusText } };
         }
-      } else return { status: 401, message: 'Incorrect platform Property' };
+      } else return { header: { status: 401, message: 'Incorrect platform Property' } };
     default:
-      return { status: 401, message: 'Api Authorization Error (Security Number Error)' };
+      return { header: { status: 401, message: 'Api Authorization Error (Security Number Error)' } };
   }
 }
 

@@ -30,6 +30,7 @@
     "mongoose": "^6.0.5",
     "neo4j-driver": "^4.3.2",
     "nodemon": "^2.0.12",
+    "redis": "^3.1.2",
     "swagger-cli": "^4.0.4",
     "swagger-ui-express": "^4.1.6",
     "ts-node": "^10.1.0",

@@ -10,9 +10,10 @@ const recipeRouter = express.Router();
 var Recipe = require('../model/RecipeModel');
 var User = require('../model/UserModel');
 
-// 전역 데이터 저장 변수
-type ingredientType = { title: string; data: string[] };
-const tmpUserIngredient: { [key: string]: ingredientType[] } = {};
+//redis setting
+const redis = require('redis');
+const client = redis.createClient(process.env.REDIS_ADDR);
+console.log('Redis: ' + client.reply);
 
 // 재료를 통해 만들 수 있는 레시피 개수를 반환하는 기능 (tmp 저장방식)
 recipeRouter.post('/number', async function (req, res) {
@@ -21,8 +22,7 @@ recipeRouter.post('/number', async function (req, res) {
   let authorizationPlatform: string = String(req.headers['platform']);
   const authzRes = await Authz(authorizationToken, authorizationPlatform, 2);
   if (authzRes.status == 200) {
-    tmpUserIngredient[authzRes.securityId] = req.body.ingre;
-    console.log(tmpUserIngredient[authzRes.securityId]);
+    await client.hset('refriger', authzRes.securityId, JSON.stringify(req.body.ingre));
     let ingreElement: string[] = await IngredElementOfInput(RefrigerToIngredientList(req.body.ingre));
     let returnStructure: object = { num: String(await NumberOfPossiRP(ingreElement)) };
     res.send(returnStructure);
@@ -35,37 +35,37 @@ recipeRouter.get('/list', async function (req, res) {
   let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
   let authorizationPlatform: string = String(req.headers['platform']);
   let reccReturnObject: any, reccRecipeList: number[];
-  const authzRes = await Authz(authorizationToken, authorizationPlatform, 1);
+  const authzRes = await Authz(authorizationToken, authorizationPlatform, 2);
   if (authzRes.status == 200) {
-    let ingreElement: string[] = await IngredElementOfInput(
-      RefrigerToIngredientList(tmpUserIngredient[authzRes.securityId]),
-    );
-    console.log(tmpUserIngredient[authzRes.securityId]);
-    let listRecipeid: any = await ListOfPossiRP(ingreElement);
-    User.findOneByUserid(authzRes.securityId)
-      .then(async function (userData: any) {
-        reccReturnObject = await SortByRecc({
-          id: listRecipeid,
-          like: { history: userData.historyRecipesId, like: userData.likeRecipesId, scrap: userData.scrapRecipesId },
-        });
-        reccRecipeList = reccReturnObject.data.id.map(Number);
-        return Recipe.ListPossiRP(reccRecipeList);
-      })
-      .then((resMon: any) => {
-        let resMonObjectbyRecc: any = {};
-        for (let i in resMon) {
-          resMonObjectbyRecc[resMon[i].recipeid] = resMon[i];
-        }
-        let resMonListbyRecc = [];
-        for (let i in reccRecipeList) {
-          resMonListbyRecc.push(resMonObjectbyRecc[reccRecipeList[i]]);
-        }
+    client.hget('refriger', authzRes.securityId, async function (err: any, result: any) {
+      if (err) console.log(err);
+      let ingreElement: string[] = await IngredElementOfInput(RefrigerToIngredientList(result));
+      let listRecipeid: any = await ListOfPossiRP(ingreElement);
+      User.updateRefrigerByUserid(authzRes.securityId, result)
+        .then(async function (userData: any) {
+          reccReturnObject = await SortByRecc({
+            id: listRecipeid,
+            like: { history: userData.historyRecipesId, like: userData.likeRecipesId, scrap: userData.scrapRecipesId },
+          });
+          reccRecipeList = reccReturnObject.data.id.map(Number);
+          return Recipe.ListPossiRP(reccRecipeList);
+        })
+        .then((resMon: any) => {
+          let resMonObjectbyRecc: any = {};
+          for (let i in resMon) {
+            resMonObjectbyRecc[resMon[i].recipeid] = resMon[i];
+          }
+          let resMonListbyRecc = [];
+          for (let i in reccRecipeList) {
+            resMonListbyRecc.push(resMonObjectbyRecc[reccRecipeList[i]]);
+          }
 
-        let returnStructure: object = { recipe: resMonListbyRecc };
-        res.send(returnStructure);
-      })
-      .catch((err: any) => res.status(500).send(err));
-  }
+          let returnStructure: object = { recipe: resMonListbyRecc };
+          res.send(returnStructure);
+        })
+        .catch((err: any) => res.status(500).send(err));
+    });
+  } else res.send(authzRes);
 });
 
 /*
@@ -113,26 +113,36 @@ recipeRouter.post('/list', async function (req, res) {
 });
 */
 
-// 레시피의 정보를 해먹에서 반환하는 기능
-recipeRouter.post('/info', function (req, res) {
+// 레시피의 정보를 mongo에서 반환하는 기능
+recipeRouter.get('/info', async function (req, res) {
   console.log('findRecipe');
-
-  Recipe.findByRecipeid(req.body.id)
-    .then((recipeInfo: any) => {
-      if (!recipeInfo) return res.status(404).send({ err: 'Recipe not found' });
-      let returnStructure: object = { recipe: recipeInfo };
-      res.send(returnStructure);
-    })
-    .catch((err: any) => res.status(500).send(err));
+  let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
+  let authorizationPlatform: string = String(req.headers['platform']);
+  const authzRes = await Authz(authorizationToken, authorizationPlatform, 0);
+  if (authzRes.status == 200)
+    Recipe.findByRecipeid(req.query.id)
+      .then((recipeInfo: any) => {
+        if (!recipeInfo) return res.status(404).send({ err: 'Recipe not found' });
+        let returnStructure: object = { recipe: recipeInfo };
+        res.send(returnStructure);
+      })
+      .catch((err: any) => res.status(500).send(err));
+  else res.send(authzRes);
 });
 
 // 처음 사용자 데이터 받을 때 보여줄 랜덤 레시피
-recipeRouter.post('/random-list', function (req, res) {
+recipeRouter.get('/random-list', async function (req, res) {
   console.log('randomRecipeList');
-  Recipe.randomRecipe(req.body.num).then((recipeInfo: object[]) => {
-    let returnStructure: object = { recipe: recipeInfo };
-    res.send(returnStructure);
-  });
+  let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
+  let authorizationPlatform: string = String(req.headers['platform']);
+  let numberOfRecipeToSend = Number(req.query.num);
+  const authzRes = await Authz(authorizationToken, authorizationPlatform, 0);
+  if (authzRes.status == 200)
+    Recipe.randomRecipe(numberOfRecipeToSend).then((recipeInfo: object[]) => {
+      let returnStructure: object = { recipe: recipeInfo };
+      res.send(returnStructure);
+    });
+  else res.send(authzRes);
 });
 
 export default recipeRouter;

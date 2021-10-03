@@ -6,7 +6,7 @@ var session = driver.session();
 //mongoDB setting
 var Recipe = require('../model/RecipeModel');
 
-import CoverWithQuotation from '../function/CoverWithQuotation';
+import { CoverWithQuotation } from './RecipeFunction';
 
 // 프론트에서 입력받은 재료의 Element 관계에 있는 재료로 List 만들어 반환
 export async function IngredElementOfInput(input: string[]) {

@@ -19,7 +19,7 @@ export default async function Authorization(
           const authRes = await verify_google(token, true);
           if (Object.entries(authRes).length == 6) newUser = true;
           else if (Object.entries(authRes).length == 7) newUser = false;
-          else return { status: 400, message: 'Mongo Error' };
+          else return { status: 500, message: 'Mongo Error' };
           return { status: 200, message: 'Login Success', newUser: newUser, token: token };
         } catch (err) {
           return { status: 401, message: err };
@@ -29,7 +29,7 @@ export default async function Authorization(
           const authRes = await verify_kakao(token, true);
           if (Object.entries(authRes).length == 6) newUser = true;
           else if (Object.entries(authRes).length == 7) newUser = false;
-          else return { status: 400, message: 'Mongo Error' };
+          else return { status: 500, message: 'Mongo Error' };
           return { status: 200, message: 'Login Success', newUser: newUser, token: token };
         } catch (err) {
           return { status: 401, message: err };

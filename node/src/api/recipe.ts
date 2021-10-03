@@ -22,9 +22,13 @@ recipeRouter.post('/number', async function (req, res) {
   let authorizationPlatform: string = String(req.headers['platform']);
   const authzRes = await Authz(authorizationToken, authorizationPlatform, 2);
   if (authzRes.status == 200) {
-    await client.hset('refriger', authzRes.securityId, JSON.stringify(req.body.ingre));
-    let ingreElement: string[] = await IngredElementOfInput(RefrigerToIngredientList(req.body.ingre));
-    let returnStructure: object = { num: String(await NumberOfPossiRP(ingreElement)) };
+    await client.hset('refriger', authzRes.securityId, JSON.stringify(req.body.refriger));
+    let ingreElement: string[] = await IngredElementOfInput(RefrigerToIngredientList(req.body.refriger));
+    let returnStructure: object = {
+      status: 201,
+      num: String(await NumberOfPossiRP(ingreElement)),
+      message: 'Save Refriger Data In Redis',
+    };
     res.send(returnStructure);
   } else res.send(authzRes);
 });
@@ -59,8 +63,11 @@ recipeRouter.get('/list', async function (req, res) {
           for (let i in reccRecipeList) {
             resMonListbyRecc.push(resMonObjectbyRecc[reccRecipeList[i]]);
           }
-
-          let returnStructure: object = { recipe: resMonListbyRecc };
+          let returnStructure: object = {
+            status: 201,
+            recipe: resMonListbyRecc,
+            message: 'Save Refriger Data In Mongo ',
+          };
           res.send(returnStructure);
         })
         .catch((err: any) => res.status(500).send(err));
@@ -120,10 +127,10 @@ recipeRouter.get('/info', async function (req, res) {
   let authorizationPlatform: string = String(req.headers['platform']);
   const authzRes = await Authz(authorizationToken, authorizationPlatform, 0);
   if (authzRes.status == 200)
-    Recipe.findByRecipeid(req.query.id)
+    Recipe.findByRecipeid(Number(req.query.id))
       .then((recipeInfo: any) => {
         if (!recipeInfo) return res.status(404).send({ err: 'Recipe not found' });
-        let returnStructure: object = { recipe: recipeInfo };
+        let returnStructure: object = { status: 201, recipe: recipeInfo, message: 'Success To Return Recipe Info' };
         res.send(returnStructure);
       })
       .catch((err: any) => res.status(500).send(err));
@@ -139,7 +146,11 @@ recipeRouter.get('/random-list', async function (req, res) {
   const authzRes = await Authz(authorizationToken, authorizationPlatform, 0);
   if (authzRes.status == 200)
     Recipe.randomRecipe(numberOfRecipeToSend).then((recipeInfo: object[]) => {
-      let returnStructure: object = { recipe: recipeInfo };
+      let returnStructure: object = {
+        status: 201,
+        recipe: recipeInfo,
+        message: 'Success To Recuen Random-Recipe List',
+      };
       res.send(returnStructure);
     });
   else res.send(authzRes);

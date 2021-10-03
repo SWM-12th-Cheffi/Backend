@@ -103,8 +103,8 @@ UserSchema.statics.initUserInfo = function (reqData: any) {
 };
 
 // 좋아하는 레시피라고 클릭했을 때 몽고에 추가함. 1개씩 가능
-UserSchema.statics.addLikeRecipesByToken = function (token: string, likeRecipe: string) {
-  return this.updateOne({ token }, { $addToSet: { likeRecipesId: likeRecipe } });
+UserSchema.statics.addLikeRecipesByToken = function (userid: string, likeRecipe: string) {
+  return this.updateOne({ userid: userid }, { $addToSet: { likeRecipesId: likeRecipe } });
 };
 
 // Create Model & Export

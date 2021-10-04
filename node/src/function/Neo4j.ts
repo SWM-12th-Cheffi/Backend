@@ -14,7 +14,6 @@ export async function IngredElementOfInput(input: string[]) {
     'MATCH (i:Input)-[:ELEMENT]->(r:Ingredient) WHERE i.name in [' +
     CoverWithQuotation(input) +
     '] RETURN COLLECT(r.name) AS element';
-
   return session
     .readTransaction(function (tx: any) {
       return tx.run(query);

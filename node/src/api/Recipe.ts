@@ -32,6 +32,7 @@ recipeRouter.post('/number', async function (req, res) {
     res.status(201).json(returnStructure);
   } else res.send(authzRes);
 });
+
 // 재료를 통해 만들 수 있는 레시피 번호 리스트를 반환하는 함수 (tmp 데이터를 db에 넣고 출력)
 recipeRouter.get('/list', async function (req, res) {
   console.log('/list Api Called');
@@ -40,16 +41,24 @@ recipeRouter.get('/list', async function (req, res) {
   let reccReturnObject: any, reccRecipeList: number[];
   const authzRes = await Authz(authorizationToken, authorizationPlatform, 2);
   if (authzRes.header.status == 200) {
-    client.hget('refriger', authzRes.auth?.securityId, async function (err: any, result: any) {
+    client.hget('refriger', authzRes.auth?.securityId, async function (err: any, result: string) {
+      result = JSON.parse(result);
       if (err) debug(err);
       let ingreElement: string[] = await IngredElementOfInput(RefrigerToIngredientList(result));
-      let listRecipeid: any = await ListOfPossiRP(ingreElement);
+      let listRecipeid: string[] = await ListOfPossiRP(ingreElement);
+      console.log(listRecipeid);
       User.updateRefrigerByUserid(authzRes.auth?.securityId, result)
         .then(async function (userData: any) {
           reccReturnObject = await SortByRecc({
             id: listRecipeid,
-            like: { history: userData.historyRecipesId, like: userData.likeRecipesId, scrap: userData.scrapRecipesId },
+            like: ['짜장면', '짬뽕'],
+            likedb: {
+              history: userData.historyRecipesId,
+              like: userData.likeRecipesId,
+              scrap: userData.scrapRecipesId,
+            },
           });
+          console.log(reccReturnObject);
           reccRecipeList = reccReturnObject.data.id.map(Number);
           return Recipe.ListPossiRP(reccRecipeList);
         })

@@ -64,9 +64,9 @@ var swaggerJson = {
       },
     },
 
-    '/Auth': {
+    '/auth': {
       post: {
-        tags: ['Auth'],
+        tags: ['auth'],
         summary: '주어진 token과 platform을 사용하여 로그인을 진행합니다.',
         description:
           '각 플랫폼의 token과 "google", "kakao" 플랫폼의 데이터를 입력하면 해당하는 플랫폼으로 로그인을 진행합니다.',

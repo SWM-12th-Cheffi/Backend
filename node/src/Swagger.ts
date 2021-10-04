@@ -5,7 +5,7 @@ var swaggerJson = {
     version: '0.2.0',
     title: 'Cheffi Api',
   },
-  host: 'localhost:2001',
+  host: '18.220.121.204:2001',
   basePath: '/',
   tags: [
     {

@@ -2,7 +2,7 @@ var swaggerJson = {
   swagger: '2.0',
   info: {
     description: 'Api Documentation.',
-    version: '0.2.0',
+    version: '0.2.1',
     title: 'Cheffi Api',
   },
   host: '18.220.121.204:2001',
@@ -141,17 +141,22 @@ var swaggerJson = {
             description: '냉장고 데이터를 입력해주세요.',
             required: true,
             schema: {
-              type: 'array',
-              items: {
-                type: 'object',
-                properties: {
-                  title: {
-                    type: 'string',
-                    example: '가공식품',
-                  },
-                  data: {
-                    type: 'array',
-                    items: ['햇반', '스팸', '즉석밥'],
+              type: 'object',
+              properties: {
+                refriger: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      title: {
+                        type: 'string',
+                        example: '가공식품',
+                      },
+                      data: {
+                        type: 'array',
+                        items: ['햇반', '스팸', '즉석밥'],
+                      },
+                    },
                   },
                 },
               },

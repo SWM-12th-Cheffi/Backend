@@ -2,7 +2,7 @@ var swaggerJson = {
   swagger: '2.0',
   info: {
     description: 'Api Documentation.',
-    version: '0.2.1',
+    version: '0.2.2',
     title: 'Cheffi Api',
   },
   host: '18.220.121.204:2001',
@@ -438,17 +438,22 @@ var swaggerJson = {
             schema: {
               type: 'object',
               properties: {
-                nickname: {
-                  type: 'string',
-                  exampel: 'exampleNickname',
-                },
-                dislikeIngredient: {
-                  type: 'array',
-                  items: ['ingre', 'ingre'],
-                },
-                likeRecipesId: {
-                  type: 'array',
-                  items: [5980, 5989],
+                data: {
+                  type: 'object',
+                  properties: {
+                    nickname: {
+                      type: 'string',
+                      exampel: 'exampleNickname',
+                    },
+                    dislikeIngredient: {
+                      type: 'array',
+                      items: ['ingre', 'ingre'],
+                    },
+                    likeRecipesId: {
+                      type: 'array',
+                      items: [5980, 5989],
+                    },
+                  },
                 },
               },
             },

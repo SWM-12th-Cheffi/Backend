@@ -1,5 +1,3 @@
-import { integer } from 'neo4j-driver';
-
 var swaggerJson = {
   swagger: '2.0',
   info: {
@@ -7,7 +5,7 @@ var swaggerJson = {
     version: '0.2.0',
     title: 'Cheffi Api',
   },
-  host: '18.220.121.204:2001',
+  host: 'localhost:2001',
   basePath: '/',
   tags: [
     {
@@ -74,8 +72,8 @@ var swaggerJson = {
         produces: ['application/json'],
         parameters: [
           {
-            in: 'head',
-            name: 'Authorization',
+            in: 'header',
+            name: 'authorization',
             description: '인증 방식과 토큰을 입력해주세요.',
             required: true,
             schema: {
@@ -84,8 +82,8 @@ var swaggerJson = {
             },
           },
           {
-            in: 'head',
-            name: 'Platform',
+            in: 'header',
+            name: 'platform',
             description: '인증 플랫폼을 입력해주세요.',
             required: true,
             schema: {
@@ -118,7 +116,7 @@ var swaggerJson = {
         produces: 'application/json',
         parameters: [
           {
-            in: 'head',
+            in: 'header',
             name: 'Authorization',
             description: '인증 방식과 토큰을 입력해주세요.',
             required: true,
@@ -128,7 +126,7 @@ var swaggerJson = {
             },
           },
           {
-            in: 'head',
+            in: 'header',
             name: 'Platform',
             description: '인증 플랫폼을 입력해주세요.',
             required: true,
@@ -187,7 +185,7 @@ var swaggerJson = {
         produces: 'application/json',
         parameters: [
           {
-            in: 'head',
+            in: 'header',
             name: 'Authorization',
             description: '인증 방식과 토큰을 입력해주세요.',
             required: true,
@@ -197,7 +195,7 @@ var swaggerJson = {
             },
           },
           {
-            in: 'head',
+            in: 'header',
             name: 'Platform',
             description: '인증 플랫폼을 입력해주세요.',
             required: true,
@@ -234,7 +232,7 @@ var swaggerJson = {
         produces: 'application/json',
         parameters: [
           {
-            in: 'head',
+            in: 'header',
             name: 'Authorization',
             description: '인증 방식과 토큰을 입력해주세요.',
             required: false,
@@ -244,7 +242,7 @@ var swaggerJson = {
             },
           },
           {
-            in: 'head',
+            in: 'header',
             name: 'Platform',
             description: '인증 플랫폼을 입력해주세요.',
             required: false,
@@ -292,7 +290,7 @@ var swaggerJson = {
         produces: 'application/json',
         parameters: [
           {
-            in: 'head',
+            in: 'header',
             name: 'Authorization',
             description: '인증 방식과 토큰을 입력해주세요.',
             required: false,
@@ -302,7 +300,7 @@ var swaggerJson = {
             },
           },
           {
-            in: 'head',
+            in: 'header',
             name: 'Platform',
             description: '인증 플랫폼을 입력해주세요.',
             required: false,
@@ -350,7 +348,7 @@ var swaggerJson = {
         produces: 'application/json',
         parameters: [
           {
-            in: 'head',
+            in: 'header',
             name: 'Authorization',
             description: '인증 방식과 토큰을 입력해주세요.',
             required: true,
@@ -360,7 +358,7 @@ var swaggerJson = {
             },
           },
           {
-            in: 'head',
+            in: 'header',
             name: 'Platform',
             description: '인증 플랫폼을 입력해주세요.',
             required: true,
@@ -408,7 +406,7 @@ var swaggerJson = {
         produces: 'application/json',
         parameters: [
           {
-            in: 'head',
+            in: 'header',
             name: 'Authorization',
             description: '인증 방식과 토큰을 입력해주세요.',
             required: true,
@@ -418,7 +416,7 @@ var swaggerJson = {
             },
           },
           {
-            in: 'head',
+            in: 'header',
             name: 'Platform',
             description: '인증 플랫폼을 입력해주세요.',
             required: true,
@@ -478,7 +476,7 @@ var swaggerJson = {
         produces: 'application/json',
         parameters: [
           {
-            in: 'head',
+            in: 'header',
             name: 'Authorization',
             description: '인증 방식과 토큰을 입력해주세요.',
             required: true,
@@ -488,7 +486,7 @@ var swaggerJson = {
             },
           },
           {
-            in: 'head',
+            in: 'header',
             name: 'Platform',
             description: '인증 플랫폼을 입력해주세요.',
             required: true,
@@ -525,7 +523,7 @@ var swaggerJson = {
         produces: 'application/json',
         parameters: [
           {
-            in: 'head',
+            in: 'header',
             name: 'Authorization',
             description: '인증 방식과 토큰을 입력해주세요.',
             required: true,
@@ -535,7 +533,7 @@ var swaggerJson = {
             },
           },
           {
-            in: 'head',
+            in: 'header',
             name: 'Platform',
             description: '인증 플랫폼을 입력해주세요.',
             required: true,
@@ -594,7 +592,7 @@ var swaggerJson = {
         produces: 'application/json',
         parameters: [
           {
-            in: 'head',
+            in: 'header',
             name: 'Authorization',
             description: '인증 방식과 토큰을 입력해주세요.',
             required: true,
@@ -604,7 +602,7 @@ var swaggerJson = {
             },
           },
           {
-            in: 'head',
+            in: 'header',
             name: 'Platform',
             description: '인증 플랫폼을 입력해주세요.',
             required: true,

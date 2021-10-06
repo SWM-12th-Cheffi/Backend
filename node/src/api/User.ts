@@ -8,6 +8,11 @@ import Authz from '../function/Authorization';
 
 const debug = require('debug')('Cheffi:User');
 
+//redis setting
+const redis = require('redis');
+const client = redis.createClient(process.env.REDIS_ADDR);
+debug('Redis: ' + client.reply);
+
 // 좋아하는 음식의 레시피 번호를 저장
 userRouter.get('/like', async function (req, res) {
   console.log('/like Api Called');
@@ -31,6 +36,7 @@ userRouter.get('/like', async function (req, res) {
 // 사용자 정보 초기설정
 userRouter.post('/info/init', async function (req, res) {
   console.log('/info/init Api Called');
+  console.log(req.body.data);
   let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
   let authorizationPlatform: string = String(req.headers['platform']);
   const authzRes = await Authz(authorizationToken, authorizationPlatform, 2);
@@ -79,16 +85,19 @@ userRouter.get('/info', async function (req, res) {
 // 냉장고 정보 저장
 userRouter.put('/refriger', async function (req, res) {
   console.log('/user/refriger Api Called');
+  console.log(req.body.refriger);
   let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
   let authorizationPlatform: string = String(req.headers['platform']);
   const authzRes = await Authz(authorizationToken, authorizationPlatform, 2);
-  if (authzRes.header.status == 200)
-    User.updateRefrigerByUserid(authzRes.auth?.securityId, req.body.refriger)
+  if (authzRes.header.status == 200) {
+    let ingreElement: string[] = await IngredElementOfInput(RefrigerToIngredientList(req.body.refriger));
+    let num: number = await NumberOfPossiRP(ingreElement);
+    User.updateRefrigerByUserid(authzRes.auth?.securityId, req.body.refriger, num)
       .then(() => {
         res.send({ status: 200, message: 'Save Refriger Data In Mongo' });
       })
       .catch(debug);
-  else {
+  } else {
     res.statusMessage = authzRes.header.message;
     res.status(authzRes.header.status);
   }
@@ -103,13 +112,8 @@ userRouter.get('/recipe-count', async function (req, res) {
   if (authzRes.header.status == 200)
     User.findOneByUserid(authzRes.auth?.securityId)
       .then(async (result: any) => {
-        let ingreElement: string[] = await IngredElementOfInput(RefrigerToIngredientList(result.refriger));
-        let returnStructure: object = {
-          status: 201,
-          num: String(await NumberOfPossiRP(ingreElement)),
-          message: 'Save Refriger Data In Redis',
-        };
-        res.send(returnStructure);
+        res.statusMessage = 'Get recipeCount Value';
+        res.status(201).json({ num: result.recipeCount });
       })
       .catch(debug);
   else {

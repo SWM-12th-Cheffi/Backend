@@ -32,6 +32,7 @@ var Schema = mongoose.Schema;
 var UserSchema = new Schema(
   {
     id: Schema.Types.ObjectID,
+    recipeCount: { type: Number, require: false, default: 0 },
     nickname: { type: String, require: false, default: '' },
     statusMessage: { type: String, require: false, default: '' },
     photo: { type: String, require: false, default: '' },
@@ -86,8 +87,8 @@ UserSchema.statics.updateTokenByUserid = function (userid: string, payload: stri
 };
 
 // Update by userid
-UserSchema.statics.updateRefrigerByUserid = function (userid: string, fridge: object) {
-  return this.findOneAndUpdate({ userid: userid }, { refriger: fridge });
+UserSchema.statics.updateRefrigerByUserid = function (userid: string, fridge: object, recipecount: number) {
+  return this.findOneAndUpdate({ userid: userid }, { refriger: fridge, recipeCount: recipecount });
 };
 
 // 초기설정

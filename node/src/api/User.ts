@@ -22,7 +22,10 @@ userRouter.get('/like', async function (req, res) {
       // token으로 정보를 찾을 수 없음
       else res.status(404);
     });
-  else res.send(authzRes);
+  else {
+    res.statusMessage = authzRes.header.message;
+    res.status(authzRes.header.status);
+  }
 });
 
 // 사용자 정보 초기설정
@@ -38,7 +41,10 @@ userRouter.post('/info/init', async function (req, res) {
       // token으로 정보를 찾을 수 없음
       else res.status(404);
     });
-  else res.send(authzRes);
+  else {
+    res.statusMessage = authzRes.header.message;
+    res.status(authzRes.header.status);
+  }
 });
 
 // 사용자 정보 불러오기
@@ -64,7 +70,10 @@ userRouter.get('/info', async function (req, res) {
         res.status(201).json(openedInfo);
       })
       .catch(debug);
-  else res.send(authzRes);
+  else {
+    res.statusMessage = authzRes.header.message;
+    res.status(authzRes.header.status);
+  }
 });
 
 // 냉장고 정보 저장
@@ -79,7 +88,10 @@ userRouter.put('/refriger', async function (req, res) {
         res.send({ status: 200, message: 'Save Refriger Data In Mongo' });
       })
       .catch(debug);
-  else res.send(authzRes);
+  else {
+    res.statusMessage = authzRes.header.message;
+    res.status(authzRes.header.status);
+  }
 });
 
 // 저장된 냉장고 데이터로 만들 수 있는 레시피 수 카운트
@@ -100,7 +112,10 @@ userRouter.get('/recipe-count', async function (req, res) {
         res.send(returnStructure);
       })
       .catch(debug);
-  else res.send(authzRes);
+  else {
+    res.statusMessage = authzRes.header.message;
+    res.status(authzRes.header.status);
+  }
 });
 
 export default userRouter;

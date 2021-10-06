@@ -30,7 +30,10 @@ recipeRouter.post('/number', async function (req, res) {
     };
     res.statusMessage = 'Save Refriger Data In Redis';
     res.status(201).json(returnStructure);
-  } else res.send(authzRes);
+  } else {
+    res.statusMessage = authzRes.header.message;
+    res.status(authzRes.header.status);
+  }
 });
 
 // 재료를 통해 만들 수 있는 레시피 번호 리스트를 반환하는 함수 (tmp 데이터를 db에 넣고 출력)
@@ -79,7 +82,10 @@ recipeRouter.get('/list', async function (req, res) {
         })
         .catch((err: any) => res.status(500).send(err));
     });
-  } else res.send(authzRes);
+  } else {
+    res.statusMessage = authzRes.header.message;
+    res.status(authzRes.header.status);
+  }
 });
 
 // 레시피의 정보를 mongo에서 반환하는 기능
@@ -98,7 +104,10 @@ recipeRouter.get('/info', async function (req, res) {
         res.send(returnStructure);
       })
       .catch((err: any) => res.status(500).send(err));
-  else res.send(authzRes);
+  else {
+    res.statusMessage = authzRes.header.message;
+    res.status(authzRes.header.status);
+  }
 });
 
 // 처음 사용자 데이터 받을 때 보여줄 랜덤 레시피
@@ -116,7 +125,10 @@ recipeRouter.get('/random-list', async function (req, res) {
       res.statusMessage = 'Success To Recuen Random-Recipe List';
       res.status(201).json(returnStructure);
     });
-  else res.send(authzRes);
+  else {
+    res.statusMessage = authzRes.header.message;
+    res.status(authzRes.header.status);
+  }
 });
 
 export default recipeRouter;

@@ -18,7 +18,8 @@ debug('Redis: ' + client.reply);
 
 // 재료를 통해 만들 수 있는 레시피 개수를 반환하는 기능 (tmp 저장방식)
 recipeRouter.post('/number', async function (req, res) {
-  debug('/number Api Called');
+  console.log('/number Api Called');
+  console.log(req.body.refriger);
   let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
   let authorizationPlatform: string = String(req.headers['platform']);
   const authzRes = await Authz(authorizationToken, authorizationPlatform, 2);
@@ -50,7 +51,7 @@ recipeRouter.get('/list', async function (req, res) {
       let ingreElement: string[] = await IngredElementOfInput(RefrigerToIngredientList(result));
       let listRecipeid: string[] = await ListOfPossiRP(ingreElement);
       console.log(listRecipeid);
-      User.updateRefrigerByUserid(authzRes.auth?.securityId, result)
+      User.updateRefrigerByUserid(authzRes.auth?.securityId, result, listRecipeid.length)
         .then(async function (userData: any) {
           reccReturnObject = await SortByRecc({
             id: listRecipeid,

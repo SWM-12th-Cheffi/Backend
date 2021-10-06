@@ -5,27 +5,55 @@ var User = require('../model/userModel');
 
 //-1: Login,  0: all access, 1: access when input token, 2: access when verify success
 export default async function Authorization(token: string, platform: string, security: number = 0) {
-  console.log('Authorization ' + platform + ' level: ' + security);
+  console.log('Authorization ' + platform + ' level: ' + security + 'token: ' + token);
   switch (security) {
     case -1: // For Login
       let newUser: boolean = false;
       if (platform && platform == 'google') {
         try {
           const authRes = await verify_google(token, true);
+          console.log(authRes);
           if (Object.entries(authRes).length == 6) newUser = true;
           else if (Object.entries(authRes).length == 7) newUser = false;
-          else return { header: { status: 500, message: 'Mongo Error' }, auth: {} };
-          return { header: { status: 200, message: 'Login Success' }, auth: { newUser: newUser, token: token } };
+          else return { header: { status: 500, message: 'Mongo Error-1' }, auth: {} };
+          return {
+            header: { status: 200, message: 'Login Success' },
+            auth: { newUser: newUser, token: token, platform: platform },
+            info: {
+              recipeCount: authRes.recipeCount,
+              nickname: authRes.nickname,
+              photo: authRes.photo,
+              dislikeIngredient: authRes.dislikeIngredient,
+              scrapRecipesId: authRes.scrapRecipesId,
+              likeRecipesId: authRes.likeRecipesId,
+              historyRecipesId: authRes.historyRecipesId,
+            },
+            refriger: authRes.refriger,
+          };
         } catch (err) {
           return { header: { status: 401, message: err }, auth: {} };
         }
       } else if (platform && platform == 'kakao') {
         try {
           const authRes = await verify_kakao(token, true);
+          console.log(authRes);
           if (Object.entries(authRes).length == 6) newUser = true;
           else if (Object.entries(authRes).length == 7) newUser = false;
-          else return { header: { status: 500, message: 'Mongo Error' }, auth: {} };
-          return { header: { status: 200, message: 'Login Success' }, auth: { newUser: newUser, token: token } };
+          else return { header: { status: 500, message: 'Mongo Error-2' }, auth: {} };
+          return {
+            header: { status: 200, message: 'Login Success' },
+            auth: { newUser: newUser, token: token, platform: platform },
+            info: {
+              recipeCount: authRes.recipeCount,
+              nickname: authRes.nickname,
+              photo: authRes.photo,
+              dislikeIngredient: authRes.dislikeIngredient,
+              scrapRecipesId: authRes.scrapRecipesId,
+              likeRecipesId: authRes.likeRecipesId,
+              historyRecipesId: authRes.historyRecipesId,
+            },
+            refriger: authRes.refriger,
+          };
         } catch (err) {
           return { header: { status: 401, message: err }, auth: {} };
         }

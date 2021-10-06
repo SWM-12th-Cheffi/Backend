@@ -9,7 +9,9 @@ authRouter.post('/', async function (req, res) {
   let authorizationPlatform: string = String(req.headers['platform']);
   let returnStructure = await authz(authorizationToken, authorizationPlatform, -1);
   res.statusMessage = returnStructure.header.message;
-  res.status(returnStructure.header.status).json(returnStructure.auth);
+  res
+    .status(returnStructure.header.status)
+    .json({ auth: returnStructure.auth, info: returnStructure.info, refriger: returnStructure.refriger });
 });
 
 export default authRouter;

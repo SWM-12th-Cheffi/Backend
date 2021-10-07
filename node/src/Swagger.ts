@@ -54,6 +54,10 @@ var swaggerJson = {
         responses: {
           '200': {
             description: 'Connecting Success!',
+            schema: {
+              type: 'string',
+              example: 'Connecting POST Test Is OK, Title Value is {POST VALUE}',
+            },
           },
           '405': {
             description: 'Invalid input',
@@ -95,6 +99,78 @@ var swaggerJson = {
         responses: {
           '200': {
             description: 'Login Success',
+            schema: {
+              type: 'object',
+              properties: {
+                auth: {
+                  type: 'object',
+                  properties: {
+                    newUser: {
+                      type: 'boolean',
+                      example: false,
+                    },
+                    token: {
+                      type: 'string',
+                      example: 'zwO-mwjKcNpB3UVKO01C1sO_62T0y3xjOP0gMgopb1QAAAF8WaBSsA',
+                    },
+                    platform: {
+                      type: 'string',
+                      example: 'kakao',
+                    },
+                  },
+                },
+                info: {
+                  type: 'object',
+                  properties: {
+                    recipeCount: {
+                      type: 'integer',
+                      format: 'int32',
+                      example: 38,
+                    },
+                    nickname: {
+                      type: 'string',
+                      example: '',
+                    },
+                    photo: {
+                      type: 'string',
+                      example: '',
+                    },
+                    dislikeIngredient: {
+                      type: 'array',
+                      items: ['당근', '오이'],
+                    },
+                    scrapRecipesId: {
+                      type: 'array',
+                      items: [1234, 2345, 3456],
+                    },
+                    likeRecipesId: {
+                      type: 'array',
+                      items: [1234, 2435, 2435],
+                    },
+                    historyRecipesId: {
+                      type: 'array',
+                      items: [1234, 2345, 2354],
+                    },
+                  },
+                },
+                refriger: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      title: {
+                        type: 'string',
+                        example: '가공식품',
+                      },
+                      data: {
+                        type: 'array',
+                        items: ['햇반', '스팸', '즉석밥'],
+                      },
+                    },
+                  },
+                },
+              },
+            },
           },
           '401': {
             description: '잘못된 입력입니다.',
@@ -166,6 +242,16 @@ var swaggerJson = {
         responses: {
           '201': {
             description: 'Good Status',
+            schema: {
+              type: 'object',
+              properties: {
+                num: {
+                  type: 'integer',
+                  format: 'int32',
+                  example: 38,
+                },
+              },
+            },
           },
           '401': {
             description: 'Authorization Error',
@@ -213,6 +299,10 @@ var swaggerJson = {
         responses: {
           '201': {
             description: 'Good Status',
+            schema: {
+              type: 'object',
+              properties: {},
+            },
           },
           '401': {
             description: 'Authorization Error',
@@ -271,6 +361,59 @@ var swaggerJson = {
         responses: {
           '201': {
             description: 'Good Status',
+            schema: {
+              type: 'object',
+              properties: {
+                recipe: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      size: {
+                        type: 'string',
+                        example: 'asdf',
+                      },
+                      difficulty: {
+                        type: 'string',
+                        example: '',
+                      },
+                      ingredient: {
+                        type: 'array',
+                        items: {
+                          type: 'string',
+                        },
+                      },
+                      _id: {
+                        type: 'string',
+                        example: '1484bddf0f21d67096d7f43',
+                      },
+                      recipeid: {
+                        type: 'integer',
+                        format: 'int32',
+                        example: 5980,
+                      },
+                      title: {
+                        type: 'string',
+                        example: '단호박 스프',
+                      },
+                      scrap: {
+                        type: 'integer',
+                        format: 'int32',
+                        example: 42,
+                      },
+                      time: {
+                        type: 'string',
+                        example: '30분',
+                      },
+                      calories: {
+                        type: 'string',
+                        example: 'asdf',
+                      },
+                    },
+                  },
+                },
+              },
+            },
           },
           '401': {
             description: 'Authorization Error',
@@ -329,6 +472,27 @@ var swaggerJson = {
         responses: {
           '201': {
             description: 'Good Status',
+            schema: {
+              type: 'object',
+              properties: {
+                recipe: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      recipeid: {
+                        type: 'number',
+                        example: 6926681,
+                      },
+                      title: {
+                        string: 'string',
+                        example: '고기야채만두 소만들기 + 찌는법&찌는시간',
+                      },
+                    },
+                  },
+                },
+              },
+            },
           },
           '401': {
             description: 'Authorization Error',

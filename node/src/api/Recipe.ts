@@ -27,7 +27,7 @@ recipeRouter.post('/number', async function (req, res) {
     await client.hset('refriger', authzRes.auth?.securityId, JSON.stringify(req.body.refriger));
     let ingreElement: string[] = await IngredElementOfInput(RefrigerToIngredientList(req.body.refriger));
     let returnStructure: object = {
-      num: String(await NumberOfPossiRP(ingreElement)),
+      num: Number(await NumberOfPossiRP(ingreElement)),
     };
     res.statusMessage = 'Save Refriger Data In Redis';
     res.status(201).json(returnStructure);

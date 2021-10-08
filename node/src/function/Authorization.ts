@@ -5,7 +5,7 @@ var User = require('../model/userModel');
 
 //-1: Login,  0: all access, 1: access when input token, 2: access when verify success
 export default async function Authorization(token: string, platform: string, security: number = 0) {
-  console.log('Authorization ' + platform + ' level: ' + security + 'token: ' + token);
+  console.log('FUNC:AUTHZ Authorization ' + platform + ' level: ' + security + ' token: ' + token);
   switch (security) {
     case -1: // For Login
       let newUser: boolean = false;
@@ -84,7 +84,9 @@ export default async function Authorization(token: string, platform: string, sec
         } catch (err: any) {
           return { header: { status: err.response.status, message: err.response.statusText } };
         }
-      } else return { header: { status: 401, message: 'Incorrect platform Property' } };
+      } else {
+        return { header: { status: 401, message: 'Incorrect platform Property' } };
+      }
     default:
       return { header: { status: 401, message: 'Api Authorization Error (Security Number Error)' } };
   }

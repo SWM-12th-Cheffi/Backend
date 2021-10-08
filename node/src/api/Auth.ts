@@ -4,7 +4,7 @@ const authRouter = express.Router();
 const debug = require('debug')('Cheffi:Auth');
 
 authRouter.post('/', async function (req, res) {
-  console.log('Authorization Api Called');
+  console.log('API:AUTH Authorization Api Called');
   let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
   let authorizationPlatform: string = String(req.headers['platform']);
   let returnStructure = await authz(authorizationToken, authorizationPlatform, -1);

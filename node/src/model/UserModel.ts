@@ -22,7 +22,60 @@ var UserSchema = new Schema(
     scrapRecipesId: { type: Array, require: false },
     likeRecipesId: { type: Array, require: false },
     historyRecipesId: { type: Array, require: false },
-    refriger: { type: Array, require: false },
+    refriger: {
+      type: Array,
+      require: false,
+      default: [
+        {
+          title: '가공식품',
+          data: [],
+        },
+        {
+          title: '계란/유제품',
+          data: [],
+        },
+        {
+          title: '과일류',
+          data: [],
+        },
+        {
+          title: '떡/밥/곡류',
+          data: [],
+        },
+        {
+          title: '빵/면/만두류',
+          data: [],
+        },
+        {
+          title: '채소류',
+          data: [],
+        },
+        {
+          title: '수산/건어물',
+          data: [],
+        },
+        {
+          title: '육류',
+          data: [],
+        },
+        {
+          title: '음료/주류',
+          data: [],
+        },
+        {
+          title: '장/양념/소스류',
+          data: [],
+        },
+        {
+          title: '초콜릿/과자/견과류',
+          data: [],
+        },
+        {
+          title: '향신료/가루류',
+          data: [],
+        },
+      ],
+    },
 
     preferenceVector: { type: Array, require: false },
     userid: { type: String, require: true, unique: true },

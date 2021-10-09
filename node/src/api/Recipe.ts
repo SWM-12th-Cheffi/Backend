@@ -48,21 +48,24 @@ recipeRouter.get('/list', async function (req, res) {
   const authzRes = await Authz(authorizationToken, authorizationPlatform, 2);
   if (authzRes.header.status == 200) {
     client.hget('refriger', authzRes.auth?.securityId, async function (err: any, result: string) {
-      if (result == '[]') {
-        console.log('Redis Data: ' + result);
-        res.statusMessage = 'Refriger Data is Empty';
-        res.status(201).json({ recipe: null });
+      if (err) {
+        debug(err);
+        res.statusMessage = 'Redis Error';
+        res.status(500).send();
       } else {
         result = JSON.parse(result);
         console.log('Redis Data: ' + result);
-        if (err) debug(err);
-        let ingreElement: string[] = await IngredElementOfInput(RefrigerToIngredientList(result));
-        let listRecipeid: string[] = await ListOfPossiRP(ingreElement);
-        console.log('API:RECIPE ListOfPossiRP: ' + listRecipeid);
-        User.updateRefrigerByUserid(authzRes.auth?.securityId, result, listRecipeid.length)
-          .then(async function (userData: any) {
-            reccRecipeList = listRecipeid.map(Number);
-            /*
+        let ingredientList: string[] = RefrigerToIngredientList(result);
+        console.log("'" + ingredientList + "'");
+        console.log(ingredientList.length);
+        if (ingredientList.length != 0) {
+          let ingreElement: string[] = await IngredElementOfInput(ingredientList);
+          let listRecipeid: string[] = await ListOfPossiRP(ingreElement);
+          console.log('API:RECIPE ListOfPossiRP: ' + listRecipeid);
+          User.updateRefrigerByUserid(authzRes.auth?.securityId, result, listRecipeid.length)
+            .then(async function (userData: any) {
+              reccRecipeList = listRecipeid.map(Number);
+              /*
             reccReturnObject = await SortByRecc({
               id: listRecipeid,
               like: ['짜장면', '짬뽕'],
@@ -73,10 +76,10 @@ recipeRouter.get('/list', async function (req, res) {
               },
             });
             reccRecipeList = reccReturnObject.data.id.map(Number);*/
-            return Recipe.getListPossiRP(reccRecipeList);
-          })
-          .then((resMon: any) => {
-            /*
+              return Recipe.getListPossiRP(reccRecipeList);
+            })
+            .then((resMon: any) => {
+              /*
             let resMonObjectbyRecc: any = {};
             for (let i in resMon) {
               resMonObjectbyRecc[resMon[i].recipeid] = resMon[i];
@@ -85,15 +88,23 @@ recipeRouter.get('/list', async function (req, res) {
             for (let i in reccRecipeList) {
               resMonListbyRecc.push(resMonObjectbyRecc[reccRecipeList[i]]);
             }*/
-            let returnStructure: object = {
-              //recipe: resMonListbyRecc,
-              recipe: resMon,
-            };
-            console.log('API:RECIPE Result: ' + returnStructure);
-            res.statusMessage = 'Save Refriger Data In Mongo';
-            res.status(201).json(returnStructure);
-          })
-          .catch((err: any) => res.status(500).send(err));
+              let returnStructure: object = {
+                //recipe: resMonListbyRecc,
+                recipe: resMon,
+              };
+              console.log('API:RECIPE Result: ' + returnStructure);
+              res.statusMessage = 'Save Refriger Data In Mongo';
+              res.status(201).json(returnStructure);
+            })
+            .catch((err: any) => res.status(500).send(err));
+        } else {
+          User.updateRefrigerByUserid(authzRes.auth?.securityId, result, 0)
+            .then((resMon: any) => {
+              res.statusMessage = 'No Refriger Data';
+              res.status(201).json({ recipe: null });
+            })
+            .catch((err: any) => res.status(500).send(err));
+        }
       }
     });
   } else {

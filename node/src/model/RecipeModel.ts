@@ -1,7 +1,8 @@
+const debug = require('debug')('Cheffi:Mongo');
+
 var mongoose = require('mongoose');
 var mongoAddr: string = String(process.env.MONGO_ADDR);
-const recipe_db = mongoose.createConnection(mongoAddr + 'recipe');
-const debug = require('debug')('Cheffi:Mongo');
+export const recipe_db = mongoose.createConnection(mongoAddr + 'recipe');
 
 var handleOpen = () => {
   debug(`Connected to recipe_db`);
@@ -10,7 +11,6 @@ var handleOpen = () => {
 recipe_db.once('open', handleOpen);
 
 var Schema = mongoose.Schema;
-
 var RecipeSchema = new Schema(
   {
     id: Schema.Types.ObjectID,
@@ -29,21 +29,13 @@ var RecipeSchema = new Schema(
   },
 );
 
-// Create new recipe document
-RecipeSchema.statics.create = function (payload: any) {
-  // this === Model
-  const recipe = new this(payload);
-  // return Promise
-  return recipe.save();
-};
-
-// 랜덤으로 레시피를 뽑아옴
-RecipeSchema.statics.randomRecipe = function (num: number) {
+// - 랜덤으로 레시피를 뽑아옴 /recipe/random-recipe
+RecipeSchema.statics.getRandomRecipe = function (num: number) {
   return this.aggregate([{ $sample: { size: num } }, { $project: { _id: 0, recipeid: 1, title: 1 } }]);
 };
 
-// 입력받은 레시피 번호 배열로 각 레시피 정보를 받아옴.
-RecipeSchema.statics.ListPossiRP = function (num: number[]) {
+// 입력받은 레시피 번호 배열로 각 레시피 정보를 받아옴. /recipe/list
+RecipeSchema.statics.getListPossiRP = function (num: number[]) {
   return this.find({
     $or: num.map((x) => {
       return { recipeid: x };
@@ -51,15 +43,9 @@ RecipeSchema.statics.ListPossiRP = function (num: number[]) {
   });
 };
 
-// Find by recipeid
-RecipeSchema.statics.findByRecipeid = function (recipeid: number[]) {
+// RecipeId에 해당하는 레시피 정보를 가져옴 /recipe/info
+RecipeSchema.statics.getRecipeInfoByRecipeId = function (recipeid: number[]) {
   return this.find({ recipeid });
-};
-
-// Update by recipeid
-RecipeSchema.statics.updateByRecipeid = function (recipeid: number, payload: any) {
-  // { new: true }: return the modified document rather than the original. defaults to false
-  return this.findOneAndUpdate({ recipeid }, payload, { new: true });
 };
 
 // Create Model & Export

@@ -103,13 +103,13 @@ async function verify_google(token: string, init: boolean) {
   if (init) {
     // 처음 로그인할 때
     let Userinfo = { userid: userid, platform: 'Google', token: securityTk };
-    return User.findOneByUserid(userid).then((result: object) => {
-      if (!result) return User.create(Userinfo);
+    return User.getInfoByUserid(userid).then((result: object) => {
+      if (!result) return User.createInfo(Userinfo);
       else return User.updateTokenByUserid(userid, securityTk);
     });
   } else {
     // 이후 권한 확인할 때
-    return User.findOneByUserid(userid);
+    return User.getInfoByUserid(userid);
   }
 }
 
@@ -126,12 +126,12 @@ async function verify_kakao(token: string, init: boolean) {
   if (init) {
     // 처음 로그인할 때
     let Userinfo = { userid: userid, platform: 'Kakao', token: securityTk };
-    return User.findOneByUserid(userid).then((result: object) => {
-      if (!result) return User.create(Userinfo);
+    return User.getInfoByUserid(userid).then((result: object) => {
+      if (!result) return User.createInfo(Userinfo);
       else return User.updateTokenByUserid(userid, securityTk);
     });
   } else {
     // 이후 권한 확인할 때
-    return User.findOneByUserid(userid);
+    return User.getInfoByUserid(userid);
   }
 }

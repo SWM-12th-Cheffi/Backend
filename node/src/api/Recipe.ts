@@ -71,7 +71,7 @@ recipeRouter.get('/list', async function (req, res) {
               },
             });
             reccRecipeList = reccReturnObject.data.id.map(Number);
-            return Recipe.ListPossiRP(reccRecipeList);
+            return Recipe.getListPossiRP(reccRecipeList);
           })
           .then((resMon: any) => {
             let resMonObjectbyRecc: any = {};
@@ -106,7 +106,7 @@ recipeRouter.get('/info', async function (req, res) {
   let authorizationPlatform: string = String(req.headers['platform']);
   const authzRes = await Authz(authorizationToken, authorizationPlatform, 0);
   if (authzRes.header.status == 200)
-    Recipe.findByRecipeid(Number(req.query.id))
+    Recipe.getRecipeInfoByRecipeId(Number(req.query.id))
       .then((recipeInfo: any) => {
         if (!recipeInfo) return res.status(404).send({ err: 'Recipe not found' });
         let returnStructure: object = { recipe: recipeInfo };
@@ -133,7 +133,7 @@ recipeRouter.get('/random-list', async function (req, res) {
   let numberOfRecipeToSend = Number(req.query.num);
   const authzRes = await Authz(authorizationToken, authorizationPlatform, 0);
   if (authzRes.header.status == 200)
-    Recipe.randomRecipe(numberOfRecipeToSend).then((recipeInfo: object[]) => {
+    Recipe.getRandomRecipe(numberOfRecipeToSend).then((recipeInfo: object[]) => {
       let returnStructure: object = {
         recipe: recipeInfo,
       };

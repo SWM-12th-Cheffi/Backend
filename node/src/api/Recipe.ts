@@ -56,8 +56,6 @@ recipeRouter.get('/list', async function (req, res) {
         result = JSON.parse(result);
         console.log('Redis Data: ' + result);
         let ingredientList: string[] = RefrigerToIngredientList(result);
-        console.log("'" + ingredientList + "'");
-        console.log(ingredientList.length);
         if (ingredientList.length != 0) {
           let ingreElement: string[] = await IngredElementOfInput(ingredientList);
           let listRecipeid: string[] = await ListOfPossiRP(ingreElement);

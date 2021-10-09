@@ -23,7 +23,7 @@ userRouter.get('/like', async function (req, res) {
   let authorizationPlatform: string = String(req.headers['platform']);
   const authzRes = await Authz(authorizationToken, authorizationPlatform, 2);
   if (authzRes.header.status == 200)
-    User.addLikeRecipesByToken(authzRes.auth?.securityId, RecipeId).then((result: any) => {
+    User.addLikeRecipeIdByUserid(authzRes.auth?.securityId, Number(RecipeId)).then((result: any) => {
       // 정상적으로 작업을 마침 -> 미구현
       if (result.matchedCount) res.status(200).json({ likeRecipesId: RecipeId });
       // token으로 정보를 찾을 수 없음
@@ -43,7 +43,7 @@ userRouter.post('/info/init', async function (req, res) {
   let authorizationPlatform: string = String(req.headers['platform']);
   const authzRes = await Authz(authorizationToken, authorizationPlatform, 2);
   if (authzRes.header.status == 200)
-    User.initUserInfo(authzRes.auth?.securityId, req.body.data).then((result: any) => {
+    User.initInfoByUserid(authzRes.auth?.securityId, req.body.data).then((result: any) => {
       // 정상적으로 작업을 마침
       if (result.matchedCount) {
         console.log('API:USER Result: ' + result);
@@ -73,13 +73,15 @@ userRouter.get('/info', async function (req, res) {
     User.findOneByUserid(authzRes.auth?.securityId)
       .then((result: any) => {
         let openedInfo = {
-          nickname: result.nickname,
-          statusMessage: result.statusMessage,
-          photo: result.photo,
-          dislikeIngredient: result.dislikeIngredient,
-          scrapRecipesId: result.scrapRecipesId,
-          likeRecipesId: result.likeRecipesId,
-          historyRecipesId: result.historyRecipesId,
+          info: {
+            recipeCount: result.recipeCount,
+            nickname: result.nickname,
+            photo: result.photo,
+            dislikeIngredient: result.dislikeIngredient,
+            scrapRecipesId: result.scrapRecipesId,
+            likeRecipesId: result.likeRecipesId,
+            historyRecipesId: result.historyRecipesId,
+          },
           refriger: result.refriger,
         };
         console.log('API:USER Result: ' + openedInfo);
@@ -106,7 +108,10 @@ userRouter.put('/refriger', async function (req, res) {
     User.updateRefrigerByUserid(authzRes.auth?.securityId, req.body.refriger, num)
       .then(() => {
         console.log('API:USER Result: No Return Data');
-        res.send({ status: 200, message: 'Save Refriger Data In Mongo' });
+        res.statusMessage = 'Save Refriger Data In Mongo';
+        res.status(200).send({
+          num: num,
+        });
       })
       .catch(debug);
   } else {

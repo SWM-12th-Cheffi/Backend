@@ -137,19 +137,33 @@ var swaggerJson = {
                     },
                     dislikeIngredient: {
                       type: 'array',
-                      items: ['당근', '오이'],
+                      items: {
+                        type: 'string',
+                      },
                     },
                     scrapRecipesId: {
                       type: 'array',
-                      items: [1234, 2345, 3456],
+                      items: {
+                        type: 'integer',
+                        foemat: 'int32',
+                        example: [5980, 5981],
+                      },
                     },
                     likeRecipesId: {
                       type: 'array',
-                      items: [1234, 2435, 2435],
+                      items: {
+                        type: 'integer',
+                        foemat: 'int32',
+                        example: [5980, 5981],
+                      },
                     },
                     historyRecipesId: {
                       type: 'array',
-                      items: [1234, 2345, 2354],
+                      items: {
+                        type: 'integer',
+                        foemat: 'int32',
+                        example: [5980, 5981],
+                      },
                     },
                   },
                 },
@@ -551,6 +565,18 @@ var swaggerJson = {
         responses: {
           '200': {
             description: 'Good Status',
+            schema: {
+              type: 'object',
+              properties: {
+                likeRecipesId: {
+                  type: 'array',
+                  items: {
+                    type: 'number',
+                    example: [5980],
+                  },
+                },
+              },
+            },
           },
           '401': {
             description: 'Authorization Error',
@@ -625,7 +651,7 @@ var swaggerJson = {
         ],
         responses: {
           '200': {
-            description: 'Good Status',
+            description: 'Save Successed',
           },
           '401': {
             description: 'Authorization Error',
@@ -673,6 +699,75 @@ var swaggerJson = {
         responses: {
           '201': {
             description: 'Good Status',
+            schema: {
+              type: 'object',
+              properties: {
+                info: {
+                  type: 'object',
+                  properties: {
+                    recipeCount: {
+                      type: 'integer',
+                      format: 'int32',
+                      example: 38,
+                    },
+                    nickname: {
+                      type: 'string',
+                      example: '',
+                    },
+                    photo: {
+                      type: 'string',
+                      example: '',
+                    },
+                    dislikeIngredient: {
+                      type: 'array',
+                      items: {
+                        type: 'string',
+                      },
+                    },
+                    scrapRecipesId: {
+                      type: 'array',
+                      items: {
+                        type: 'integer',
+                        foemat: 'int32',
+                        example: [5980, 5981],
+                      },
+                    },
+                    likeRecipesId: {
+                      type: 'array',
+                      items: {
+                        type: 'integer',
+                        foemat: 'int32',
+                        example: [5980, 5981],
+                      },
+                    },
+                    historyRecipesId: {
+                      type: 'array',
+                      items: {
+                        type: 'integer',
+                        foemat: 'int32',
+                        example: [5980, 5981],
+                      },
+                    },
+                  },
+                },
+                refriger: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      title: {
+                        type: 'string',
+                        example: '가공식품',
+                      },
+                      data: {
+                        type: 'array',
+                        items: ['햇반', '스팸', '즉석밥'],
+                      },
+                    },
+                  },
+                },
+              },
+            },
           },
           '401': {
             description: 'Authorization Error',
@@ -742,6 +837,16 @@ var swaggerJson = {
         responses: {
           '201': {
             description: 'Good Status',
+            schema: {
+              type: 'object',
+              properties: {
+                num: {
+                  type: 'integer',
+                  format: 'int32',
+                  example: 33,
+                },
+              },
+            },
           },
           '401': {
             description: 'Authorization Error',
@@ -789,6 +894,16 @@ var swaggerJson = {
         responses: {
           '201': {
             description: 'Good Status',
+            schema: {
+              type: 'object',
+              properties: {
+                num: {
+                  type: 'integer',
+                  format: 'int32',
+                  example: 33,
+                },
+              },
+            },
           },
           '401': {
             description: 'Authorization Error',

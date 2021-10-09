@@ -92,9 +92,9 @@ UserSchema.statics.updateRefrigerByUserid = function (userid: string, fridge: ob
 };
 
 // 초기설정
-UserSchema.statics.initUserInfo = function (reqData: any) {
+UserSchema.statics.initUserInfo = function (securityId: String, reqData: any) {
   return this.updateOne(
-    { token: reqData.token },
+    { userid: securityId },
     {
       nickname: reqData.nickname,
       dislikeIngredient: reqData.dislike,
@@ -105,7 +105,7 @@ UserSchema.statics.initUserInfo = function (reqData: any) {
 };
 
 // 좋아하는 레시피라고 클릭했을 때 몽고에 추가함. 1개씩 가능
-UserSchema.statics.addLikeRecipesByToken = function (userid: string, likeRecipe: string) {
+UserSchema.statics.addLikeRecipesById = function (userid: string, likeRecipe: number) {
   return this.updateOne({ userid: userid }, { $addToSet: { likeRecipesId: likeRecipe } });
 };
 

@@ -3,7 +3,6 @@ import { SortByRecc } from '../function/Python';
 import { IngredElementOfInput, ListOfPossiRP, NumberOfPossiRP } from '../function/Neo4j';
 import Authz from '../function/Authorization';
 import { RefrigerToIngredientList } from '../function/RecipeFunction';
-import { collapseTextChangeRangesAcrossMultipleVersions } from 'typescript';
 const debug = require('debug')('Cheffi:Recipes');
 
 const recipeRouter = express.Router();
@@ -115,7 +114,10 @@ recipeRouter.get('/info', async function (req, res) {
         res.statusMessage = 'Success To Return Recipe Info';
         res.status(201).json(returnStructure);
       })
-      .catch((err: any) => res.status(500).send(err));
+      .catch((err: any) => {
+        res.statusMessage = 'Recipe not found';
+        res.status(404).send(err);
+      });
   else {
     res.statusMessage = authzRes.header.message;
     res.status(authzRes.header.status).send();

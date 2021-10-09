@@ -76,6 +76,7 @@ recipeRouter.get('/list', async function (req, res) {
             return Recipe.getListPossiRP(reccRecipeList);
           })
           .then((resMon: any) => {
+            /*
             let resMonObjectbyRecc: any = {};
             for (let i in resMon) {
               resMonObjectbyRecc[resMon[i].recipeid] = resMon[i];
@@ -83,9 +84,10 @@ recipeRouter.get('/list', async function (req, res) {
             let resMonListbyRecc = [];
             for (let i in reccRecipeList) {
               resMonListbyRecc.push(resMonObjectbyRecc[reccRecipeList[i]]);
-            }
+            }*/
             let returnStructure: object = {
-              recipe: resMonListbyRecc,
+              //recipe: resMonListbyRecc,
+              recipe: resMon,
             };
             console.log('API:RECIPE Result: ' + returnStructure);
             res.statusMessage = 'Save Refriger Data In Mongo';

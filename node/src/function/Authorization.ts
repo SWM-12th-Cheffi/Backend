@@ -1,7 +1,7 @@
 var { OAuth2Client } = require('google-auth-library');
 var crypto = require('crypto');
 var axios = require('axios');
-var User = require('../model/userModel');
+var User = require('../model/UserModel');
 
 //-1: Login,  0: all access, 1: access when input token, 2: access when verify success
 export default async function Authorization(token: string, platform: string, security: number = 0) {

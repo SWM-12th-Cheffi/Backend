@@ -61,7 +61,7 @@ recipeRouter.get('/list', async function (req, res) {
         console.log('API:RECIPE ListOfPossiRP: ' + listRecipeid);
         User.updateRefrigerByUserid(authzRes.auth?.securityId, result, listRecipeid.length)
           .then(async function (userData: any) {
-            reccReturnObject = listRecipeid;
+            reccRecipeList = listRecipeid.map(Number);
             /*
             reccReturnObject = await SortByRecc({
               id: listRecipeid,

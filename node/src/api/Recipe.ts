@@ -61,6 +61,8 @@ recipeRouter.get('/list', async function (req, res) {
         console.log('API:RECIPE ListOfPossiRP: ' + listRecipeid);
         User.updateRefrigerByUserid(authzRes.auth?.securityId, result, listRecipeid.length)
           .then(async function (userData: any) {
+            reccReturnObject = listRecipeid;
+            /*
             reccReturnObject = await SortByRecc({
               id: listRecipeid,
               like: ['짜장면', '짬뽕'],
@@ -70,7 +72,7 @@ recipeRouter.get('/list', async function (req, res) {
                 scrap: userData.scrapRecipesId,
               },
             });
-            reccRecipeList = reccReturnObject.data.id.map(Number);
+            reccRecipeList = reccReturnObject.data.id.map(Number);*/
             return Recipe.getListPossiRP(reccRecipeList);
           })
           .then((resMon: any) => {

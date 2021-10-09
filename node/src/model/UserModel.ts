@@ -92,9 +92,9 @@ UserSchema.statics.updateRefrigerByUserid = function (userid: string, fridge: ob
 };
 
 // 초기설정
-UserSchema.statics.initUserInfo = function (reqData: any) {
+UserSchema.statics.initUserInfo = function (securityId: String, reqData: any) {
   return this.updateOne(
-    { token: reqData.token },
+    { userid: securityId },
     {
       nickname: reqData.nickname,
       dislikeIngredient: reqData.dislike,

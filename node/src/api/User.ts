@@ -14,9 +14,10 @@ const client = redis.createClient(process.env.REDIS_ADDR);
 debug('Redis: ' + client.reply);
 
 // 좋아하는 음식의 레시피 번호를 저장
+// Todo: like 리스트를 불러와서 업데이트하도록 설정해야함.
 userRouter.get('/like', async function (req, res) {
   console.log('API:USER /like Api Called');
-  console.log('API:USER RecipeId: ' + req.query.RecipeId);
+  console.log('API:USER RecipeId: ' + req.query.id);
   let RecipeId = req.query.id; // $push 사용해서 몽고에 저장
   let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
   let authorizationPlatform: string = String(req.headers['platform']);
@@ -42,14 +43,18 @@ userRouter.post('/info/init', async function (req, res) {
   let authorizationPlatform: string = String(req.headers['platform']);
   const authzRes = await Authz(authorizationToken, authorizationPlatform, 2);
   if (authzRes.header.status == 200)
-    User.initInfo(req.body.data).then((result: any) => {
+    User.initUserInfo(authzRes.auth?.securityId, req.body.data).then((result: any) => {
       // 정상적으로 작업을 마침
       if (result.matchedCount) {
         console.log('API:USER Result: ' + result);
-        res.status(200).json(result);
+        res.statusMessage = 'Save Successed';
+        res.status(200).send();
       }
-      // token으로 정보를 찾을 수 없음
-      else res.status(404);
+      // id로 정보를 찾을 수 없음
+      else {
+        res.statusMessage = 'Cannot Find User';
+        res.status(404).send();
+      }
     });
   else {
     res.statusMessage = authzRes.header.message;
@@ -61,7 +66,7 @@ userRouter.post('/info/init', async function (req, res) {
 userRouter.get('/info', async function (req, res) {
   console.log('API:USER /user/info Api Called');
   console.log('API:USER No Query Data');
-  let authorizationToken: string = String(req.headers['Authorization']).split(' ')[1];
+  let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
   let authorizationPlatform: string = String(req.headers['platform']);
   const authzRes = await Authz(authorizationToken, authorizationPlatform, 2);
   if (authzRes.header.status == 200)

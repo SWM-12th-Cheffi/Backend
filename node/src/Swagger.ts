@@ -283,7 +283,8 @@ var swaggerJson = {
     '/recipe/list': {
       get: {
         tags: ['Recipe'],
-        summary: 'redis에 저장된 냉장고 데이터로 만들 수 있는 레시피 반환, redis에 저장된 냉장고 데이터를 Mongo에 저장',
+        summary:
+          'redis에 저장된 냉장고 데이터로 만들 수 있는 레시피 반환, redis에 저장된 냉장고 데이터를 Mongo에 저장 Pagenation 추가',
         description:
           'Authorization 2 \n /recipe/number로 저장한 냉장고 데이터를 활용하는 함수\n전송 방식: Get \n Input: Header(Token, Platform) \n Output: status, recipe, message',
         consumes: 'application/json',
@@ -309,13 +310,52 @@ var swaggerJson = {
               enum: ['kakao', 'google'],
             },
           },
+          {
+            in: 'query',
+            name: 'page',
+            description: '원하는 페이지를 입력해주세요. (1페이지부터 시작)',
+            required: true,
+            schema: {
+              page: {
+                type: 'integer',
+                format: 'int32',
+                example: 1,
+              },
+            },
+          },
+          {
+            in: 'query',
+            name: 'step',
+            description: '원하는 레시피의 수를 입력해주세요. (한 페이지당 보일 레시피 수)',
+            required: true,
+            schema: {
+              step: {
+                type: 'integer',
+                format: 'int32',
+                example: 10,
+              },
+            },
+          },
         ],
         responses: {
           '201': {
             description: 'Good Status',
             schema: {
               type: 'object',
-              properties: {},
+              properties: {
+                recipe: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {},
+                  },
+                },
+                maxPage: {
+                  type: 'integer',
+                  format: 'int32',
+                  example: 5,
+                },
+              },
             },
           },
           '401': {

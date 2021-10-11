@@ -521,10 +521,10 @@ var swaggerJson = {
       },
     },
 
-    '/user/like': {
+    '/user/scrap': {
       get: {
         tags: ['User'],
-        summary: '사용자가 like를 누른 레시피를 저장합니다.',
+        summary: '사용자가 Scrap한 레시피를 저장합니다.',
         description:
           'Authorization 2 \n 전송 방식: Post \n Input: Header(Token, Platform), Query(id) \n Output: status, likeRecipesId, message',
         consumes: 'application/json',
@@ -568,11 +568,80 @@ var swaggerJson = {
             schema: {
               type: 'object',
               properties: {
-                likeRecipesId: {
-                  type: 'array',
-                  items: {
-                    type: 'number',
-                    example: [5980],
+                add: {
+                  type: 'object',
+                  properties: {
+                    type: 'integer',
+                    format: 'int32',
+                    example: 5980,
+                  },
+                },
+              },
+            },
+          },
+          '401': {
+            description: 'Authorization Error',
+          },
+          '404': {
+            description: 'Data not Found',
+          },
+          '500': {
+            description: 'Mongo Error',
+          },
+        },
+      },
+      delete: {
+        tags: ['User'],
+        summary: '사용자가 Scrap한 레시피 목록에서 삭제합니다.',
+        description:
+          'Authorization 2 \n 전송 방식: Post \n Input: Header(Token, Platform), Query(id) \n Output: status, likeRecipesId, message',
+        consumes: 'application/json',
+        produces: 'application/json',
+        parameters: [
+          {
+            in: 'header',
+            name: 'Authorization',
+            description: '인증 방식과 토큰을 입력해주세요.',
+            required: true,
+            schema: {
+              type: 'string',
+              example: 'Bearer TOTOTOTOOTOTTOOKENENEKENKENKENE',
+            },
+          },
+          {
+            in: 'header',
+            name: 'Platform',
+            description: '인증 플랫폼을 입력해주세요.',
+            required: true,
+            schema: {
+              type: 'string',
+              enum: ['kakao', 'google'],
+            },
+          },
+          {
+            in: 'body',
+            name: 'id',
+            description: '레시피 번호를 입력해주세요',
+            required: true,
+            schema: {
+              type: 'integer',
+              format: 'int32',
+              example: 5980,
+            },
+          },
+        ],
+        responses: {
+          '200': {
+            description: 'Good Status',
+            schema: {
+              type: 'object',
+              properties: {
+                delete: {
+                  type: 'object',
+                  properties: {
+                    type: 'integer',
+                    format: 'int32',
+                    example: 5980,
                   },
                 },
               },

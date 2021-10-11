@@ -128,5 +128,10 @@ UserSchema.statics.addLikeRecipeIdByUserid = function (userid: string, likeRecip
   return this.updateOne({ userid: userid }, { $addToSet: { likeRecipesId: likeRecipeId } });
 };
 
+// - 좋아요 버튼 /user/like
+UserSchema.statics.removeLikeRecipeIdByUserid = function (userid: string, likeRecipeId: number) {
+  return this.updateOne({ userid: userid }, { $pull: { likeRecipesId: likeRecipeId } });
+};
+
 // Create Model & Export
 module.exports = user_db.model('user', UserSchema);

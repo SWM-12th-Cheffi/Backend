@@ -31,7 +31,10 @@ var RecipeSchema = new Schema(
 
 // - 랜덤으로 레시피를 뽑아옴 /recipe/random-recipe
 RecipeSchema.statics.getRandomRecipe = function (num: number) {
-  return this.aggregate([{ $sample: { size: num } }, { $project: { _id: 0, recipeid: 1, title: 1 } }]);
+  return this.aggregate([
+    { $sample: { size: num } },
+    { $project: { _id: 0, ingredient: 0 /*recipeid: 1, title: 1*/ } },
+  ]);
 };
 
 // 입력받은 레시피 번호 배열로 각 레시피 정보를 받아옴. /recipe/list

@@ -145,7 +145,7 @@ recipeRouter.get('/info', async function (req, res) {
   }
 });
 
-// 처음 사용자 데이터 받을 때 보여줄 랜덤 레시피
+// 처음 사용자 데이터 받을 때 보여줄 랜덤 레시피 + 일단 추천할 때 쓸 레시피
 recipeRouter.get('/random-list', async function (req, res) {
   console.log('API:RECIPE /random-list Api Called');
   console.log('API:RECIPE number of Recipe: ' + req.query.num);

@@ -544,8 +544,35 @@ var swaggerJson = {
                         example: 6926681,
                       },
                       title: {
-                        string: 'string',
+                        type: 'string',
                         example: '고기야채만두 소만들기 + 찌는법&찌는시간',
+                      },
+                      scrap: {
+                        type: 'integer',
+                        format: 'int32',
+                        example: null,
+                      },
+                      time: {
+                        type: 'string',
+                        example: '20분',
+                      },
+                      calories: {
+                        type: 'integer',
+                        format: 'int32',
+                        example: null,
+                      },
+                      size: {
+                        type: 'integer',
+                        format: 'int32',
+                        example: 2,
+                      },
+                      difficulty: {
+                        type: 'string',
+                        example: '아무나',
+                      },
+                      platform: {
+                        type: 'string',
+                        example: 'mangae',
                       },
                     },
                   },

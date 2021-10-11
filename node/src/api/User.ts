@@ -13,12 +13,32 @@ const redis = require('redis');
 const client = redis.createClient(process.env.REDIS_ADDR);
 debug('Redis: ' + client.reply);
 
-// 좋아하는 음식의 레시피 번호를 저장
+// 좋아하는 음식의 레시피 번호 목록 불러오기
 // Todo: Scrap 리스트를 불러와서 업데이트하도록 설정해야함.
 userRouter.get('/scrap', async function (req, res) {
-  console.log('API:USER /like Api Called');
-  console.log('API:USER RecipeId: ' + req.query.id);
-  let RecipeId = req.query.id; // $push 사용해서 몽고에 저장
+  console.log('API:USER /scrap get Api Called');
+  let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
+  let authorizationPlatform: string = String(req.headers['platform']);
+  const authzRes = await Authz(authorizationToken, authorizationPlatform, 2);
+  if (authzRes.header.status == 200)
+    User.getLikeRecipeIdByUserid(authzRes.auth?.securityId)
+      .then((result: any) => {
+        // 정상적으로 작업을 마침 -> 미구현
+        res.status(200).json({ get: result });
+      })
+      .catch((err: any) => res.status(500).send(err));
+  else {
+    res.statusMessage = authzRes.header.message;
+    res.status(authzRes.header.status).send();
+  }
+});
+
+// 좋아하는 음식의 레시피 번호를 저장
+// Todo: Scrap 리스트를 불러와서 업데이트하도록 설정해야함.
+userRouter.put('/scrap', async function (req, res) {
+  console.log('API:USER /scrap put Api Called');
+  console.log('API:USER RecipeId: ' + req.body.id);
+  let RecipeId = req.body.id; // $push 사용해서 몽고에 저장
   let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
   let authorizationPlatform: string = String(req.headers['platform']);
   const authzRes = await Authz(authorizationToken, authorizationPlatform, 2);
@@ -38,7 +58,7 @@ userRouter.get('/scrap', async function (req, res) {
 // 좋아하는 음식의 레시피 번호를 삭제
 // Todo: like 리스트를 불러와서 업데이트하도록 설정해야함.
 userRouter.delete('/scrap', async function (req, res) {
-  console.log('API:USER /like Api Called');
+  console.log('API:USER /scrap delete Api Called');
   console.log('API:USER RecipeId: ' + req.body.id);
   let RecipeId = req.body.id; // $push 사용해서 몽고에 저장
   let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
@@ -47,37 +67,9 @@ userRouter.delete('/scrap', async function (req, res) {
   if (authzRes.header.status == 200)
     User.removeLikeRecipeIdByUserid(authzRes.auth?.securityId, Number(RecipeId)).then((result: any) => {
       // 정상적으로 작업을 마침 -> 미구현
-      console.log(result);
       if (result.modifiedCount) res.status(200).json({ delete: { likeRecipesId: RecipeId } });
       // token으로 정보를 찾을 수 없음
       else res.status(404).send();
-    });
-  else {
-    res.statusMessage = authzRes.header.message;
-    res.status(authzRes.header.status).send();
-  }
-});
-
-// 사용자 정보 초기설정
-userRouter.post('/info/init', async function (req, res) {
-  console.log('API:USER /info/init Api Called');
-  console.log('API:USER data: ' + req.body.data);
-  let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
-  let authorizationPlatform: string = String(req.headers['platform']);
-  const authzRes = await Authz(authorizationToken, authorizationPlatform, 2);
-  if (authzRes.header.status == 200)
-    User.initInfoByUserid(authzRes.auth?.securityId, req.body.data).then((result: any) => {
-      // 정상적으로 작업을 마침
-      if (result.matchedCount) {
-        console.log('API:USER Result: ' + result);
-        res.statusMessage = 'Save Successed';
-        res.status(200).send();
-      }
-      // id로 정보를 찾을 수 없음
-      else {
-        res.statusMessage = 'Cannot Find User';
-        res.status(404).send();
-      }
     });
   else {
     res.statusMessage = authzRes.header.message;
@@ -112,6 +104,56 @@ userRouter.get('/info', async function (req, res) {
         res.status(201).json(openedInfo);
       })
       .catch(debug);
+  else {
+    res.statusMessage = authzRes.header.message;
+    res.status(authzRes.header.status).send();
+  }
+});
+
+// 사용자 정보 변경
+userRouter.put('/info', async function (req, res) {
+  console.log('API:USER /info/init Api Called');
+  console.log('API:USER data: ' + req.body.data);
+  let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
+  let authorizationPlatform: string = String(req.headers['platform']);
+  const authzRes = await Authz(authorizationToken, authorizationPlatform, 2);
+  if (authzRes.header.status == 200)
+    User.initInfoByUserid(authzRes.auth?.securityId, req.body.data).then((result: any) => {
+      // 정상적으로 작업을 마침
+      if (result.matchedCount) {
+        console.log('API:USER Result: ' + result);
+        res.statusMessage = 'Save Successed';
+        res.status(200).send();
+      }
+      // id로 정보를 찾을 수 없음
+      else {
+        res.statusMessage = 'Cannot Find User';
+        res.status(404).send();
+      }
+    });
+  else {
+    res.statusMessage = authzRes.header.message;
+    res.status(authzRes.header.status).send();
+  }
+});
+
+// 사용자 정보 변경
+userRouter.delete('/info', async function (req, res) {
+  console.log('API:USER /info/init Api Called');
+  let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
+  let authorizationPlatform: string = String(req.headers['platform']);
+  const authzRes = await Authz(authorizationToken, authorizationPlatform, 2);
+  if (authzRes.header.status == 200)
+    User.removeInfoByUserid(authzRes.auth?.securityId).then((result: any) => {
+      // 정상적으로 작업을 마침 -> 미구현
+      console.log(result);
+      if (result.deletedCount) {
+        res.statusMessage = 'Remove Data Success';
+        res.status(200).send();
+      }
+      // token으로 정보를 찾을 수 없음
+      else res.status(404).send();
+    });
   else {
     res.statusMessage = authzRes.header.message;
     res.status(authzRes.header.status).send();

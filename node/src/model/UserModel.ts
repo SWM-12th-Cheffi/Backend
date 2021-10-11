@@ -95,7 +95,7 @@ UserSchema.statics.createInfo = function (payload: any) {
   return user.save();
 };
 
-// - 초기설정 /user/info/init
+// - 초기설정 /user/info put
 UserSchema.statics.initInfoByUserid = function (securityId: String, reqData: any) {
   return this.updateOne(
     { userid: securityId },
@@ -108,9 +108,14 @@ UserSchema.statics.initInfoByUserid = function (securityId: String, reqData: any
   );
 };
 
-// - Userid로 사용자의 정보를 받아옴 func Authorization /user/info /user/recipe-count
+// - Userid로 사용자의 정보를 받아옴 func Authorization /user/info get /user/recipe-count
 UserSchema.statics.getInfoByUserid = function (userid: string) {
   return this.findOne({ userid: userid });
+};
+
+// - Userid로 사용자의 정보를 받아옴 func Authorization /user/info get /user/recipe-count
+UserSchema.statics.removeInfoByUserid = function (userid: string) {
+  return this.deleteOne({ userid: userid });
 };
 
 // - 사용자의 토큰을 업데이트 func Authorization
@@ -123,12 +128,17 @@ UserSchema.statics.updateRefrigerByUserid = function (userid: string, fridge: ob
   return this.findOneAndUpdate({ userid: userid }, { refriger: fridge, recipeCount: recipecount });
 };
 
-// - 좋아요 버튼 /user/like
+// - 좋아요 버튼 /user/like get
+UserSchema.statics.getLikeRecipeIdByUserid = function (userid: string) {
+  return this.findOne({ userid: userid }, { _id: 0, likeRecipesId: 1 });
+};
+
+// - 좋아요 버튼 /user/like put
 UserSchema.statics.addLikeRecipeIdByUserid = function (userid: string, likeRecipeId: number) {
   return this.updateOne({ userid: userid }, { $addToSet: { likeRecipesId: likeRecipeId } });
 };
 
-// - 좋아요 버튼 /user/like
+// - 좋아요 버튼 /user/like delete
 UserSchema.statics.removeLikeRecipeIdByUserid = function (userid: string, likeRecipeId: number) {
   return this.updateOne({ userid: userid }, { $pull: { likeRecipesId: likeRecipeId } });
 };

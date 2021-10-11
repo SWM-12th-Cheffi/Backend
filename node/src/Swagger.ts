@@ -1111,17 +1111,22 @@ var swaggerJson = {
             description: '냉장고 데이터를 입력해주세요.',
             required: true,
             schema: {
-              type: 'array',
-              items: {
-                type: 'object',
-                properties: {
-                  title: {
-                    type: 'string',
-                    example: '가공식품',
-                  },
-                  data: {
-                    type: 'array',
-                    items: ['햇반', '스팸', '즉석밥'],
+              type: 'object',
+              properties: {
+                refriger: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      title: {
+                        type: 'string',
+                        example: '가공식품',
+                      },
+                      data: {
+                        type: 'array',
+                        items: ['햇반', '스팸', '즉석밥'],
+                      },
+                    },
                   },
                 },
               },

@@ -86,13 +86,21 @@ recipeRouter.get('/list', async function (req, res) {
             for (let i in reccRecipeList) {
               resMonListbyRecc.push(resMonObjectbyRecc[reccRecipeList[i]]);
             }*/
-              let returnStructure: object = {
-                //recipe: resMonListbyRecc,
-                recipe: resMon,
-              };
-              console.log('API:RECIPE Result: ' + returnStructure);
-              res.statusMessage = 'Save Refriger Data In Mongo';
-              res.status(201).json(returnStructure);
+              let nowPage: number = Number(req.query.page);
+              let step: number = Number(req.query.step);
+              let maxPage: number = parseInt(String(resMon.length / step)) + 1;
+              if (nowPage > maxPage) {
+              } else {
+                // 에러 핸들링 필요
+                let returnStructure: object = {
+                  //recipe: resMonListbyRecc,
+                  recipe: resMon.slice((nowPage - 1) * step, nowPage * step),
+                  maxPage: maxPage,
+                };
+                console.log('API:RECIPE Result: ' + returnStructure);
+                res.statusMessage = 'Save Refriger Data In Mongo';
+                res.status(201).json(returnStructure);
+              }
             })
             .catch((err: any) => res.status(500).send(err));
         } else {

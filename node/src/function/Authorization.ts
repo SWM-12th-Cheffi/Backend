@@ -3,7 +3,16 @@ var crypto = require('crypto');
 var axios = require('axios');
 var User = require('../model/UserModel');
 
-//-1: Login,  0: all access, 1: access when input token, 2: access when verify success
+//redis setting
+const redis = require('redis');
+const { promisify } = require('util');
+const client = redis.createClient(process.env.REDIS_ADDR);
+const redisSet = promisify(client.set).bind(client);
+const redisGet = promisify(client.get).bind(client);
+
+const expirationTime: number = 60;
+
+//-1: Login,  0: all access, 1: Have Already Authorized token 2: Have good states when Authorizing token
 export default async function Authorization(token: string, platform: string, security: number = 0) {
   console.log('FUNC:AUTHZ Authorization ' + platform + ' level: ' + security + ' token: ' + token);
   switch (security) {
@@ -16,6 +25,8 @@ export default async function Authorization(token: string, platform: string, sec
           if (Object.entries(authRes).length == 6) newUser = true;
           else if (Object.entries(authRes).length == 7) newUser = false;
           else return { header: { status: 500, message: 'Mongo Error-1' }, auth: {} };
+          let res = await redisSet(token, authRes.userid, 'EX', expirationTime);
+          console.log(token + ' redis 저장완료 EX: ' + String(expirationTime) + '(s) ' + res);
           return {
             header: { status: 200, message: 'Login Success' },
             auth: { newUser: newUser, token: token, platform: platform },
@@ -40,6 +51,8 @@ export default async function Authorization(token: string, platform: string, sec
           if (Object.entries(authRes).length == 6) newUser = true;
           else if (Object.entries(authRes).length == 7) newUser = false;
           else return { header: { status: 500, message: 'Mongo Error-2' }, auth: {} };
+          let resRedis = await redisSet(token, authRes.userid, 'EX', expirationTime);
+          console.log(token + ' redis 저장완료 EX: ' + String(expirationTime) + '(s) ' + resRedis);
           return {
             header: { status: 200, message: 'Login Success' },
             auth: { newUser: newUser, token: token, platform: platform },
@@ -60,12 +73,18 @@ export default async function Authorization(token: string, platform: string, sec
       } else return { header: { status: 401, message: 'Incorrect platform Property' }, auth: {} };
     case 0: // All Access
       return { header: { status: 200, message: 'Access Success' } };
-    case 1: // Can Access When Input Token
+    case 1: // Have Already Authorized token
       if (platform && (platform == 'google' || platform == 'kakao')) {
-        if (token) return { header: { status: 200, message: 'Access Success' } };
-        else return { header: { status: 401, message: "Can't Find token Property" } };
+        let resRedis = await redisGet(token);
+        console.log('Redis: ' + resRedis);
+        if (!resRedis) return { header: { status: 401, message: 'Token Error' } };
+        else
+          return {
+            header: { status: 200, message: 'Access Success' },
+            auth: { securityId: resRedis },
+          };
       } else return { header: { status: 401, message: 'Incorrect platform Property' } };
-    case 2: // Can Access When Verify Success
+    case 2: // Have good states when Authorizing token
       if (platform && platform == 'google') {
         try {
           const authRes = await verify_google(token, false);

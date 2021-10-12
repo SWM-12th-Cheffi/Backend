@@ -1,10 +1,13 @@
 //mongoDB 설정
 var Recipe = require('../model/RecipeModel');
-import recipeData from '../data/mangae_recipe';
+import authz from '../function/Authorization';
+
 //router 세팅
 import * as express from 'express';
 const adminRouter = express.Router();
 
+/*
+import recipeData from '../data/mangae_recipe';
 adminRouter.post('/insert/Recipe', function (req, res) {
   console.time('insert_Recipe');
   console.log('Insert Recipe Recipe');
@@ -32,6 +35,17 @@ adminRouter.post('/insert/Recipe', function (req, res) {
   }
   res.send('insert command running');
   console.timeEnd('insert_Recipe');
+});
+*/
+
+adminRouter.get('/auth/:level', async function (req, res) {
+  let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
+  let authorizationPlatform: string = String(req.headers['platform']);
+  console.log('Authorization Test Request Id: ' + req.params.level);
+  console.log('Token: ' + authorizationToken + '  & Platform: ' + authorizationPlatform);
+  let returnStructure = await authz(authorizationToken, authorizationPlatform, Number(req.params.level));
+  res.statusMessage = returnStructure.header.message;
+  res.status(returnStructure.header.status).send(returnStructure.auth);
 });
 
 export default adminRouter;

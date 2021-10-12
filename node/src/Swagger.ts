@@ -2,7 +2,7 @@ var swaggerJson = {
   swagger: '2.0',
   info: {
     description: 'Api Documentation.',
-    version: '0.2.2',
+    version: '0.3.0',
     title: 'Cheffi Api',
   },
   host: '18.220.121.204:2001',
@@ -23,6 +23,10 @@ var swaggerJson = {
     {
       name: 'User',
       description: 'Everything about User Info',
+    },
+    {
+      name: 'Admin',
+      description: 'Everything about Admin',
     },
   ],
   schemes: ['http', 'https'],
@@ -191,6 +195,60 @@ var swaggerJson = {
           },
           '500': {
             description: 'Mongo Error입니다. 관리자에게 문의주세요.',
+          },
+        },
+      },
+    },
+
+    '/auth/expire-time': {
+      get: {
+        tags: ['Auth'],
+        summary: '토큰이 있다면 토큰 만료 시간을 알려줍니다.',
+        description:
+          '로그인을 한 뒤에 토큰 만료시간이 몇초남았는지 궁금할 때 호출하는 api... 그냥 테스트용으로 만든겁니다!',
+        consumes: ['application/json'],
+        produces: ['application/json'],
+        parameters: [
+          {
+            in: 'header',
+            name: 'authorization',
+            description: '인증 방식과 토큰을 입력해주세요.',
+            required: true,
+            schema: {
+              type: 'string',
+              example: 'Bearer TOTOTOTOOTOTTOOKENENEKENKENKENE',
+            },
+          },
+          {
+            in: 'header',
+            name: 'platform',
+            description: '인증 플랫폼을 입력해주세요.',
+            required: true,
+            schema: {
+              type: 'string',
+              enum: ['kakao', 'google'],
+            },
+          },
+        ],
+        responses: {
+          '201': {
+            description: '토큰이 있음. (단위: 초)',
+            schema: {
+              type: 'object',
+              properties: {
+                timeToExpire: {
+                  type: 'integer',
+                  format: 'int32',
+                  example: 56,
+                },
+              },
+            },
+          },
+          '404': {
+            description: '토큰이 없음',
+          },
+          '500': {
+            description: 'Redis Error입니다. 관리자에게 문의주세요.',
           },
         },
       },
@@ -1206,6 +1264,72 @@ var swaggerJson = {
           },
           '401': {
             description: 'Authorization Error',
+          },
+          '404': {
+            description: 'Data not Found',
+          },
+          '500': {
+            description: 'Mongo Error',
+          },
+        },
+      },
+    },
+
+    '/admin/auth/': {
+      get: {
+        tags: ['Admin'],
+        summary: 'Authorization 테스트 ',
+        description:
+          '0: all access(토큰같은거 없어도 됨.), </br>1: Have Already Authorized token (로그인으로 인증된 토큰이고, 만료되지도 않았다면 사용할 수 있음.)) </br>2: Have good states when Authorizing token (인증을 직접 받아야하는 API - 로그인 아님!) </br> Postman으로 넘겨주세요... swagger JSON 형식이 데이터가 너무 없어서... 어캐 써야할지 모르겠어... </br> /admin/auth/1 처럼 url상에 level 정보를 주면 됩니다.',
+        consumes: 'application/json',
+        produces: 'application/json',
+        parameters: [
+          {
+            in: 'header',
+            name: 'Authorization',
+            description: '인증 방식과 토큰을 입력해주세요.',
+            required: true,
+            schema: {
+              type: 'string',
+              example: 'Bearer TOTOTOTOOTOTTOOKENENEKENKENKENE',
+            },
+          },
+          {
+            in: 'header',
+            name: 'Platform',
+            description: '인증 플랫폼을 입력해주세요.',
+            required: true,
+            schema: {
+              type: 'string',
+              enum: ['kakao', 'google'],
+            },
+          },
+          {
+            in: 'path',
+            name: 'level',
+            description: '인증 레벨을 입력해주세요',
+            required: true,
+            schema: {
+              type: 'string',
+              example: '1',
+            },
+          },
+        ],
+        responses: {
+          '200': {
+            description: 'Good Status',
+            schema: {
+              type: 'object',
+              properties: {
+                securityId: {
+                  type: 'String',
+                  example: 'qwerqwfdsagasvasvasdfvcqewvsvv==',
+                },
+              },
+            },
+          },
+          '401': {
+            description: 'Authorization Error (인증되지 않은 토큰 오류)',
           },
           '404': {
             description: 'Data not Found',

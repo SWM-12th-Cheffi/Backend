@@ -19,7 +19,7 @@ userRouter.get('/scrap', async function (req, res) {
   console.log('API:USER /scrap get Api Called');
   let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
   let authorizationPlatform: string = String(req.headers['platform']);
-  const authzRes = await Authz(authorizationToken, authorizationPlatform, 2);
+  const authzRes = await Authz(authorizationToken, authorizationPlatform, 1);
   if (authzRes.header.status == 200)
     User.getLikeRecipeIdByUserid(authzRes.auth?.securityId)
       .then((result: any) => {
@@ -41,7 +41,7 @@ userRouter.put('/scrap', async function (req, res) {
   let RecipeId = req.body.id; // $push 사용해서 몽고에 저장
   let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
   let authorizationPlatform: string = String(req.headers['platform']);
-  const authzRes = await Authz(authorizationToken, authorizationPlatform, 2);
+  const authzRes = await Authz(authorizationToken, authorizationPlatform, 1);
   if (authzRes.header.status == 200)
     User.addLikeRecipeIdByUserid(authzRes.auth?.securityId, Number(RecipeId)).then((result: any) => {
       // 정상적으로 작업을 마침 -> 미구현
@@ -63,7 +63,7 @@ userRouter.delete('/scrap', async function (req, res) {
   let RecipeId = req.body.id; // $push 사용해서 몽고에 저장
   let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
   let authorizationPlatform: string = String(req.headers['platform']);
-  const authzRes = await Authz(authorizationToken, authorizationPlatform, 2);
+  const authzRes = await Authz(authorizationToken, authorizationPlatform, 1);
   if (authzRes.header.status == 200)
     User.removeLikeRecipeIdByUserid(authzRes.auth?.securityId, Number(RecipeId)).then((result: any) => {
       // 정상적으로 작업을 마침 -> 미구현
@@ -83,7 +83,7 @@ userRouter.get('/info', async function (req, res) {
   console.log('API:USER No Query Data');
   let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
   let authorizationPlatform: string = String(req.headers['platform']);
-  const authzRes = await Authz(authorizationToken, authorizationPlatform, 2);
+  const authzRes = await Authz(authorizationToken, authorizationPlatform, 1);
   if (authzRes.header.status == 200)
     User.getInfoByUserid(authzRes.auth?.securityId)
       .then((result: any) => {
@@ -166,7 +166,7 @@ userRouter.put('/refriger', async function (req, res) {
   console.log('API:USER refriger : ' + req.body.refriger);
   let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
   let authorizationPlatform: string = String(req.headers['platform']);
-  const authzRes = await Authz(authorizationToken, authorizationPlatform, 2);
+  const authzRes = await Authz(authorizationToken, authorizationPlatform, 1);
   if (authzRes.header.status == 200) {
     let ingreElement: string[] = await IngredElementOfInput(RefrigerToIngredientList(req.body.refriger));
     let num: number = await NumberOfPossiRP(ingreElement);
@@ -191,7 +191,7 @@ userRouter.get('/recipe-count', async function (req, res) {
   console.log('API:USER No Query Data');
   let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
   let authorizationPlatform: string = String(req.headers['platform']);
-  const authzRes = await Authz(authorizationToken, authorizationPlatform, 2);
+  const authzRes = await Authz(authorizationToken, authorizationPlatform, 1);
   if (authzRes.header.status == 200)
     User.getInfoByUserid(authzRes.auth?.securityId)
       .then(async (result: any) => {

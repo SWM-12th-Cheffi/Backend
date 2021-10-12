@@ -22,7 +22,7 @@ recipeRouter.post('/number', async function (req, res) {
   console.log('API:RECIPE refriger: ' + req.body.refriger);
   let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
   let authorizationPlatform: string = String(req.headers['platform']);
-  const authzRes = await Authz(authorizationToken, authorizationPlatform, 2);
+  const authzRes = await Authz(authorizationToken, authorizationPlatform, 1);
   if (authzRes.header.status == 200) {
     await client.hset('refriger', authzRes.auth?.securityId, JSON.stringify(req.body.refriger));
     let ingreElement: string[] = await IngredElementOfInput(RefrigerToIngredientList(req.body.refriger));
@@ -45,7 +45,7 @@ recipeRouter.get('/list', async function (req, res) {
   let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
   let authorizationPlatform: string = String(req.headers['platform']);
   let reccReturnObject: any, reccRecipeList: number[];
-  const authzRes = await Authz(authorizationToken, authorizationPlatform, 2);
+  const authzRes = await Authz(authorizationToken, authorizationPlatform, 1);
   if (authzRes.header.status == 200) {
     client.hget('refriger', authzRes.auth?.securityId, async function (err: any, result: string) {
       if (err) {

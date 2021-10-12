@@ -10,7 +10,7 @@ const client = redis.createClient(process.env.REDIS_ADDR);
 const redisSet = promisify(client.set).bind(client);
 const redisGet = promisify(client.get).bind(client);
 
-const expirationTime: number = 60;
+const expirationTime: number = 3600;
 
 //-1: Login,  0: all access, 1: Have Already Authorized token 2: Have good states when Authorizing token
 export default async function Authorization(token: string, platform: string, security: number = 0) {

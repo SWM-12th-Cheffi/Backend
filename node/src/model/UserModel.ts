@@ -27,6 +27,10 @@ var UserSchema = new Schema(
       require: false,
       default: [
         {
+          title: '떡/곡류',
+          data: [],
+        },
+        {
           title: '가공식품',
           data: [],
         },
@@ -35,15 +39,7 @@ var UserSchema = new Schema(
           data: [],
         },
         {
-          title: '과일류',
-          data: [],
-        },
-        {
-          title: '떡/밥/곡류',
-          data: [],
-        },
-        {
-          title: '빵/면/만두류',
+          title: '콩/묵/두부',
           data: [],
         },
         {
@@ -51,19 +47,27 @@ var UserSchema = new Schema(
           data: [],
         },
         {
-          title: '수산/건어물',
-          data: [],
-        },
-        {
           title: '육류',
           data: [],
         },
         {
-          title: '음료/주류',
+          title: '과일류',
           data: [],
         },
         {
-          title: '장/양념/소스류',
+          title: '조미료/양념/육수',
+          data: [],
+        },
+        {
+          title: '빵/면/만두류',
+          data: [],
+        },
+        {
+          title: '수산/건어물',
+          data: [],
+        },
+        {
+          title: '기름/향신료/가루',
           data: [],
         },
         {
@@ -71,7 +75,7 @@ var UserSchema = new Schema(
           data: [],
         },
         {
-          title: '향신료/가루류',
+          title: '음료/주류',
           data: [],
         },
       ],

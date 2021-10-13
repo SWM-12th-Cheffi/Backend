@@ -1,5 +1,5 @@
 require('dotenv').config();
-const debug = require('debug')('Cheffi:app');
+const debugApp = require('debug')('cheffi:app');
 const logger = require('morgan');
 
 // http setting
@@ -28,7 +28,7 @@ app.use(logger('dev'));
 
 const server = createServer(app);
 server.listen(port, () => {
-  debug(`${port}포트 서버 대기 중!`);
+  debugApp(`${port}포트 서버 대기 중!`);
 });
 
 app.use(json());

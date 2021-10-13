@@ -1,3 +1,6 @@
+const debugAuthTest = require('debug')('cheffi:authtest');
+const errorAuthTest = require('debug')('cheffi:authtest:error');
+
 //mongoDB 설정
 var Recipe = require('../model/RecipeModel');
 import authz from '../function/Authorization';
@@ -41,9 +44,10 @@ adminRouter.post('/insert/Recipe', function (req, res) {
 adminRouter.get('/auth/:level', async function (req, res) {
   let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
   let authorizationPlatform: string = String(req.headers['platform']);
-  console.log('Authorization Test Request Id: ' + req.params.level);
-  console.log('Token: ' + authorizationToken + '  & Platform: ' + authorizationPlatform);
+  debugAuthTest('Authorization Test Request Id: ' + req.params.level);
+  debugAuthTest('Token: ' + authorizationToken + '  & Platform: ' + authorizationPlatform);
   let returnStructure = await authz(authorizationToken, authorizationPlatform, Number(req.params.level));
+  debugAuthTest(returnStructure.header.message);
   res.statusMessage = returnStructure.header.message;
   res.status(returnStructure.header.status).send(returnStructure.auth);
 });

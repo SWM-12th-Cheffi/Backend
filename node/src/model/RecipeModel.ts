@@ -1,4 +1,4 @@
-const debug = require('debug')('Cheffi:Mongo');
+const debug = require('debug')('cheffi:mongo');
 
 var mongoose = require('mongoose');
 var mongoAddr: string = String(process.env.MONGO_ADDR);

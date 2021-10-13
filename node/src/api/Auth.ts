@@ -62,7 +62,7 @@ authRouter.delete('/expire-time', function (req, res) {
     } else {
       errorAuth('Redis Error: ' + err);
       res.statusMessage = 'Redis Error(3)';
-      res.status(201).json({ timeToExpire: result });
+      res.status(500).send();
     }
   });
 });

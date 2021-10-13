@@ -252,6 +252,46 @@ var swaggerJson = {
           },
         },
       },
+      delete: {
+        tags: ['Auth'],
+        summary: 'Redis에 저장된 토큰이 있다면 해당 토큰을 삭제합니다.',
+        description: 'Redis의 토큰을 만료시켜버리는 api...입니다',
+        consumes: ['application/json'],
+        produces: ['application/json'],
+        parameters: [
+          {
+            in: 'header',
+            name: 'authorization',
+            description: '인증 방식과 토큰을 입력해주세요.',
+            required: true,
+            schema: {
+              type: 'string',
+              example: 'Bearer TOTOTOTOOTOTTOOKENENEKENKENKENE',
+            },
+          },
+          {
+            in: 'header',
+            name: 'platform',
+            description: '인증 플랫폼을 입력해주세요.',
+            required: true,
+            schema: {
+              type: 'string',
+              enum: ['kakao', 'google'],
+            },
+          },
+        ],
+        responses: {
+          '200': {
+            description: '토큰 시간을 만료시킴',
+          },
+          '404': {
+            description: '해당하는 토큰이 없음',
+          },
+          '500': {
+            description: 'Redis Error입니다. 관리자에게 문의주세요.',
+          },
+        },
+      },
     },
 
     '/recipe/number': {

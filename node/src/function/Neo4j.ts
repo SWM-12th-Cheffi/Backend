@@ -2,6 +2,8 @@
 var neo4j = require('neo4j-driver');
 var driver = neo4j.driver(String(process.env.NEO_ADDR), neo4j.auth.basic('neo4j', 'r6qEpV4t'));
 var session = driver.session();
+const debugneo4j = require('debug')('cheffi:neo4j');
+const errorneo4j = require('debug')('cheffi:neo4j:error');
 
 //mongoDB setting
 var Recipe = require('../model/RecipeModel');
@@ -20,10 +22,11 @@ export async function IngredElementOfInput(input: string[]) {
     })
     .then(function (resNeo: any) {
       let elementIngredientList: string[] = resNeo.records[0].get('element');
+      debugneo4j('Func elementIngredientList Return');
       return elementIngredientList;
     })
     .catch(function (error: string) {
-      console.log('에러: ' + error);
+      errorneo4j('In elementIngredientList: ' + error);
     });
 }
 
@@ -40,10 +43,11 @@ export async function NumberOfPossiRP(ingredient: string[]) {
     })
     .then(function (resNeo: any) {
       let numberOfRecipe: string = resNeo.records[0].get('count').low;
+      debugneo4j('Func NumberOfPossiRP Return');
       return numberOfRecipe;
     })
     .catch(function (error: string) {
-      console.log('에러: ' + error);
+      errorneo4j('In NumberOfPOssiRP: ' + error);
     });
 }
 
@@ -60,9 +64,10 @@ export async function ListOfPossiRP(ingreData: string[]) {
     })
     .then(async function (resNeo: any) {
       let listOfRecipeid: string[] = resNeo.records[0].get('recipe');
+      debugneo4j('Func ListOfPossiRP Return');
       return listOfRecipeid;
     })
     .catch(function (error: string) {
-      console.log('에러: ' + error);
+      errorneo4j('In ListOfPossiRP: ' + error);
     });
 }

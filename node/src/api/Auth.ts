@@ -53,7 +53,7 @@ authRouter.delete('/expire-time', function (req, res) {
       res.status(500).send();
     }
     if (result == String(1)) {
-      debugAuth('Have No Expiration Time');
+      debugAuth('Delete Success');
       res.statusMessage = 'Delete Success';
       res.status(200).send();
     } else if (result == String(0)) {

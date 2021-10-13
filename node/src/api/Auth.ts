@@ -43,4 +43,28 @@ authRouter.get('/expire-time', function (req, res) {
   });
 });
 
+authRouter.delete('/expire-time', function (req, res) {
+  let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
+  debugAuth('Delete Expire Time : ' + authorizationToken);
+  client.del(String(authorizationToken), (err: any, result: string) => {
+    if (err) {
+      errorAuth('Redis Error' + err);
+      res.statusMessage = 'Redis Error(1)';
+      res.status(500).send();
+    }
+    if (result == String(1)) {
+      debugAuth('Have No Expiration Time');
+      res.statusMessage = 'Delete Success';
+      res.status(200).send();
+    } else if (result == String(0)) {
+      errorAuth('Not Found');
+      res.status(404).send();
+    } else {
+      errorAuth('Redis Error: ' + err);
+      res.statusMessage = 'Redis Error(3)';
+      res.status(201).json({ timeToExpire: result });
+    }
+  });
+});
+
 export default authRouter;

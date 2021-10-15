@@ -17,6 +17,10 @@ const errorrefriger = require('debug')('cheffi:refriger:error');
 //redis setting
 const redis = require('redis');
 const client = redis.createClient(process.env.REDIS_ADDR);
+const { promisify } = require('util');
+const redisHget = promisify(client.hget).bind(client);
+const redisHset = promisify(client.hset).bind(client);
+debugRedis('Redis: ' + client.reply);
 debugRedis('Redis: ' + client.reply);
 
 // 좋아하는 음식의 레시피 번호 목록 불러오기
@@ -27,16 +31,7 @@ userRouter.get('/scrap', async function (req, res) {
   let authorizationPlatform: string = String(req.headers['platform']);
   const authzRes = await Authz(authorizationToken, authorizationPlatform, 1);
   if (authzRes.header.status == 200)
-    User.getLikeRecipeIdByUserid(authzRes.auth?.securityId)
-      .then((result: any) => {
-        // 정상적으로 작업을 마침 -> 미구현
-        debugscrap('result: ' + result);
-        res.status(200).json({ get: result });
-      })
-      .catch((err: any) => {
-        errorscrap('Mongo Error: ' + err);
-        res.status(500).send(err);
-      });
+    res.status(201).json({ get: (await redisHget('scrap', authzRes.auth?.securityId)).slice(1, -1).split(',') });
   else {
     errorscrap(authzRes.header.message);
     res.statusMessage = authzRes.header.message;
@@ -45,29 +40,41 @@ userRouter.get('/scrap', async function (req, res) {
 });
 
 // 좋아하는 음식의 레시피 번호를 저장
-// Todo: Scrap 리스트를 불러와서 업데이트하도록 설정해야함.
 userRouter.put('/scrap', async function (req, res) {
   debugscrap('/scrap put Api Called');
-  debugscrap('RecipeId: ' + req.body.id);
-  let RecipeId = req.body.id; // $push 사용해서 몽고에 저장
+  debugscrap('RecipeId: ' + req.body.recipeInfo);
   let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
   let authorizationPlatform: string = String(req.headers['platform']);
   const authzRes = await Authz(authorizationToken, authorizationPlatform, 1);
-  if (authzRes.header.status == 200)
-    User.addLikeRecipeIdByUserid(authzRes.auth?.securityId, Number(RecipeId)).then((result: any) => {
-      // 정상적으로 작업을 마침 -> 미구현
-
-      if (result.matchedCount) {
-        debugscrap('result: ' + result);
-        res.status(200).json({ add: { likeRecipesId: RecipeId } });
-      }
-      // token으로 정보를 찾을 수 없음
-      else {
-        errorscrap('Not Found In Mongo');
-        res.status(404).send;
-      }
-    });
-  else {
+  if (authzRes.header.status == 200) {
+    let addScrapRecipeData = req.body.recipeInfo;
+    let scrapRecipeIdList: number[] = (await redisHget('scrap', authzRes.auth?.securityId))
+      .slice(1, -1)
+      .split(',')
+      .map(Number);
+    debugscrap(scrapRecipeIdList);
+    if (scrapRecipeIdList.indexOf(addScrapRecipeData.id) != -1) {
+      debugRedis('Recipe is already in');
+      res.statusMessage = 'This Recipe is Already Added';
+      res.status(400).send();
+    } else {
+      debugRedis('Recipe is not in!');
+      scrapRecipeIdList.push(addScrapRecipeData.id);
+      User.addScrapRecipeIdByUserid(authzRes.auth?.securityId, addScrapRecipeData).then(async (result: any) => {
+        let retRedis = await redisHset('scrap', authzRes.auth?.securityId, JSON.stringify(scrapRecipeIdList));
+        debugscrap('Mongo, Redis Result: ' + result.modifiedCount + ' ' + retRedis);
+        if (result.modifiedCount) {
+          debugscrap('result: ' + result);
+          res.status(200).json({ scrap: scrapRecipeIdList });
+        }
+        // token으로 정보를 찾을 수 없음
+        else {
+          errorscrap('Not Found In Mongo');
+          res.status(404).send;
+        }
+      });
+    }
+  } else {
     errorscrap(authzRes.header.message);
     res.statusMessage = authzRes.header.message;
     res.status(authzRes.header.status).send();
@@ -84,7 +91,7 @@ userRouter.delete('/scrap', async function (req, res) {
   let authorizationPlatform: string = String(req.headers['platform']);
   const authzRes = await Authz(authorizationToken, authorizationPlatform, 1);
   if (authzRes.header.status == 200)
-    User.removeLikeRecipeIdByUserid(authzRes.auth?.securityId, Number(RecipeId)).then((result: any) => {
+    User.removeScrapRecipeIdByUserid(authzRes.auth?.securityId, Number(RecipeId)).then((result: any) => {
       // 정상적으로 작업을 마침 -> 미구현
       if (result.modifiedCount) {
         debugscrap('result: ' + RecipeId);

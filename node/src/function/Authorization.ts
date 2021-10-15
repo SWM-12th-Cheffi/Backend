@@ -11,6 +11,7 @@ const redis = require('redis');
 const { promisify } = require('util');
 const client = redis.createClient(process.env.REDIS_ADDR);
 const redisSet = promisify(client.set).bind(client);
+const redisHset = promisify(client.hset).bind(client);
 const redisGet = promisify(client.get).bind(client);
 
 const expirationTime: number = 3600;
@@ -30,8 +31,15 @@ export default async function Authorization(token: string, platform: string, sec
             errorAuth('Mongo Error-2');
             return { header: { status: 500, message: 'Mongo Error-1' }, auth: {} };
           }
-          let res = await redisSet(token, authRes.userid, 'EX', expirationTime);
-          debugAuth(token + ' redis 저장완료 EX: ' + String(expirationTime) + '(s) ' + res);
+          let resSet = await redisSet(token, authRes.userid, 'EX', expirationTime);
+          let resHset = await redisHset(
+            'scrap',
+            authRes.userid,
+            JSON.stringify(authRes.likeRecipesId),
+            'EX',
+            expirationTime,
+          );
+          debugAuth(token + ' redis 저장완료 EX: ' + String(expirationTime) + '(s) ' + resSet + resHset);
           return {
             header: { status: 200, message: 'Login Success' },
             auth: { newUser: newUser, token: token, platform: platform },
@@ -60,8 +68,15 @@ export default async function Authorization(token: string, platform: string, sec
             errorAuth('Mongo Error-2');
             return { header: { status: 500, message: 'Mongo Error-2' }, auth: {} };
           }
-          let resRedis = await redisSet(token, authRes.userid, 'EX', expirationTime);
-          debugAuth(token + ' redis 저장완료 EX: ' + String(expirationTime) + '(s) ' + resRedis);
+          let resSet = await redisSet(token, authRes.userid, 'EX', expirationTime);
+          let resHset = await redisHset(
+            'scrap',
+            authRes.userid,
+            JSON.stringify(authRes.likeRecipesId),
+            'EX',
+            expirationTime,
+          );
+          debugAuth(token + ' redis 저장완료 EX: ' + String(expirationTime) + '(s) ' + resSet + resHset);
           return {
             header: { status: 200, message: 'Login Success' },
             auth: { newUser: newUser, token: token, platform: platform },

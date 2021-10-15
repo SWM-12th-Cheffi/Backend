@@ -150,7 +150,10 @@ UserSchema.statics.addScrapRecipeIdByUserid = function (userid: string, scrapRec
 
 // - 좋아요 버튼 /user/scrap delete
 UserSchema.statics.removeScrapRecipeIdByUserid = function (userid: string, scrapRecipeId: number) {
-  return this.updateOne({ userid: userid }, { $pull: { scrapRecipesId: scrapRecipeId } });
+  return this.updateOne(
+    { userid: userid },
+    { $pull: { scrapRecipesId: scrapRecipeId, scrapRecipesIdInfo: { id: scrapRecipeId } } },
+  );
 };
 
 // Create Model & Export

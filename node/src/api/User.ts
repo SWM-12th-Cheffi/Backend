@@ -20,11 +20,11 @@ const client = redis.createClient(process.env.REDIS_ADDR);
 const { promisify } = require('util');
 const redisHget = promisify(client.hget).bind(client);
 const redisHset = promisify(client.hset).bind(client);
+const redisHrem = promisify(client.hdel).bind(client);
 debugRedis('Redis: ' + client.reply);
 debugRedis('Redis: ' + client.reply);
 
 // 좋아하는 음식의 레시피 번호 목록 불러오기
-// Todo: Scrap 리스트를 불러와서 업데이트하도록 설정해야함.
 userRouter.get('/scrap', async function (req, res) {
   debugscrap('/scrap get Api Called');
   let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
@@ -40,6 +40,7 @@ userRouter.get('/scrap', async function (req, res) {
 });
 
 // 좋아하는 음식의 레시피 번호를 저장
+// 업데이트 결과를 레디스에 반영하는게 필요.
 userRouter.put('/scrap', async function (req, res) {
   debugscrap('/scrap put Api Called');
   debugscrap('RecipeId: ' + req.body.recipeInfo);
@@ -92,6 +93,7 @@ userRouter.delete('/scrap', async function (req, res) {
   const authzRes = await Authz(authorizationToken, authorizationPlatform, 1);
   if (authzRes.header.status == 200)
     User.removeScrapRecipeIdByUserid(authzRes.auth?.securityId, Number(RecipeId)).then((result: any) => {
+      debugRedis(result);
       // 정상적으로 작업을 마침 -> 미구현
       if (result.modifiedCount) {
         debugscrap('result: ' + RecipeId);

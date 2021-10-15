@@ -20,7 +20,7 @@ var UserSchema = new Schema(
     photo: { type: String, require: false, default: '' },
     dislikeIngredient: { type: Array, require: false },
     scrapRecipesId: { type: Array, require: false },
-    scrapRecipesIdInfo: { type: Array, require: false },
+    scrapRecipesIdInfo: { type: Array, require: false, default: [0] },
     likeRecipesId: { type: Array, require: false },
     likeRecipesIdInfo: { type: Array, require: false },
     historyRecipesId: { type: Array, require: false },

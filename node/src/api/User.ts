@@ -91,20 +91,34 @@ userRouter.delete('/scrap', async function (req, res) {
   let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
   let authorizationPlatform: string = String(req.headers['platform']);
   const authzRes = await Authz(authorizationToken, authorizationPlatform, 1);
-  if (authzRes.header.status == 200)
-    User.removeScrapRecipeIdByUserid(authzRes.auth?.securityId, Number(RecipeId)).then((result: any) => {
-      debugRedis(result);
-      // 정상적으로 작업을 마침 -> 미구현
-      if (result.modifiedCount) {
-        debugscrap('result: ' + RecipeId);
-        res.status(200).json({ delete: { likeRecipesId: RecipeId } });
-      } // token으로 정보를 찾을 수 없음
-      else {
-        errorscrap('Not Found In Mongo');
-        res.status(404).send;
-      }
-    });
-  else {
+  if (authzRes.header.status == 200) {
+    let scrapRecipeIdList: number[] = (await redisHget('scrap', authzRes.auth?.securityId))
+      .slice(1, -1)
+      .split(',')
+      .map(Number);
+    if (scrapRecipeIdList.indexOf(RecipeId) != -1) {
+      User.removeScrapRecipeIdByUserid(authzRes.auth?.securityId, Number(RecipeId)).then((result: any) => {
+        debugscrap(result);
+        // 정상적으로 작업을 마침 -> 미구현
+        if (result.modifiedCount) {
+          debugscrap('result: ' + RecipeId);
+          for (let i = 0; i < scrapRecipeIdList.length; i++)
+            if (scrapRecipeIdList[i] == RecipeId) scrapRecipeIdList.splice(i, 1);
+          redisHset('scrap', authzRes.auth?.securityId, JSON.stringify(scrapRecipeIdList));
+          res.status(200).json({ delete: { scrapRecipeIdList: scrapRecipeIdList } });
+        } // token으로 정보를 찾을 수 없음
+        else {
+          errorscrap('Not Found In Mongo');
+          res.statusMessage = 'Not Found In Mongo';
+          res.status(404).send();
+        }
+      });
+    } else {
+      errorscrap('Not Found In Redis');
+      res.statusMessage = 'Not Found In Redis';
+      res.status(404).send();
+    }
+  } else {
     errorscrap(authzRes.header.message);
     res.statusMessage = authzRes.header.message;
     res.status(authzRes.header.status).send();

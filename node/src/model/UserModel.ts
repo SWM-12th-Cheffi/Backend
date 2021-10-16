@@ -20,8 +20,11 @@ var UserSchema = new Schema(
     photo: { type: String, require: false, default: '' },
     dislikeIngredient: { type: Array, require: false },
     scrapRecipesId: { type: Array, require: false },
+    scrapRecipesIdInfo: { type: Array, require: false, default: [0] },
     likeRecipesId: { type: Array, require: false },
+    likeRecipesIdInfo: { type: Array, require: false },
     historyRecipesId: { type: Array, require: false },
+    historyRecipesIdInfo: { type: Array, require: false },
     refriger: {
       type: Array,
       require: false,
@@ -132,19 +135,67 @@ UserSchema.statics.updateRefrigerByUserid = function (userid: string, fridge: ob
   return this.findOneAndUpdate({ userid: userid }, { refriger: fridge, recipeCount: recipecount });
 };
 
+// - 좋아요 버튼 /user/scrap get
+UserSchema.statics.getScrapRecipeIdByUserid = function (userid: string) {
+  return this.findOne({ userid: userid }, { _id: 0, scrapRecipesId: 1, scrapRecipesIdInfo: 1 });
+};
+
+// - 좋아요 버튼 /user/scrap put
+UserSchema.statics.addScrapRecipeIdByUserid = function (userid: string, scrapRecipesIdInfo: any) {
+  return this.updateOne(
+    { userid: userid },
+    { $push: { scrapRecipesId: Number(scrapRecipesIdInfo.id), scrapRecipesIdInfo: scrapRecipesIdInfo } },
+  );
+};
+
+// - 좋아요 버튼 /user/scrap delete
+UserSchema.statics.removeScrapRecipeIdByUserid = function (userid: string, scrapRecipeId: number) {
+  return this.updateOne(
+    { userid: userid },
+    { $pull: { scrapRecipesId: scrapRecipeId, scrapRecipesIdInfo: { id: scrapRecipeId } } },
+  );
+};
+
 // - 좋아요 버튼 /user/like get
 UserSchema.statics.getLikeRecipeIdByUserid = function (userid: string) {
-  return this.findOne({ userid: userid }, { _id: 0, likeRecipesId: 1 });
+  return this.findOne({ userid: userid }, { _id: 0, likeRecipesId: 1, likeRecipesIdInfo: 1 });
 };
 
 // - 좋아요 버튼 /user/like put
-UserSchema.statics.addLikeRecipeIdByUserid = function (userid: string, likeRecipeId: number) {
-  return this.updateOne({ userid: userid }, { $addToSet: { likeRecipesId: likeRecipeId } });
+UserSchema.statics.addLikeRecipeIdByUserid = function (userid: string, likeRecipesIdInfo: any) {
+  return this.updateOne(
+    { userid: userid },
+    { $push: { likeRecipesId: Number(likeRecipesIdInfo.id), likeRecipesIdInfo: likeRecipesIdInfo } },
+  );
 };
 
 // - 좋아요 버튼 /user/like delete
 UserSchema.statics.removeLikeRecipeIdByUserid = function (userid: string, likeRecipeId: number) {
-  return this.updateOne({ userid: userid }, { $pull: { likeRecipesId: likeRecipeId } });
+  return this.updateOne(
+    { userid: userid },
+    { $pull: { likeRecipesId: likeRecipeId, likeRecipesIdInfo: { id: likeRecipeId } } },
+  );
+};
+
+// - 좋아요 버튼 /user/history get
+UserSchema.statics.getHistoryRecipeIdByUserid = function (userid: string) {
+  return this.findOne({ userid: userid }, { _id: 0, historyRecipesId: 1, historyRecipesIdInfo: 1 });
+};
+
+// - 좋아요 버튼 /user/history put
+UserSchema.statics.addHistoryRecipeIdByUserid = function (userid: string, historyRecipesIdInfo: any) {
+  return this.updateOne(
+    { userid: userid },
+    { $push: { historyRecipesId: Number(historyRecipesIdInfo.id), historyRecipesIdInfo: historyRecipesIdInfo } },
+  );
+};
+
+// - 좋아요 버튼 /user/history delete
+UserSchema.statics.removeHistoryRecipeIdByUserid = function (userid: string, historyRecipeId: number) {
+  return this.updateOne(
+    { userid: userid },
+    { $pull: { historyRecipesId: historyRecipeId, historyRecipesIdInfo: { id: historyRecipeId } } },
+  );
 };
 
 // Create Model & Export

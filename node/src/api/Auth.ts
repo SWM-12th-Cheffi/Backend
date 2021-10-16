@@ -38,7 +38,7 @@ authRouter.get('/expire-time', function (req, res) {
     } else {
       debugAuth(result + '(s) Remain');
       res.statusMessage = 'Load Success';
-      res.status(201).json({ timeToExpire: result });
+      res.status(200).json({ timeToExpire: result });
     }
   });
 });
@@ -55,7 +55,7 @@ authRouter.delete('/expire-time', function (req, res) {
     if (result == String(1)) {
       debugAuth('Delete Success');
       res.statusMessage = 'Delete Success';
-      res.status(200).send();
+      res.status(201).send();
     } else if (result == String(0)) {
       errorAuth('Not Found');
       res.status(404).send();

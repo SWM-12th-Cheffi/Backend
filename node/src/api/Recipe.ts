@@ -79,11 +79,10 @@ recipeRouter.get('/list', async function (req, res) {
             /*
             reccReturnObject = await SortByRecc({
               id: listRecipeid,
-              like: ['짜장면', '짬뽕'],
-              likedb: {
-                history: userData.historyRecipesId,
-                like: userData.likeRecipesId,
-                scrap: userData.scrapRecipesId,
+              like: {
+                history: userData.historyRecipesIdInfo,
+                like: userData.likeRecipesIdInfo,
+                scrap: userData.scrapRecipesIdInfo,
               },
             });
             reccRecipeList = reccReturnObject.data.id.map(Number);*/

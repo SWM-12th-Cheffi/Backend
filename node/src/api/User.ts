@@ -429,6 +429,32 @@ userRouter.delete('/info', async function (req, res) {
   }
 });
 
+// 냉장고 정보 불러오기
+userRouter.get('/refriger', async function (req, res) {
+  debugrefriger('/refriger Api Called');
+  let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
+  let authorizationPlatform: string = String(req.headers['platform']);
+  const authzRes = await Authz(authorizationToken, authorizationPlatform, 1);
+  if (authzRes.header.status == 200) {
+    User.getRefrigerByUserid(authzRes.auth?.securityId)
+      .then(async (resMongo: any) => {
+        let resRedis = await redisHset('refriger', authzRes.auth?.securityId, JSON.stringify(resMongo.refriger));
+        debugrefriger(resMongo + resRedis);
+        res.statusMessage = 'Success Load Refriger Data';
+        res.status(200).json({ refriger: resMongo.refriger });
+      })
+      .catch((err: any) => {
+        errorrefriger('Mongo Error: ' + err);
+        res.statusMessage = 'Mongo Error';
+        res.status(500).send();
+      });
+  } else {
+    errorrefriger(authzRes.header.message);
+    res.statusMessage = authzRes.header.message;
+    res.status(authzRes.header.status).send();
+  }
+});
+
 // 냉장고 정보 저장
 userRouter.put('/refriger', async function (req, res) {
   debugrefriger('/refriger Api Called');
@@ -440,14 +466,19 @@ userRouter.put('/refriger', async function (req, res) {
     let ingreElement: string[] = await IngredElementOfInput(RefrigerToIngredientList(req.body.refriger));
     let num: number = await NumberOfPossiRP(ingreElement);
     User.updateRefrigerByUserid(authzRes.auth?.securityId, req.body.refriger, num)
-      .then(() => {
-        debugrefriger('num: ' + num + ' & Save Refriger Data in Mongo');
+      .then(async () => {
+        let resRedis = await redisHset('refriger', authzRes.auth?.securityId, JSON.stringify(req.body.refriger));
+        debugrefriger('num: ' + num + ' & Save Refriger Data in Mongo' + resRedis);
         res.statusMessage = 'Save Refriger Data In Mongo';
         res.status(201).send({
           num: num,
         });
       })
-      .catch((err: any) => errorrefriger('Mongo Error: ' + err));
+      .catch((err: any) => {
+        errorrefriger('Mongo Error: ' + err);
+        res.statusMessage = 'Mongo Error';
+        res.status(500).send();
+      });
   } else {
     errorrefriger(authzRes.header.message);
     res.statusMessage = authzRes.header.message;
@@ -469,7 +500,11 @@ userRouter.get('/recipe-count', async function (req, res) {
         res.statusMessage = 'Get recipeCount Value';
         res.status(200).json({ num: result.recipeCount });
       })
-      .catch((err: any) => errorrefriger('Mongo Error: ' + err));
+      .catch((err: any) => {
+        errorrefriger('Mongo Error: ' + err);
+        res.statusMessage = 'Mongo Error';
+        res.status(500).send();
+      });
   else {
     errorrefriger(authzRes.header.message);
     res.statusMessage = authzRes.header.message;

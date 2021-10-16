@@ -180,7 +180,7 @@ recipeRouter.get('/info', async function (req, res) {
         let returnStructure: object = { recipe: recipeInfo };
         debuginfo('Success To Return Recipe Info');
         res.statusMessage = 'Success To Return Recipe Info';
-        res.status(201).json(returnStructure);
+        res.status(200).json(returnStructure);
       })
       .catch((err: any) => {
         errorinfo('Recipe not Found');
@@ -209,7 +209,7 @@ recipeRouter.get('/random-list', async function (req, res) {
       };
       debugrandomlist('Success To Return Random-Recipe List');
       res.statusMessage = 'Success To Return Random-Recipe List';
-      res.status(201).json(returnStructure);
+      res.status(200).json(returnStructure);
     });
   } else {
     errorrandomlist(authzRes.header.message);

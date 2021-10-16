@@ -57,7 +57,7 @@ export default async function Authorization(token: string, platform: string, sec
             token + ' redis 저장완료 EX: ' + String(expirationTime) + '(s) ' + resSet + resScrap + resLike + resHistory,
           );
           return {
-            header: { status: 200, message: 'Login Success' },
+            header: { status: 201, message: 'Login Success' },
             auth: { newUser: newUser, token: token, platform: platform },
             info: {
               recipeCount: authRes.recipeCount,
@@ -110,7 +110,7 @@ export default async function Authorization(token: string, platform: string, sec
             token + ' redis 저장완료 EX: ' + String(expirationTime) + '(s) ' + resSet + resScrap + resLike + resHistory,
           );
           return {
-            header: { status: 200, message: 'Login Success' },
+            header: { status: 201, message: 'Login Success' },
             auth: { newUser: newUser, token: token, platform: platform },
             info: {
               recipeCount: authRes.recipeCount,

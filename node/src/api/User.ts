@@ -34,7 +34,7 @@ userRouter.get('/scrap', async function (req, res) {
   const authzRes = await Authz(authorizationToken, authorizationPlatform, 1);
   if (authzRes.header.status == 200)
     res
-      .status(201)
+      .status(200)
       .json({ get: (await redisHget('scrap', authzRes.auth?.securityId)).slice(1, -1).split(',').map(Number) });
   else {
     errorscrap(authzRes.header.message);
@@ -71,7 +71,7 @@ userRouter.put('/scrap', async function (req, res) {
         debugscrap('Mongo, Redis Result: ' + result.modifiedCount + ' ' + retRedis);
         if (result.modifiedCount) {
           debugscrap('result: ' + result);
-          res.status(200).json({ scrap: scrapRecipeIdList });
+          res.status(201).json({ put: scrapRecipeIdList });
         }
         // token으로 정보를 찾을 수 없음
         else {
@@ -109,7 +109,7 @@ userRouter.delete('/scrap', async function (req, res) {
           for (let i = 0; i < scrapRecipeIdList.length; i++)
             if (scrapRecipeIdList[i] == RecipeId) scrapRecipeIdList.splice(i, 1);
           redisHset('scrap', authzRes.auth?.securityId, JSON.stringify(scrapRecipeIdList));
-          res.status(200).json({ delete: { scrapRecipeIdList: scrapRecipeIdList } });
+          res.status(201).json({ delete: scrapRecipeIdList });
         } // token으로 정보를 찾을 수 없음
         else {
           errorscrap('Not Found In Mongo');
@@ -137,7 +137,7 @@ userRouter.get('/like', async function (req, res) {
   const authzRes = await Authz(authorizationToken, authorizationPlatform, 1);
   if (authzRes.header.status == 200)
     res
-      .status(201)
+      .status(200)
       .json({ get: (await redisHget('like', authzRes.auth?.securityId)).slice(1, -1).split(',').map(Number) });
   else {
     errorlike(authzRes.header.message);
@@ -174,7 +174,7 @@ userRouter.put('/like', async function (req, res) {
         debuglike('Mongo, Redis Result: ' + result.modifiedCount + ' ' + retRedis);
         if (result.modifiedCount) {
           debuglike('result: ' + result);
-          res.status(200).json({ like: likeRecipeIdList });
+          res.status(201).json({ put: likeRecipeIdList });
         }
         // token으로 정보를 찾을 수 없음
         else {
@@ -212,7 +212,7 @@ userRouter.delete('/like', async function (req, res) {
           for (let i = 0; i < likeRecipeIdList.length; i++)
             if (likeRecipeIdList[i] == RecipeId) likeRecipeIdList.splice(i, 1);
           redisHset('like', authzRes.auth?.securityId, JSON.stringify(likeRecipeIdList));
-          res.status(200).json({ delete: { likeRecipeIdList: likeRecipeIdList } });
+          res.status(201).json({ delete: likeRecipeIdList });
         } // token으로 정보를 찾을 수 없음
         else {
           errorlike('Not Found In Mongo');
@@ -240,7 +240,7 @@ userRouter.get('/history', async function (req, res) {
   const authzRes = await Authz(authorizationToken, authorizationPlatform, 1);
   if (authzRes.header.status == 200)
     res
-      .status(201)
+      .status(200)
       .json({ get: (await redisHget('history', authzRes.auth?.securityId)).slice(1, -1).split(',').map(Number) });
   else {
     errorhistory(authzRes.header.message);
@@ -277,7 +277,7 @@ userRouter.put('/history', async function (req, res) {
         debughistory('Mongo, Redis Result: ' + result.modifiedCount + ' ' + retRedis);
         if (result.modifiedCount) {
           debughistory('result: ' + result);
-          res.status(200).json({ history: historyRecipeIdList });
+          res.status(201).json({ put: historyRecipeIdList });
         }
         // token으로 정보를 찾을 수 없음
         else {
@@ -315,7 +315,7 @@ userRouter.delete('/history', async function (req, res) {
           for (let i = 0; i < historyRecipeIdList.length; i++)
             if (historyRecipeIdList[i] == RecipeId) historyRecipeIdList.splice(i, 1);
           redisHset('history', authzRes.auth?.securityId, JSON.stringify(historyRecipeIdList));
-          res.status(200).json({ delete: { historyRecipeIdList: historyRecipeIdList } });
+          res.status(201).json({ delete: historyRecipeIdList });
         } // token으로 정보를 찾을 수 없음
         else {
           errorhistory('Not Found In Mongo');
@@ -359,7 +359,7 @@ userRouter.get('/info', async function (req, res) {
         };
         debuginfo('Information Load Success');
         res.statusMessage = 'Information Load Success';
-        res.status(201).json(openedInfo);
+        res.status(200).json(openedInfo);
       })
       .catch((err: any) => {
         errorinfo('Mongo Error: ' + err);
@@ -386,7 +386,7 @@ userRouter.put('/info', async function (req, res) {
       if (result.matchedCount) {
         debuginfo('Save Successed');
         res.statusMessage = 'Save Successed';
-        res.status(200).send();
+        res.status(201).send();
       }
       // id로 정보를 찾을 수 없음
       else {
@@ -414,7 +414,7 @@ userRouter.delete('/info', async function (req, res) {
       if (result.deletedCount) {
         debuginfo('Remove Data Success');
         res.statusMessage = 'Remove Data Success';
-        res.status(200).send();
+        res.status(201).send();
       }
       // token으로 정보를 찾을 수 없음
       else {
@@ -443,7 +443,7 @@ userRouter.put('/refriger', async function (req, res) {
       .then(() => {
         debugrefriger('num: ' + num + ' & Save Refriger Data in Mongo');
         res.statusMessage = 'Save Refriger Data In Mongo';
-        res.status(200).send({
+        res.status(201).send({
           num: num,
         });
       })
@@ -467,7 +467,7 @@ userRouter.get('/recipe-count', async function (req, res) {
       .then(async (result: any) => {
         debugrefriger('Result: ' + String(result.recipeCount));
         res.statusMessage = 'Get recipeCount Value';
-        res.status(201).json({ num: result.recipeCount });
+        res.status(200).json({ num: result.recipeCount });
       })
       .catch((err: any) => errorrefriger('Mongo Error: ' + err));
   else {

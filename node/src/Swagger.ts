@@ -2,7 +2,7 @@ var swaggerJson = {
   swagger: '2.0',
   info: {
     description: 'Api Documentation.',
-    version: '0.3.0',
+    version: '0.4.0',
     title: 'Cheffi Api',
   },
   host: '18.220.121.204:2001',
@@ -21,8 +21,20 @@ var swaggerJson = {
       description: 'Everything about Recipe Info',
     },
     {
-      name: 'User',
+      name: 'Info',
       description: 'Everything about User Info',
+    },
+    {
+      name: 'Scrap',
+      description: 'Everything about User Scrap',
+    },
+    {
+      name: 'Like',
+      description: 'Everything about User Like',
+    },
+    {
+      name: 'History',
+      description: 'Everything about User History',
     },
     {
       name: 'Admin',
@@ -101,7 +113,7 @@ var swaggerJson = {
           },
         ],
         responses: {
-          '200': {
+          '201': {
             description: 'Login Success',
             schema: {
               type: 'object',
@@ -231,7 +243,7 @@ var swaggerJson = {
           },
         ],
         responses: {
-          '201': {
+          '200': {
             description: '토큰이 있음. (단위: 초)',
             schema: {
               type: 'object',
@@ -281,7 +293,7 @@ var swaggerJson = {
           },
         ],
         responses: {
-          '200': {
+          '201': {
             description: '토큰 시간을 만료시킴',
           },
           '404': {
@@ -547,7 +559,7 @@ var swaggerJson = {
           },
         ],
         responses: {
-          '201': {
+          '200': {
             description: 'Good Status',
             schema: {
               type: 'object',
@@ -663,7 +675,7 @@ var swaggerJson = {
           },
         ],
         responses: {
-          '201': {
+          '200': {
             description: 'Good Status',
             schema: {
               type: 'object',
@@ -729,7 +741,7 @@ var swaggerJson = {
 
     '/user/info': {
       get: {
-        tags: ['User'],
+        tags: ['Info'],
         summary: '사용자 정보 불러오기',
         description:
           'Authorization 2 \n 전송 방식: Post \n Input: Header(Token, Platform) \n Output: status, info, message',
@@ -758,7 +770,7 @@ var swaggerJson = {
           },
         ],
         responses: {
-          '201': {
+          '200': {
             description: 'Good Status',
             schema: {
               type: 'object',
@@ -842,7 +854,7 @@ var swaggerJson = {
         },
       },
       put: {
-        tags: ['User'],
+        tags: ['Info'],
         summary: '사용자 정보 초기 설정',
         description:
           'Authorization 2 \n 전송 방식: Post \n Input: Header(Token, Platform), Body(data) \n Output: status, info, message',
@@ -899,7 +911,7 @@ var swaggerJson = {
           },
         ],
         responses: {
-          '200': {
+          '201': {
             description: 'Save Successed',
           },
           '401': {
@@ -914,7 +926,7 @@ var swaggerJson = {
         },
       },
       delete: {
-        tags: ['User'],
+        tags: ['Info'],
         summary: '사용자 정보 삭제',
         description:
           'Authorization 2 \n 전송 방식: Post \n Input: Header(Token, Platform) \n Output: status, info, message',
@@ -943,7 +955,7 @@ var swaggerJson = {
           },
         ],
         responses: {
-          '200': {
+          '201': {
             description: 'Good Status',
           },
           '401': {
@@ -961,10 +973,9 @@ var swaggerJson = {
 
     '/user/scrap': {
       get: {
-        tags: ['User'],
+        tags: ['Scrap'],
         summary: '사용자가 Scrap한 레시피를 저장합니다.',
-        description:
-          'Authorization 2 \n 전송 방식: Post \n Input: Header(Token, Platform), Query(id) \n Output: status, likeRecipesId, message',
+        description: '',
         consumes: 'application/json',
         produces: 'application/json',
         parameters: [
@@ -991,21 +1002,16 @@ var swaggerJson = {
         ],
         responses: {
           '200': {
-            description: 'Good Status',
+            description: '사용자에게 저장된 전체 값을 출력합니다.',
             schema: {
               type: 'object',
               properties: {
                 get: {
-                  type: 'object',
-                  properties: {
-                    likeRecipesId: {
-                      type: 'array',
-                      items: {
-                        type: 'integer',
-                        format: 'int32',
-                        example: 5980,
-                      },
-                    },
+                  type: 'array',
+                  items: {
+                    type: 'integer',
+                    format: 'int32',
+                    example: 5980,
                   },
                 },
               },
@@ -1023,10 +1029,9 @@ var swaggerJson = {
         },
       },
       put: {
-        tags: ['User'],
+        tags: ['Scrap'],
         summary: '사용자가 Scrap한 레시피를 저장합니다.',
-        description:
-          'Authorization 2 \n 전송 방식: Post \n Input: Header(Token, Platform), Query(id) \n Output: status, likeRecipesId, message',
+        description: '',
         consumes: 'application/json',
         produces: 'application/json',
         parameters: [
@@ -1058,29 +1063,42 @@ var swaggerJson = {
             schema: {
               type: 'object',
               properties: {
-                id: {
-                  type: 'integer',
-                  format: 'int32',
-                  example: 5980,
+                recipeInfo: {
+                  type: 'object',
+                  properties: {
+                    id: {
+                      type: 'integer',
+                      format: 'int32',
+                      example: 5980,
+                    },
+                    place: {
+                      type: 'integer',
+                      format: 'int32',
+                      example: 1,
+                    },
+                    rating: {
+                      type: 'integer',
+                      format: 'int32',
+                      example: 3,
+                    },
+                  },
                 },
               },
             },
           },
         ],
         responses: {
-          '200': {
-            description: 'Good Status',
+          '201': {
+            description: '사용자에게 저장된 전체 값을 출력합니다.',
             schema: {
               type: 'object',
               properties: {
-                add: {
-                  likeRecipesId: {
-                    type: 'object',
-                    properties: {
-                      type: 'integer',
-                      format: 'int32',
-                      example: 5980,
-                    },
+                put: {
+                  type: 'array',
+                  items: {
+                    type: 'integer',
+                    format: 'int32',
+                    example: 5980,
                   },
                 },
               },
@@ -1098,10 +1116,9 @@ var swaggerJson = {
         },
       },
       delete: {
-        tags: ['User'],
+        tags: ['Scrap'],
         summary: '사용자가 Scrap한 레시피 목록에서 삭제합니다.',
-        description:
-          'Authorization 2 \n 전송 방식: Post \n Input: Header(Token, Platform), Query(id) \n Output: status, likeRecipesId, message',
+        description: '',
         consumes: 'application/json',
         produces: 'application/json',
         parameters: [
@@ -1143,19 +1160,453 @@ var swaggerJson = {
           },
         ],
         responses: {
-          '200': {
-            description: 'Good Status',
+          '201': {
+            description: '사용자에게 저장된 전체 값을 출력합니다.',
             schema: {
               type: 'object',
               properties: {
                 delete: {
-                  likeRecipesId: {
-                    type: 'object',
-                    properties: {
+                  type: 'array',
+                  items: {
+                    type: 'integer',
+                    format: 'int32',
+                    example: 5980,
+                  },
+                },
+              },
+            },
+          },
+          '401': {
+            description: 'Authorization Error',
+          },
+          '404': {
+            description: 'Data not Found',
+          },
+          '500': {
+            description: 'Mongo Error',
+          },
+        },
+      },
+    },
+
+    '/user/like': {
+      get: {
+        tags: ['Like'],
+        summary: '사용자가 like한 레시피를 저장합니다.',
+        description: '',
+        consumes: 'application/json',
+        produces: 'application/json',
+        parameters: [
+          {
+            in: 'header',
+            name: 'Authorization',
+            description: '인증 방식과 토큰을 입력해주세요.',
+            required: true,
+            schema: {
+              type: 'string',
+              example: 'Bearer TOTOTOTOOTOTTOOKENENEKENKENKENE',
+            },
+          },
+          {
+            in: 'header',
+            name: 'Platform',
+            description: '인증 플랫폼을 입력해주세요.',
+            required: true,
+            schema: {
+              type: 'string',
+              enum: ['kakao', 'google'],
+            },
+          },
+        ],
+        responses: {
+          '200': {
+            description: '사용자에게 저장된 전체 값을 출력합니다.',
+            schema: {
+              type: 'object',
+              properties: {
+                get: {
+                  type: 'array',
+                  items: {
+                    type: 'integer',
+                    format: 'int32',
+                    example: 5980,
+                  },
+                },
+              },
+            },
+          },
+          '401': {
+            description: 'Authorization Error',
+          },
+          '404': {
+            description: 'Data not Found',
+          },
+          '500': {
+            description: 'Mongo Error',
+          },
+        },
+      },
+      put: {
+        tags: ['Like'],
+        summary: '사용자가 like한 레시피를 저장합니다.',
+        description: '',
+        consumes: 'application/json',
+        produces: 'application/json',
+        parameters: [
+          {
+            in: 'header',
+            name: 'Authorization',
+            description: '인증 방식과 토큰을 입력해주세요.',
+            required: true,
+            schema: {
+              type: 'string',
+              example: 'Bearer TOTOTOTOOTOTTOOKENENEKENKENKENE',
+            },
+          },
+          {
+            in: 'header',
+            name: 'Platform',
+            description: '인증 플랫폼을 입력해주세요.',
+            required: true,
+            schema: {
+              type: 'string',
+              enum: ['kakao', 'google'],
+            },
+          },
+          {
+            in: 'body',
+            name: 'id',
+            description: 'Recipe Id를 입력해주세요',
+            required: true,
+            schema: {
+              type: 'object',
+              properties: {
+                recipeInfo: {
+                  type: 'object',
+                  properties: {
+                    id: {
                       type: 'integer',
                       format: 'int32',
                       example: 5980,
                     },
+                    place: {
+                      type: 'integer',
+                      format: 'int32',
+                      example: 1,
+                    },
+                    rating: {
+                      type: 'integer',
+                      format: 'int32',
+                      example: 3,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        ],
+        responses: {
+          '201': {
+            description: '사용자에게 저장된 전체 값을 출력합니다.',
+            schema: {
+              type: 'object',
+              properties: {
+                put: {
+                  type: 'array',
+                  items: {
+                    type: 'integer',
+                    format: 'int32',
+                    example: 5980,
+                  },
+                },
+              },
+            },
+          },
+          '401': {
+            description: 'Authorization Error',
+          },
+          '404': {
+            description: 'Data not Found',
+          },
+          '500': {
+            description: 'Mongo Error',
+          },
+        },
+      },
+      delete: {
+        tags: ['Like'],
+        summary: '사용자가 like한 레시피 목록에서 삭제합니다.',
+        description: '',
+        consumes: 'application/json',
+        produces: 'application/json',
+        parameters: [
+          {
+            in: 'header',
+            name: 'Authorization',
+            description: '인증 방식과 토큰을 입력해주세요.',
+            required: true,
+            schema: {
+              type: 'string',
+              example: 'Bearer TOTOTOTOOTOTTOOKENENEKENKENKENE',
+            },
+          },
+          {
+            in: 'header',
+            name: 'Platform',
+            description: '인증 플랫폼을 입력해주세요.',
+            required: true,
+            schema: {
+              type: 'string',
+              enum: ['kakao', 'google'],
+            },
+          },
+          {
+            in: 'body',
+            name: 'id',
+            description: 'Recipe Id를 입력해주세요',
+            required: true,
+            schema: {
+              type: 'object',
+              properties: {
+                id: {
+                  type: 'integer',
+                  format: 'int32',
+                  example: 5980,
+                },
+              },
+            },
+          },
+        ],
+        responses: {
+          '201': {
+            description: '사용자에게 저장된 전체 값을 출력합니다.',
+            schema: {
+              type: 'object',
+              properties: {
+                delete: {
+                  type: 'array',
+                  items: {
+                    type: 'integer',
+                    format: 'int32',
+                    example: 5980,
+                  },
+                },
+              },
+            },
+          },
+          '401': {
+            description: 'Authorization Error',
+          },
+          '404': {
+            description: 'Data not Found',
+          },
+          '500': {
+            description: 'Mongo Error',
+          },
+        },
+      },
+    },
+
+    '/user/history': {
+      get: {
+        tags: ['History'],
+        summary: '사용자가 과거에 본 레시피를 저장합니다.',
+        description: '',
+        consumes: 'application/json',
+        produces: 'application/json',
+        parameters: [
+          {
+            in: 'header',
+            name: 'Authorization',
+            description: '인증 방식과 토큰을 입력해주세요.',
+            required: true,
+            schema: {
+              type: 'string',
+              example: 'Bearer TOTOTOTOOTOTTOOKENENEKENKENKENE',
+            },
+          },
+          {
+            in: 'header',
+            name: 'Platform',
+            description: '인증 플랫폼을 입력해주세요.',
+            required: true,
+            schema: {
+              type: 'string',
+              enum: ['kakao', 'google'],
+            },
+          },
+        ],
+        responses: {
+          '200': {
+            description: '사용자에게 저장된 전체 값을 출력합니다.',
+            schema: {
+              type: 'object',
+              properties: {
+                get: {
+                  type: 'array',
+                  items: {
+                    type: 'integer',
+                    format: 'int32',
+                    example: 5980,
+                  },
+                },
+              },
+            },
+          },
+          '401': {
+            description: 'Authorization Error',
+          },
+          '404': {
+            description: 'Data not Found',
+          },
+          '500': {
+            description: 'Mongo Error',
+          },
+        },
+      },
+      put: {
+        tags: ['History'],
+        summary: '사용자가 과거에 본 레시피를 저장합니다.',
+        description: '',
+        consumes: 'application/json',
+        produces: 'application/json',
+        parameters: [
+          {
+            in: 'header',
+            name: 'Authorization',
+            description: '인증 방식과 토큰을 입력해주세요.',
+            required: true,
+            schema: {
+              type: 'string',
+              example: 'Bearer TOTOTOTOOTOTTOOKENENEKENKENKENE',
+            },
+          },
+          {
+            in: 'header',
+            name: 'Platform',
+            description: '인증 플랫폼을 입력해주세요.',
+            required: true,
+            schema: {
+              type: 'string',
+              enum: ['kakao', 'google'],
+            },
+          },
+          {
+            in: 'body',
+            name: 'id',
+            description: 'Recipe Id를 입력해주세요',
+            required: true,
+            schema: {
+              type: 'object',
+              properties: {
+                recipeInfo: {
+                  type: 'object',
+                  properties: {
+                    id: {
+                      type: 'integer',
+                      format: 'int32',
+                      example: 5980,
+                    },
+                    place: {
+                      type: 'integer',
+                      format: 'int32',
+                      example: 1,
+                    },
+                    rating: {
+                      type: 'integer',
+                      format: 'int32',
+                      example: 3,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        ],
+        responses: {
+          '201': {
+            description: '사용자에게 저장된 전체 값을 출력합니다.',
+            schema: {
+              type: 'object',
+              properties: {
+                put: {
+                  type: 'array',
+                  items: {
+                    type: 'integer',
+                    format: 'int32',
+                    example: 5980,
+                  },
+                },
+              },
+            },
+          },
+          '401': {
+            description: 'Authorization Error',
+          },
+          '404': {
+            description: 'Data not Found',
+          },
+          '500': {
+            description: 'Mongo Error',
+          },
+        },
+      },
+      delete: {
+        tags: ['History'],
+        summary: '사용자가 과거에 본 레시피 목록에서 삭제합니다.',
+        description: '',
+        consumes: 'application/json',
+        produces: 'application/json',
+        parameters: [
+          {
+            in: 'header',
+            name: 'Authorization',
+            description: '인증 방식과 토큰을 입력해주세요.',
+            required: true,
+            schema: {
+              type: 'string',
+              example: 'Bearer TOTOTOTOOTOTTOOKENENEKENKENKENE',
+            },
+          },
+          {
+            in: 'header',
+            name: 'Platform',
+            description: '인증 플랫폼을 입력해주세요.',
+            required: true,
+            schema: {
+              type: 'string',
+              enum: ['kakao', 'google'],
+            },
+          },
+          {
+            in: 'body',
+            name: 'id',
+            description: 'Recipe Id를 입력해주세요',
+            required: true,
+            schema: {
+              type: 'object',
+              properties: {
+                id: {
+                  type: 'integer',
+                  format: 'int32',
+                  example: 5980,
+                },
+              },
+            },
+          },
+        ],
+        responses: {
+          '201': {
+            description: '사용자에게 저장된 전체 값을 출력합니다.',
+            schema: {
+              type: 'object',
+              properties: {
+                delete: {
+                  type: 'array',
+                  items: {
+                    type: 'integer',
+                    format: 'int32',
+                    example: 5980,
                   },
                 },
               },
@@ -1176,7 +1627,7 @@ var swaggerJson = {
 
     '/user/refriger': {
       put: {
-        tags: ['User'],
+        tags: ['Info'],
         summary: '냉장고 데이터를 post로 전송, Mongo에 저장.',
         description:
           'Authorization 2 \n 전송 방식: Put \n Input: Header(Token, Platform), Body(refriger) \n Output: status, message',
@@ -1260,7 +1711,7 @@ var swaggerJson = {
 
     '/user/recipe-count': {
       get: {
-        tags: ['User'],
+        tags: ['Info'],
         summary: 'Mongo에 있는 냉장고 데이터로 만들 수 있는 레시피의 수 출력.',
         description:
           'Authorization 2 \n 전송 방식: Get \n Input: Header(Token, Platform),  \n Output: status, num, message',

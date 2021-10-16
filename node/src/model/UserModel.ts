@@ -130,6 +130,11 @@ UserSchema.statics.updateTokenByUserid = function (userid: string, payload: stri
   return this.findOneAndUpdate({ userid: userid }, { token: payload });
 };
 
+// - 냉장고 데이터를 가져오기 /user/refriger
+UserSchema.statics.getRefrigerByUserid = function (userid: string) {
+  return this.findOne({ userid: userid }, { refriger: 1 });
+};
+
 // - 냉장고 데이터를 사용자 db에 업데이트 /user/refriger /recipe/list
 UserSchema.statics.updateRefrigerByUserid = function (userid: string, fridge: object, recipecount: number) {
   return this.findOneAndUpdate({ userid: userid }, { refriger: fridge, recipeCount: recipecount });

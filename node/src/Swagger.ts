@@ -309,7 +309,8 @@ var swaggerJson = {
     '/recipe/number': {
       post: {
         tags: ['Recipe'],
-        summary: '냉장고 데이터를 post로 전송, redis에 저장한 후 만들 수 있는 레시피의 개수를 반환',
+        summary:
+          '냉장고 데이터를 post로 전송, redis에 저장한 후 만들 수 있는 레시피의 개수를 반환 (Mongo에는 저장하지 않음)',
         description:
           'Authorization 2 \n 전송 방식: Post \n Input: Header(Token, Platform), Body(refriger) \n Output: status, num, message',
         consumes: 'application/json',
@@ -1626,11 +1627,74 @@ var swaggerJson = {
     },
 
     '/user/refriger': {
+      get: {
+        tags: ['Info'],
+        summary: '냉장고 데이터를 불러옴',
+        description: '냉장고 데이터를 Mongo에서 불러오고 해당 냉장고 데이터로 Redis에 업데이트함.',
+        consumes: 'application/json',
+        produces: 'application/json',
+        parameters: [
+          {
+            in: 'header',
+            name: 'Authorization',
+            description: '인증 방식과 토큰을 입력해주세요.',
+            required: true,
+            schema: {
+              type: 'string',
+              example: 'Bearer TOTOTOTOOTOTTOOKENENEKENKENKENE',
+            },
+          },
+          {
+            in: 'header',
+            name: 'Platform',
+            description: '인증 플랫폼을 입력해주세요.',
+            required: true,
+            schema: {
+              type: 'string',
+              enum: ['kakao', 'google'],
+            },
+          },
+        ],
+        responses: {
+          '200': {
+            description: 'Good Status',
+            schema: {
+              type: 'object',
+              properties: {
+                refriger: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      title: {
+                        type: 'string',
+                        example: '가공식품',
+                      },
+                      data: {
+                        type: 'array',
+                        items: ['햇반', '스팸', '즉석밥'],
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          '401': {
+            description: 'Authorization Error',
+          },
+          '404': {
+            description: 'Data not Found',
+          },
+          '500': {
+            description: 'Mongo Error',
+          },
+        },
+      },
       put: {
         tags: ['Info'],
         summary: '냉장고 데이터를 post로 전송, Mongo에 저장.',
-        description:
-          'Authorization 2 \n 전송 방식: Put \n Input: Header(Token, Platform), Body(refriger) \n Output: status, message',
+        description: '받아온 냉장고 데이터를 Mongo에 저장하고, Redis에도 해당 냉장고 데이터로 변경함.',
         consumes: 'application/json',
         produces: 'application/json',
         parameters: [

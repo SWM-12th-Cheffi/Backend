@@ -9,6 +9,10 @@ import Authz from '../function/Authorization';
 const debugRedis = require('debug')('cheffi:redis');
 const debugscrap = require('debug')('cheffi:scrap');
 const errorscrap = require('debug')('cheffi:scrap:error');
+const debuglike = require('debug')('cheffi:like');
+const errorlike = require('debug')('cheffi:like:error');
+const debughistory = require('debug')('cheffi:history');
+const errorhistory = require('debug')('cheffi:history:error');
 const debuginfo = require('debug')('cheffi:info');
 const errorinfo = require('debug')('cheffi:info:error');
 const debugrefriger = require('debug')('cheffi:refriger');
@@ -20,18 +24,18 @@ const client = redis.createClient(process.env.REDIS_ADDR);
 const { promisify } = require('util');
 const redisHget = promisify(client.hget).bind(client);
 const redisHset = promisify(client.hset).bind(client);
-const redisHrem = promisify(client.hdel).bind(client);
-debugRedis('Redis: ' + client.reply);
 debugRedis('Redis: ' + client.reply);
 
-// 좋아하는 음식의 레시피 번호 목록 불러오기
+// 스크랩한 음식의 레시피 번호 목록 불러오기
 userRouter.get('/scrap', async function (req, res) {
   debugscrap('/scrap get Api Called');
   let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
   let authorizationPlatform: string = String(req.headers['platform']);
   const authzRes = await Authz(authorizationToken, authorizationPlatform, 1);
   if (authzRes.header.status == 200)
-    res.status(201).json({ get: (await redisHget('scrap', authzRes.auth?.securityId)).slice(1, -1).split(',') });
+    res
+      .status(201)
+      .json({ get: (await redisHget('scrap', authzRes.auth?.securityId)).slice(1, -1).split(',').map(Number) });
   else {
     errorscrap(authzRes.header.message);
     res.statusMessage = authzRes.header.message;
@@ -39,7 +43,7 @@ userRouter.get('/scrap', async function (req, res) {
   }
 });
 
-// 좋아하는 음식의 레시피 번호를 저장
+// 스크랩한 음식의 레시피 번호를 저장
 // 업데이트 결과를 레디스에 반영하는게 필요.
 userRouter.put('/scrap', async function (req, res) {
   debugscrap('/scrap put Api Called');
@@ -53,6 +57,7 @@ userRouter.put('/scrap', async function (req, res) {
       .slice(1, -1)
       .split(',')
       .map(Number);
+    if (scrapRecipeIdList[0] == 0) scrapRecipeIdList = [];
     debugscrap(scrapRecipeIdList);
     if (scrapRecipeIdList.indexOf(addScrapRecipeData.id) != -1) {
       debugRedis('Recipe is already in');
@@ -82,8 +87,7 @@ userRouter.put('/scrap', async function (req, res) {
   }
 });
 
-// 좋아하는 음식의 레시피 번호를 삭제
-// Todo: like 리스트를 불러와서 업데이트하도록 설정해야함.
+// 스크랩한 음식의 레시피 번호를 삭제
 userRouter.delete('/scrap', async function (req, res) {
   debugscrap('/scrap delete Api Called');
   debugscrap('RecipeId: ' + req.body.id);
@@ -125,6 +129,212 @@ userRouter.delete('/scrap', async function (req, res) {
   }
 });
 
+// 좋아하는 음식의 레시피 번호 목록 불러오기
+userRouter.get('/like', async function (req, res) {
+  debuglike('/like get Api Called');
+  let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
+  let authorizationPlatform: string = String(req.headers['platform']);
+  const authzRes = await Authz(authorizationToken, authorizationPlatform, 1);
+  if (authzRes.header.status == 200)
+    res
+      .status(201)
+      .json({ get: (await redisHget('like', authzRes.auth?.securityId)).slice(1, -1).split(',').map(Number) });
+  else {
+    errorlike(authzRes.header.message);
+    res.statusMessage = authzRes.header.message;
+    res.status(authzRes.header.status).send();
+  }
+});
+
+// 좋아하는 음식의 레시피 번호를 저장
+// 업데이트 결과를 레디스에 반영하는게 필요.
+userRouter.put('/like', async function (req, res) {
+  debuglike('/like put Api Called');
+  debuglike('RecipeId: ' + req.body.recipeInfo);
+  let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
+  let authorizationPlatform: string = String(req.headers['platform']);
+  const authzRes = await Authz(authorizationToken, authorizationPlatform, 1);
+  if (authzRes.header.status == 200) {
+    let addLikeRecipeData = req.body.recipeInfo;
+    let likeRecipeIdList: number[] = (await redisHget('like', authzRes.auth?.securityId))
+      .slice(1, -1)
+      .split(',')
+      .map(Number);
+    if (likeRecipeIdList[0] == 0) likeRecipeIdList = [];
+    debuglike(likeRecipeIdList);
+    if (likeRecipeIdList.indexOf(addLikeRecipeData.id) != -1) {
+      debugRedis('Recipe is already in');
+      res.statusMessage = 'This Recipe is Already Added';
+      res.status(400).send();
+    } else {
+      debugRedis('Recipe is not in!');
+      likeRecipeIdList.push(addLikeRecipeData.id);
+      User.addLikeRecipeIdByUserid(authzRes.auth?.securityId, addLikeRecipeData).then(async (result: any) => {
+        let retRedis = await redisHset('like', authzRes.auth?.securityId, JSON.stringify(likeRecipeIdList));
+        debuglike('Mongo, Redis Result: ' + result.modifiedCount + ' ' + retRedis);
+        if (result.modifiedCount) {
+          debuglike('result: ' + result);
+          res.status(200).json({ like: likeRecipeIdList });
+        }
+        // token으로 정보를 찾을 수 없음
+        else {
+          errorlike('Not Found In Mongo');
+          res.status(404).send;
+        }
+      });
+    }
+  } else {
+    errorlike(authzRes.header.message);
+    res.statusMessage = authzRes.header.message;
+    res.status(authzRes.header.status).send();
+  }
+});
+
+// 좋아하는 음식의 레시피 번호를 삭제
+userRouter.delete('/like', async function (req, res) {
+  debuglike('/like delete Api Called');
+  debuglike('RecipeId: ' + req.body.id);
+  let RecipeId = req.body.id; // $push 사용해서 몽고에 저장
+  let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
+  let authorizationPlatform: string = String(req.headers['platform']);
+  const authzRes = await Authz(authorizationToken, authorizationPlatform, 1);
+  if (authzRes.header.status == 200) {
+    let likeRecipeIdList: number[] = (await redisHget('like', authzRes.auth?.securityId))
+      .slice(1, -1)
+      .split(',')
+      .map(Number);
+    if (likeRecipeIdList.indexOf(RecipeId) != -1) {
+      User.removeLikeRecipeIdByUserid(authzRes.auth?.securityId, Number(RecipeId)).then((result: any) => {
+        debuglike(result);
+        // 정상적으로 작업을 마침 -> 미구현
+        if (result.modifiedCount) {
+          debuglike('result: ' + RecipeId);
+          for (let i = 0; i < likeRecipeIdList.length; i++)
+            if (likeRecipeIdList[i] == RecipeId) likeRecipeIdList.splice(i, 1);
+          redisHset('like', authzRes.auth?.securityId, JSON.stringify(likeRecipeIdList));
+          res.status(200).json({ delete: { likeRecipeIdList: likeRecipeIdList } });
+        } // token으로 정보를 찾을 수 없음
+        else {
+          errorlike('Not Found In Mongo');
+          res.statusMessage = 'Not Found In Mongo';
+          res.status(404).send();
+        }
+      });
+    } else {
+      errorlike('Not Found In Redis');
+      res.statusMessage = 'Not Found In Redis';
+      res.status(404).send();
+    }
+  } else {
+    errorlike(authzRes.header.message);
+    res.statusMessage = authzRes.header.message;
+    res.status(authzRes.header.status).send();
+  }
+});
+
+// 과거에 본 음식의 레시피 번호 목록 불러오기
+userRouter.get('/history', async function (req, res) {
+  debughistory('/history get Api Called');
+  let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
+  let authorizationPlatform: string = String(req.headers['platform']);
+  const authzRes = await Authz(authorizationToken, authorizationPlatform, 1);
+  if (authzRes.header.status == 200)
+    res
+      .status(201)
+      .json({ get: (await redisHget('history', authzRes.auth?.securityId)).slice(1, -1).split(',').map(Number) });
+  else {
+    errorhistory(authzRes.header.message);
+    res.statusMessage = authzRes.header.message;
+    res.status(authzRes.header.status).send();
+  }
+});
+
+// 과거에 본 음식의 레시피 번호를 저장
+// 업데이트 결과를 레디스에 반영하는게 필요.
+userRouter.put('/history', async function (req, res) {
+  debughistory('/history put Api Called');
+  debughistory('RecipeId: ' + req.body.recipeInfo);
+  let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
+  let authorizationPlatform: string = String(req.headers['platform']);
+  const authzRes = await Authz(authorizationToken, authorizationPlatform, 1);
+  if (authzRes.header.status == 200) {
+    let addHistoryRecipeData = req.body.recipeInfo;
+    let historyRecipeIdList: number[] = (await redisHget('history', authzRes.auth?.securityId))
+      .slice(1, -1)
+      .split(',')
+      .map(Number);
+    if (historyRecipeIdList[0] == 0) historyRecipeIdList = [];
+    debughistory(historyRecipeIdList);
+    if (historyRecipeIdList.indexOf(addHistoryRecipeData.id) != -1) {
+      debugRedis('Recipe is already in');
+      res.statusMessage = 'This Recipe is Already Added';
+      res.status(400).send();
+    } else {
+      debugRedis('Recipe is not in!');
+      historyRecipeIdList.push(addHistoryRecipeData.id);
+      User.addHistoryRecipeIdByUserid(authzRes.auth?.securityId, addHistoryRecipeData).then(async (result: any) => {
+        let retRedis = await redisHset('history', authzRes.auth?.securityId, JSON.stringify(historyRecipeIdList));
+        debughistory('Mongo, Redis Result: ' + result.modifiedCount + ' ' + retRedis);
+        if (result.modifiedCount) {
+          debughistory('result: ' + result);
+          res.status(200).json({ history: historyRecipeIdList });
+        }
+        // token으로 정보를 찾을 수 없음
+        else {
+          errorhistory('Not Found In Mongo');
+          res.status(404).send;
+        }
+      });
+    }
+  } else {
+    errorhistory(authzRes.header.message);
+    res.statusMessage = authzRes.header.message;
+    res.status(authzRes.header.status).send();
+  }
+});
+
+// 과거에 본 음식의 레시피 번호를 삭제
+userRouter.delete('/history', async function (req, res) {
+  debughistory('/history delete Api Called');
+  debughistory('RecipeId: ' + req.body.id);
+  let RecipeId = req.body.id; // $push 사용해서 몽고에 저장
+  let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
+  let authorizationPlatform: string = String(req.headers['platform']);
+  const authzRes = await Authz(authorizationToken, authorizationPlatform, 1);
+  if (authzRes.header.status == 200) {
+    let historyRecipeIdList: number[] = (await redisHget('history', authzRes.auth?.securityId))
+      .slice(1, -1)
+      .split(',')
+      .map(Number);
+    if (historyRecipeIdList.indexOf(RecipeId) != -1) {
+      User.removeHistoryRecipeIdByUserid(authzRes.auth?.securityId, Number(RecipeId)).then((result: any) => {
+        debughistory(result);
+        // 정상적으로 작업을 마침 -> 미구현
+        if (result.modifiedCount) {
+          debughistory('result: ' + RecipeId);
+          for (let i = 0; i < historyRecipeIdList.length; i++)
+            if (historyRecipeIdList[i] == RecipeId) historyRecipeIdList.splice(i, 1);
+          redisHset('history', authzRes.auth?.securityId, JSON.stringify(historyRecipeIdList));
+          res.status(200).json({ delete: { historyRecipeIdList: historyRecipeIdList } });
+        } // token으로 정보를 찾을 수 없음
+        else {
+          errorhistory('Not Found In Mongo');
+          res.statusMessage = 'Not Found In Mongo';
+          res.status(404).send();
+        }
+      });
+    } else {
+      errorhistory('Not Found In Redis');
+      res.statusMessage = 'Not Found In Redis';
+      res.status(404).send();
+    }
+  } else {
+    errorhistory(authzRes.header.message);
+    res.statusMessage = authzRes.header.message;
+    res.status(authzRes.header.status).send();
+  }
+});
+
 // 사용자 정보 불러오기
 userRouter.get('/info', async function (req, res) {
   debuginfo('/info get Api Called');
@@ -157,7 +367,7 @@ userRouter.get('/info', async function (req, res) {
         res.status(500).send();
       });
   else {
-    errorscrap(authzRes.header.message);
+    errorinfo(authzRes.header.message);
     res.statusMessage = authzRes.header.message;
     res.status(authzRes.header.status).send();
   }
@@ -186,7 +396,7 @@ userRouter.put('/info', async function (req, res) {
       }
     });
   else {
-    errorscrap(authzRes.header.message);
+    errorinfo(authzRes.header.message);
     res.statusMessage = authzRes.header.message;
     res.status(authzRes.header.status).send();
   }
@@ -213,7 +423,7 @@ userRouter.delete('/info', async function (req, res) {
       }
     });
   else {
-    errorscrap(authzRes.header.message);
+    errorinfo(authzRes.header.message);
     res.statusMessage = authzRes.header.message;
     res.status(authzRes.header.status).send();
   }
@@ -239,7 +449,7 @@ userRouter.put('/refriger', async function (req, res) {
       })
       .catch((err: any) => errorrefriger('Mongo Error: ' + err));
   } else {
-    errorscrap(authzRes.header.message);
+    errorrefriger(authzRes.header.message);
     res.statusMessage = authzRes.header.message;
     res.status(authzRes.header.status).send();
   }
@@ -261,7 +471,7 @@ userRouter.get('/recipe-count', async function (req, res) {
       })
       .catch((err: any) => errorrefriger('Mongo Error: ' + err));
   else {
-    errorscrap(authzRes.header.message);
+    errorrefriger(authzRes.header.message);
     res.statusMessage = authzRes.header.message;
     res.status(authzRes.header.status).send();
   }

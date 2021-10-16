@@ -32,14 +32,30 @@ export default async function Authorization(token: string, platform: string, sec
             return { header: { status: 500, message: 'Mongo Error-1' }, auth: {} };
           }
           let resSet = await redisSet(token, authRes.userid, 'EX', expirationTime);
-          let resHset = await redisHset(
+          let resScrap = await redisHset(
             'scrap',
+            authRes.userid,
+            JSON.stringify(authRes.scrapRecipesId),
+            'EX',
+            expirationTime,
+          );
+          let resLike = await redisHset(
+            'like',
             authRes.userid,
             JSON.stringify(authRes.likeRecipesId),
             'EX',
             expirationTime,
           );
-          debugAuth(token + ' redis 저장완료 EX: ' + String(expirationTime) + '(s) ' + resSet + resHset);
+          let resHistory = await redisHset(
+            'history',
+            authRes.userid,
+            JSON.stringify(authRes.historyRecipesId),
+            'EX',
+            expirationTime,
+          );
+          debugAuth(
+            token + ' redis 저장완료 EX: ' + String(expirationTime) + '(s) ' + resSet + resScrap + resLike + resHistory,
+          );
           return {
             header: { status: 200, message: 'Login Success' },
             auth: { newUser: newUser, token: token, platform: platform },
@@ -69,14 +85,30 @@ export default async function Authorization(token: string, platform: string, sec
             return { header: { status: 500, message: 'Mongo Error-2' }, auth: {} };
           }
           let resSet = await redisSet(token, authRes.userid, 'EX', expirationTime);
-          let resHset = await redisHset(
+          let resScrap = await redisHset(
             'scrap',
+            authRes.userid,
+            JSON.stringify(authRes.scrapRecipesId),
+            'EX',
+            expirationTime,
+          );
+          let resLike = await redisHset(
+            'like',
             authRes.userid,
             JSON.stringify(authRes.likeRecipesId),
             'EX',
             expirationTime,
           );
-          debugAuth(token + ' redis 저장완료 EX: ' + String(expirationTime) + '(s) ' + resSet + resHset);
+          let resHistory = await redisHset(
+            'history',
+            authRes.userid,
+            JSON.stringify(authRes.historyRecipesId),
+            'EX',
+            expirationTime,
+          );
+          debugAuth(
+            token + ' redis 저장완료 EX: ' + String(expirationTime) + '(s) ' + resSet + resScrap + resLike + resHistory,
+          );
           return {
             header: { status: 200, message: 'Login Success' },
             auth: { newUser: newUser, token: token, platform: platform },

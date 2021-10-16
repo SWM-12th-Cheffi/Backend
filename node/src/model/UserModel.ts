@@ -156,5 +156,47 @@ UserSchema.statics.removeScrapRecipeIdByUserid = function (userid: string, scrap
   );
 };
 
+// - 좋아요 버튼 /user/like get
+UserSchema.statics.getLikeRecipeIdByUserid = function (userid: string) {
+  return this.findOne({ userid: userid }, { _id: 0, likeRecipesId: 1, likeRecipesIdInfo: 1 });
+};
+
+// - 좋아요 버튼 /user/like put
+UserSchema.statics.addLikeRecipeIdByUserid = function (userid: string, likeRecipesIdInfo: any) {
+  return this.updateOne(
+    { userid: userid },
+    { $push: { likeRecipesId: Number(likeRecipesIdInfo.id), likeRecipesIdInfo: likeRecipesIdInfo } },
+  );
+};
+
+// - 좋아요 버튼 /user/like delete
+UserSchema.statics.removeLikeRecipeIdByUserid = function (userid: string, likeRecipeId: number) {
+  return this.updateOne(
+    { userid: userid },
+    { $pull: { likeRecipesId: likeRecipeId, likeRecipesIdInfo: { id: likeRecipeId } } },
+  );
+};
+
+// - 좋아요 버튼 /user/history get
+UserSchema.statics.getHistoryRecipeIdByUserid = function (userid: string) {
+  return this.findOne({ userid: userid }, { _id: 0, historyRecipesId: 1, historyRecipesIdInfo: 1 });
+};
+
+// - 좋아요 버튼 /user/history put
+UserSchema.statics.addHistoryRecipeIdByUserid = function (userid: string, historyRecipesIdInfo: any) {
+  return this.updateOne(
+    { userid: userid },
+    { $push: { historyRecipesId: Number(historyRecipesIdInfo.id), historyRecipesIdInfo: historyRecipesIdInfo } },
+  );
+};
+
+// - 좋아요 버튼 /user/history delete
+UserSchema.statics.removeHistoryRecipeIdByUserid = function (userid: string, historyRecipeId: number) {
+  return this.updateOne(
+    { userid: userid },
+    { $pull: { historyRecipesId: historyRecipeId, historyRecipesIdInfo: { id: historyRecipeId } } },
+  );
+};
+
 // Create Model & Export
 module.exports = user_db.model('user', UserSchema);

@@ -459,7 +459,7 @@ userRouter.get('/refriger', async function (req, res) {
 // 냉장고 정보 저장
 userRouter.put('/refriger', async function (req, res) {
   debugrefriger('/refriger Api Called');
-  debugrefriger('refriger : ' + req.body.refriger);
+  debugrefriger('refriger : ' + JSON.stringify(req.body.refriger));
   let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
   let authorizationPlatform: string = String(req.headers['platform']);
   const authzRes = await Authz(authorizationToken, authorizationPlatform, 1);

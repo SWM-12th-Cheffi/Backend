@@ -397,6 +397,7 @@ userRouter.put('/info', async function (req, res) {
     });
   else {
     errorinfo(authzRes.header.message);
+    errorinfo(JSON.stringify(req.body.data));
     res.statusMessage = authzRes.header.message;
     res.status(authzRes.header.status).send();
   }
@@ -476,6 +477,7 @@ userRouter.put('/refriger', async function (req, res) {
       })
       .catch((err: any) => {
         errorrefriger('Mongo Error: ' + err);
+        errorrefriger(JSON.stringify(req.body.refriger));
         res.statusMessage = 'Mongo Error';
         res.status(500).send();
       });

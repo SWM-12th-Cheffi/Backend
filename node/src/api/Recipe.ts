@@ -35,7 +35,7 @@ recipeRouter.post('/number', async function (req, res) {
   let authorizationPlatform: string = String(req.headers['platform']);
   const authzRes = await Authz(authorizationToken, authorizationPlatform, 1);
   if (authzRes.header.status == 200) {
-    debugNumber('refriger: ' + req.body.refriger);
+    debugNumber('refriger: ' + JSON.stringify(req.body.refriger));
     let resRedis = await redisHset('refriger', authzRes.auth?.securityId, JSON.stringify(req.body.refriger));
     debugNumber('Save Refriger Data in Redis: ' + resRedis);
     let ingreElement: string[] = await IngredElementOfInput(RefrigerToIngredientList(req.body.refriger));
@@ -66,8 +66,8 @@ recipeRouter.get('/list', async function (req, res) {
     if (nowPage == 1) {
       // Neo4j에 접근해서 계산한 뒤, Redis에 결과를 저장
       let resRedis = await redisHget('refriger', authzRes.auth?.securityId);
-      resRedis = JSON.parse(resRedis);
       debugList('Redis Data: ' + resRedis);
+      resRedis = JSON.parse(resRedis);
       let ingredientList: string[] = RefrigerToIngredientList(resRedis);
       if (ingredientList.length != 0) {
         let ingreElement: string[] = await IngredElementOfInput(ingredientList);
@@ -150,7 +150,7 @@ recipeRouter.get('/list', async function (req, res) {
           recipe: resRedis.slice((nowPage - 1) * step, nowPage * step),
           maxPage: maxPage,
         };
-        debugList('Result: ' + returnStructure);
+        debugList('Result: ' + JSON.stringify(returnStructure));
         res.statusMessage = 'Load Recipe In Redis';
         res.status(201).json(returnStructure);
       }

@@ -35,6 +35,7 @@ recipeRouter.post('/number', async function (req, res) {
   let authorizationPlatform: string = String(req.headers['platform']);
   const authzRes = await Authz(authorizationToken, authorizationPlatform, 1);
   if (authzRes.header.status == 200) {
+    // 인증 성공
     debugNumber('refriger: ' + JSON.stringify(req.body.refriger));
     let resRedis = await redisHset('refriger', authzRes.auth?.securityId, JSON.stringify(req.body.refriger));
     debugNumber('Save Refriger Data in Redis: ' + resRedis);
@@ -47,6 +48,7 @@ recipeRouter.post('/number', async function (req, res) {
     res.statusMessage = 'Save Refriger Data In Redis';
     res.status(201).json(returnStructure);
   } else {
+    // 인증 실패
     errorNumber(authzRes.header.message);
     res.statusMessage = authzRes.header.message;
     res.status(authzRes.header.status).send();
@@ -61,20 +63,26 @@ recipeRouter.get('/list', async function (req, res) {
   let reccReturnObject: any, reccRecipeList: number[];
   const authzRes = await Authz(authorizationToken, authorizationPlatform, 1);
   if (authzRes.header.status == 200) {
+    // 인증 성공
     let nowPage: number = Number(req.query.page);
     let step: number = Number(req.query.step);
     if (nowPage == 1) {
+      // 원하는 페이지가 1페이지면 처음 요청하는것으로 간주
       // Neo4j에 접근해서 계산한 뒤, Redis에 결과를 저장
       let resRedis = await redisHget('refriger', authzRes.auth?.securityId);
       debugList('Redis Data: ' + resRedis);
       resRedis = JSON.parse(resRedis);
       let ingredientList: string[] = RefrigerToIngredientList(resRedis);
       if (ingredientList.length != 0) {
+        // 입력된 재료가 없을 때
         let ingreElement: string[] = await IngredElementOfInput(ingredientList);
         let listRecipeid: string[] = await ListOfPossiRP(ingreElement);
         debugList('Array of Recipes: ' + listRecipeid);
-        User.updateRefrigerByUserid(authzRes.auth?.securityId, resRedis, listRecipeid.length)
-          .then(async function (userData: any) {
+        User.updateRefrigerByUserid(authzRes.auth?.securityId, resRedis, listRecipeid.length).then(async function (
+          userData: any,
+        ) {
+          if (listRecipeid.length != 0) {
+            // 만들 수 있는 레시피가 있을 때
             reccRecipeList = listRecipeid.map(Number);
             /*
             reccReturnObject = await SortByRecc({
@@ -86,42 +94,50 @@ recipeRouter.get('/list', async function (req, res) {
               },
             });
             reccRecipeList = reccReturnObject.data.id.map(Number);*/
-            return Recipe.getListPossiRP(reccRecipeList);
-          })
-          .then(async (resMon: any) => {
-            /*
-            let resMonObjectbyRecc: any = {};
-            for (let i in resMon) {
-              resMonObjectbyRecc[resMon[i].recipeid] = resMon[i];
-            }
-            let resMonListbyRecc = [];
-            for (let i in reccRecipeList) {
-              resMonListbyRecc.push(resMonObjectbyRecc[reccRecipeList[i]]);
-            }*/
-            let resRedis = await redisHset('userRecipeList', authzRes.auth?.securityId, JSON.stringify(resMon));
-            let maxPage: number = parseInt(String(resMon.length / step));
-            if (resMon.length % step != 0) maxPage += 1;
-            if (nowPage > maxPage) {
-              errorList('max Page: ' + maxPage + ', request Page: ' + nowPage);
-              res.statusMessage = 'max Page: ' + maxPage;
-              res.status(400).send();
-            } else {
-              // 에러 핸들링 필요
-              let returnStructure: object = {
-                //recipe: resMonListbyRecc,
-                recipe: resMon.slice((nowPage - 1) * step, nowPage * step),
-                maxPage: maxPage,
-              };
-              debugList('Result: ' + returnStructure);
-              res.statusMessage = 'Save Refriger Data In Mongo';
-              res.status(201).json(returnStructure);
-            }
-          })
-          .catch((err: any) => {
-            errorList('Mongo Error: ' + err);
-            res.status(500).send(err);
-          });
+
+            Recipe.getListPossiRP(reccRecipeList)
+              .then(async (resMon: any) => {
+                /*
+              let resMonObjectbyRecc: any = {};
+              for (let i in resMon) {
+                resMonObjectbyRecc[resMon[i].recipeid] = resMon[i];
+              }
+              let resMonListbyRecc = [];
+              for (let i in reccRecipeList) {
+                resMonListbyRecc.push(resMonObjectbyRecc[reccRecipeList[i]]);
+              }*/
+                let resRedis = await redisHset('userRecipeList', authzRes.auth?.securityId, JSON.stringify(resMon));
+                debugRedis('redis: ' + resRedis);
+                let maxPage: number = parseInt(String(resMon.length / step));
+                if (resMon.length % step != 0) maxPage += 1; // maxPage를 계산하는 부분
+                if (nowPage > maxPage) {
+                  // maxPage를 nowPage가 넘으면 안됨
+                  errorList('max Page: ' + maxPage + ', request Page: ' + nowPage);
+                  res.statusMessage = 'max Page: ' + maxPage;
+                  res.status(400).send();
+                } else {
+                  let returnStructure: object = {
+                    //recipe: resMonListbyRecc,
+                    recipe: resMon.slice((nowPage - 1) * step, nowPage * step),
+                    maxPage: maxPage,
+                  };
+                  debugList('Result: ' + returnStructure);
+                  res.statusMessage = 'Save Refriger Data In Mongo';
+                  res.status(201).json(returnStructure);
+                }
+              })
+              .catch((err: any) => {
+                errorList('Mongo Error: ' + err);
+                res.status(500).send(err);
+              });
+          } else {
+            // 재료는 있지만 만들 수 있는 레시피가 없을 때
+            res.statusMessage = 'No Recipe Can Make';
+            res.status(201).json({ recipe: [] });
+          }
+        });
       } else {
+        // 냉장고에 들어있는 재료가 없음
         User.updateRefrigerByUserid(authzRes.auth?.securityId, resRedis, 0)
           .then((resMon: any) => {
             debugList('No Refriger Data, Set to Empty Refriger');
@@ -144,7 +160,6 @@ recipeRouter.get('/list', async function (req, res) {
         res.statusMessage = 'max Page: ' + maxPage;
         res.status(400).send();
       } else {
-        // 에러 핸들링 필요
         let returnStructure: object = {
           //recipe: resMonListbyRecc,
           recipe: resRedis.slice((nowPage - 1) * step, nowPage * step),
@@ -156,6 +171,7 @@ recipeRouter.get('/list', async function (req, res) {
       }
     }
   } else {
+    // 인증 실패
     errorList(authzRes.header.message);
     res.statusMessage = authzRes.header.message;
     res.status(authzRes.header.status).send();

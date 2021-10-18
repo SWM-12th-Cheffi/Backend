@@ -83,8 +83,8 @@ recipeRouter.get('/list', async function (req, res) {
         ) {
           if (listRecipeid.length != 0) {
             // 만들 수 있는 레시피가 있을 때
-            reccRecipeList = listRecipeid.map(Number);
-            /*
+            //reccRecipeList = listRecipeid.map(Number);
+
             reccReturnObject = await SortByRecc({
               id: listRecipeid,
               like: {
@@ -93,20 +93,24 @@ recipeRouter.get('/list', async function (req, res) {
                 scrap: userData.scrapRecipesIdInfo,
               },
             });
-            reccRecipeList = reccReturnObject.data.id.map(Number);*/
+            debugList(reccReturnObject.data);
+            reccRecipeList = reccReturnObject.data.output_json.id.map(Number);
 
             Recipe.getListPossiRP(reccRecipeList)
               .then(async (resMon: any) => {
-                /*
-              let resMonObjectbyRecc: any = {};
-              for (let i in resMon) {
-                resMonObjectbyRecc[resMon[i].recipeid] = resMon[i];
-              }
-              let resMonListbyRecc = [];
-              for (let i in reccRecipeList) {
-                resMonListbyRecc.push(resMonObjectbyRecc[reccRecipeList[i]]);
-              }*/
-                let resRedis = await redisHset('userRecipeList', authzRes.auth?.securityId, JSON.stringify(resMon));
+                let resMonObjectbyRecc: any = {};
+                for (let i in resMon) {
+                  resMonObjectbyRecc[resMon[i].recipeid] = resMon[i];
+                }
+                let resMonListbyRecc = [];
+                for (let i in reccRecipeList) {
+                  resMonListbyRecc.push(resMonObjectbyRecc[reccRecipeList[i]]);
+                }
+                let resRedis = await redisHset(
+                  'userRecipeList',
+                  authzRes.auth?.securityId,
+                  JSON.stringify(resMonListbyRecc),
+                );
                 debugRedis('redis: ' + resRedis);
                 let maxPage: number = parseInt(String(resMon.length / step));
                 if (resMon.length % step != 0) maxPage += 1; // maxPage를 계산하는 부분
@@ -117,8 +121,8 @@ recipeRouter.get('/list', async function (req, res) {
                   res.status(400).send();
                 } else {
                   let returnStructure: object = {
-                    //recipe: resMonListbyRecc,
-                    recipe: resMon.slice((nowPage - 1) * step, nowPage * step),
+                    recipe: resMonListbyRecc.slice((nowPage - 1) * step, nowPage * step),
+                    //recipe: resMon.slice((nowPage - 1) * step, nowPage * step),
                     maxPage: maxPage,
                   };
                   debugList('Result: ' + returnStructure);
@@ -161,7 +165,6 @@ recipeRouter.get('/list', async function (req, res) {
         res.status(400).send();
       } else {
         let returnStructure: object = {
-          //recipe: resMonListbyRecc,
           recipe: resRedis.slice((nowPage - 1) * step, nowPage * step),
           maxPage: maxPage,
         };

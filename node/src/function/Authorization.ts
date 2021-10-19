@@ -73,7 +73,7 @@ export default async function Authorization(token: string, platform: string, sec
         } catch (err) {
           errorAuth('Error in Google Authorization');
           errorAuth(err);
-          return { header: { status: 401, message: err }, auth: {} };
+          return { header: { status: 401, message: 'Token Error' }, auth: {} };
         }
       } else if (platform && platform == 'kakao') {
         try {
@@ -126,7 +126,7 @@ export default async function Authorization(token: string, platform: string, sec
         } catch (err) {
           errorAuth('Error in Kakao Authorization');
           errorAuth(err);
-          return { header: { status: 401, message: err }, auth: {} };
+          return { header: { status: 401, message: 'Token Error' }, auth: {} };
         }
       } else {
         errorAuth('Incorrect platform Property');

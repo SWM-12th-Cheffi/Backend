@@ -94,8 +94,7 @@ recipeRouter.get('/list', async function (req, res) {
               },
             });
             debugList(reccReturnObject.data);
-            reccRecipeList = reccReturnObject.data.output_json.id.map(Number);
-
+            reccRecipeList = reccReturnObject.data.map(Number);
             Recipe.getListPossiRP(reccRecipeList)
               .then(async (resMon: any) => {
                 let resMonObjectbyRecc: any = {};

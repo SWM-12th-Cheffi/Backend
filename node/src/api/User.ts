@@ -32,11 +32,11 @@ userRouter.get('/scrap', async function (req, res) {
   let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
   let authorizationPlatform: string = String(req.headers['platform']);
   const authzRes = await Authz(authorizationToken, authorizationPlatform, 1);
-  if (authzRes.header.status == 200)
-    res
-      .status(200)
-      .json({ get: (await redisHget('scrap', authzRes.auth?.securityId)).slice(1, -1).split(',').map(Number) });
-  else {
+  if (authzRes.header.status == 200) {
+    let resRedis = (await redisHget('scrap', authzRes.auth?.securityId)).slice(1, -1).split(',').map(Number);
+    if (resRedis[0] == 0) resRedis = [];
+    res.status(200).json({ get: resRedis });
+  } else {
     errorscrap(authzRes.header.message);
     res.statusMessage = authzRes.header.message;
     res.status(authzRes.header.status).send();
@@ -135,11 +135,11 @@ userRouter.get('/like', async function (req, res) {
   let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
   let authorizationPlatform: string = String(req.headers['platform']);
   const authzRes = await Authz(authorizationToken, authorizationPlatform, 1);
-  if (authzRes.header.status == 200)
-    res
-      .status(200)
-      .json({ get: (await redisHget('like', authzRes.auth?.securityId)).slice(1, -1).split(',').map(Number) });
-  else {
+  if (authzRes.header.status == 200) {
+    let resRedis = (await redisHget('like', authzRes.auth?.securityId)).slice(1, -1).split(',').map(Number);
+    if (resRedis[0] == 0) resRedis = [];
+    res.status(200).json({ get: resRedis });
+  } else {
     errorlike(authzRes.header.message);
     res.statusMessage = authzRes.header.message;
     res.status(authzRes.header.status).send();
@@ -238,11 +238,11 @@ userRouter.get('/history', async function (req, res) {
   let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
   let authorizationPlatform: string = String(req.headers['platform']);
   const authzRes = await Authz(authorizationToken, authorizationPlatform, 1);
-  if (authzRes.header.status == 200)
-    res
-      .status(200)
-      .json({ get: (await redisHget('history', authzRes.auth?.securityId)).slice(1, -1).split(',').map(Number) });
-  else {
+  if (authzRes.header.status == 200) {
+    let resRedis = (await redisHget('history', authzRes.auth?.securityId)).slice(1, -1).split(',').map(Number);
+    if (resRedis[0] == 0) resRedis = [];
+    res.status(200).json({ get: resRedis });
+  } else {
     errorhistory(authzRes.header.message);
     res.statusMessage = authzRes.header.message;
     res.status(authzRes.header.status).send();

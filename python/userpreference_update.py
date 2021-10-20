@@ -3,6 +3,47 @@ import ast
 import numpy as np
 from calculate_similarity_vectors import calculate_similarity_vectors
 
+
+def trackTopNaccuracy(InputPythonJson):
+    print("here")
+    likeList = InputPythonJson['like']['like']
+    historyList = InputPythonJson['like']['history']
+    if len(historyList) > 0:
+        with open(f"./TopNaccuracy/TopNaccuracy.json","r") as f:
+            top_json = json.load(f)
+            top_json = json.dumps(top_json,ensure_ascii = False)
+            top_json = ast.literal_eval(top_json)
+            if top_json == {}:
+                length_ = len(historyList)
+                iter_ = 1
+                for i in range(length_):
+                    print(historyList[i]['rating'])
+                    if historyList[i]['rating'] == int(historyList[i]['rating']):
+                
+                        top_json[str(iter_)] = {
+                            "top1":1 if historyList[i]['place']==1 else 0,
+                            "top10":1 if historyList[i]['place']<=10 else 0,
+                            "top25":1 if historyList[i]['place']<=25 else 0
+                        }
+                        iter_+=1
+            else:
+                max_ = 0
+                for k in top_json.keys():
+                    max_ = max(int(k),max_)
+                length_ = len(historyList)
+                for i in range(length_):
+                    if historyList[i]['rating'] == int(historyList[i]['rating']):
+                        top_json[str(max_+1)] = {
+                            "top1":1 if historyList[i]['place']==1 else 0,
+                            "top10":1 if historyList[i]['place']<=10 else 0,
+                            "top25":1 if historyList[i]['place']<=25 else 0
+                        }
+                        max_ += 1
+            with open(f"./TopNaccuracy/TopNaccuracy.json", 'w', encoding='utf-8') as make_file:
+                    json.dump(top_json, make_file, indent="\t",ensure_ascii = False)
+               
+
+
 def returnVectorJson(filename):
     with open(f"./recipe_vector/{filename}.json","r") as f:
         vector_json = json.load(f)
@@ -11,10 +52,13 @@ def returnVectorJson(filename):
     return vector_json
 
 def UpdateUserPreferrence(InputPythonJson):
+    
     likeList = InputPythonJson['like']['like']
     historyList = InputPythonJson['like']['history']
     scrapList = InputPythonJson['like']['scrap']
     for recipebefore in historyList:
+        if recipebefore['rating'] == int(recipebefore['rating']):
+            recipebefore['rating'] += 0.1
         if recipebefore['rating'] != None and int(recipebefore['rating']) < 3:
             hate_id = recipebefore['id']
             vector_json = returnVectorJson(hate_id)
@@ -24,7 +68,10 @@ def UpdateUserPreferrence(InputPythonJson):
                 vector_json = returnVectorJson(like_id)
                 likevector = np.array(vector_json[str(like_id)])
                 if calculate_similarity_vectors(likevector,hatevector) > 0.85:
-                    likeList.remove(likerecipe)
+                    if calculate_similarity_vectors(likevector,hatevector) > 0.95 and int(likerecipe['rating'])-int(recipebefore['rating']) >= 2:
+                        likerecipe['rating'] = abs(int(likerecipe['rating'])+int(recipebefore['rating']))//2
+                    else:
+                        likeList.remove(likerecipe)
         if recipebefore['rating'] == None or int(recipebefore['rating']) >= 4:
             recipe_like_id = recipebefore['id']
             replace = False
@@ -46,6 +93,22 @@ def UpdateUserPreferrence(InputPythonJson):
                         likeList.append(recipebefore)
                 if done == False:
                     likeList.append(recipebefore)
+    
+    length_ = len(historyList)
+    if length_ > 5:
+        for i in range(length_-1):
+            for j in range(i+1,length_):
+                ca = np.array(returnVectorJson(historyList[i]['id'])[str(historyList[i]['id'])])
+                cb = np.array(returnVectorJson(historyList[j]['id'])[str(historyList[j]['id'])])
+                if calculate_similarity_vectors(ca,cb) > 0.93:
+                    historyList.remove(historyList[j])
+    length_ = len(historyList)            
+    if length_ > 100:
+        for reduce_iter in range(length_ - 100):
+            if historyList[reduce_iter] not in scrapList:
+                historyList.remove(historyList[reduce_iter])
+
+
     outputJson = {
         "id":InputPythonJson['id'],
         "like":{
@@ -56,29 +119,3 @@ def UpdateUserPreferrence(InputPythonJson):
     }
     return outputJson
 
-
-def trackTopNaccuracy(InputPythonJson):
-    likeList = InputPythonJson['like']['like']
-    historyList = InputPythonJson['like']['history']
-    with open(f"./TopNaccuracy/TopNaccuracy.json","r") as f:
-        top_json = json.load(f)
-        top_json = json.dumps(top_json,ensure_ascii = False)
-        top_json = ast.literal_eval(top_json)
-        if top_json == {}:
-            top_json['1'] = {
-                "top1":1 if historyList[-1]['place']==1 else 0,
-                "top10":1 if historyList[-1]['place']<=10 else 0,
-                "top20":1 if historyList[-1]['place']<=20 else 0
-            }
-        else:
-            max_ = 0
-            for k in top_json.keys():
-                max_ = max(int(k),max_)
-            top_json[str(max_+1)] = {
-                "top1":1 if historyList[-1]['place']==1 else 0,
-                "top10":1 if historyList[-1]['place']<=10 else 0,
-                "top20":1 if historyList[-1]['place']<=20 else 0
-            }
-        with open(f"./TopNaccuracy/TopNaccuracy.json", 'w', encoding='utf-8') as make_file:
-                json.dump(top_json, make_file, indent="\t",ensure_ascii = False)
-               

@@ -5,6 +5,7 @@ var { OAuth2Client } = require('google-auth-library');
 var crypto = require('crypto');
 var axios = require('axios');
 var User = require('../model/UserModel');
+import { UpdateUserPreference } from './Python';
 
 //redis setting
 const redis = require('redis');
@@ -39,13 +40,6 @@ export default async function Authorization(token: string, platform: string, sec
             'EX',
             expirationTime,
           );
-          let resLike = await redisHset(
-            'like',
-            authRes.userid,
-            JSON.stringify(authRes.likeRecipesId),
-            'EX',
-            expirationTime,
-          );
           let resHistory = await redisHset(
             'history',
             authRes.userid,
@@ -53,9 +47,18 @@ export default async function Authorization(token: string, platform: string, sec
             'EX',
             expirationTime,
           );
-          debugAuth(
-            token + ' redis 저장완료 EX: ' + String(expirationTime) + '(s) ' + resSet + resScrap + resLike + resHistory,
-          );
+          debugAuth(token + ' redis 저장완료 EX: ' + String(expirationTime) + '(s) ' + resSet + resScrap + resHistory);
+          let inputPy = {
+            id: [],
+            like: {
+              history: authRes.historyRecipesIdInfo,
+              like: authRes.likeRecipesIdInfo,
+              scrap: authRes.scrapRecipesIdInfo,
+            },
+          };
+          let resPython = await UpdateUserPreference(inputPy);
+          debugAuth(resPython.data);
+          User.userPreference(authRes.userid, resPython.data.scrap, resPython.data.like, resPython.data.history);
           return {
             header: { status: 201, message: 'Login Success' },
             auth: { newUser: newUser, token: token, platform: platform },
@@ -70,6 +73,7 @@ export default async function Authorization(token: string, platform: string, sec
             },
             refriger: authRes.refriger,
           };
+          // 데이터 오면 업데이트.
         } catch (err) {
           errorAuth('Error in Google Authorization');
           errorAuth(err);
@@ -109,6 +113,17 @@ export default async function Authorization(token: string, platform: string, sec
           debugAuth(
             token + ' redis 저장완료 EX: ' + String(expirationTime) + '(s) ' + resSet + resScrap + resLike + resHistory,
           );
+          let inputPy = {
+            id: [],
+            like: {
+              history: authRes.historyRecipesIdInfo,
+              like: authRes.likeRecipesIdInfo,
+              scrap: authRes.scrapRecipesIdInfo,
+            },
+          };
+          let resPython = await UpdateUserPreference(inputPy);
+          debugAuth(resPython.data);
+          User.userPreference(authRes.userid, resPython.data.scrap, resPython.data.like, resPython.data.history);
           return {
             header: { status: 201, message: 'Login Success' },
             auth: { newUser: newUser, token: token, platform: platform },

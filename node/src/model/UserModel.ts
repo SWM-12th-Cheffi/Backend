@@ -20,7 +20,7 @@ var UserSchema = new Schema(
     photo: { type: String, require: false, default: '' },
     dislikeIngredient: { type: Array, require: false },
     scrapRecipesId: { type: Array, require: false },
-    scrapRecipesIdInfo: { type: Array, require: false, default: [0] },
+    scrapRecipesIdInfo: { type: Array, require: false },
     likeRecipesId: { type: Array, require: false },
     likeRecipesIdInfo: { type: Array, require: false },
     historyRecipesId: { type: Array, require: false },
@@ -161,24 +161,22 @@ UserSchema.statics.removeScrapRecipeIdByUserid = function (userid: string, scrap
   );
 };
 
-// - 좋아요 버튼 /user/like get
-UserSchema.statics.getLikeRecipeIdByUserid = function (userid: string) {
-  return this.findOne({ userid: userid }, { _id: 0, likeRecipesId: 1, likeRecipesIdInfo: 1 });
-};
-
-// - 좋아요 버튼 /user/like put
-UserSchema.statics.addLikeRecipeIdByUserid = function (userid: string, likeRecipesIdInfo: any) {
+// - 사용자 like 목록 업데이트 /authorization
+UserSchema.statics.userPreference = function (
+  userid: string,
+  scrapRecipesIdInfo: any,
+  likeRecipesIdInfo: any,
+  historyRecipesIdInfo: any,
+) {
   return this.updateOne(
     { userid: userid },
-    { $push: { likeRecipesId: Number(likeRecipesIdInfo.id), likeRecipesIdInfo: likeRecipesIdInfo } },
-  );
-};
-
-// - 좋아요 버튼 /user/like delete
-UserSchema.statics.removeLikeRecipeIdByUserid = function (userid: string, likeRecipeId: number) {
-  return this.updateOne(
-    { userid: userid },
-    { $pull: { likeRecipesId: likeRecipeId, likeRecipesIdInfo: { id: likeRecipeId } } },
+    {
+      $set: {
+        scrapRecipesIdInfo: scrapRecipesIdInfo,
+        likeRecipesIdInfo: likeRecipesIdInfo,
+        historyRecipesIdInfo: historyRecipesIdInfo,
+      },
+    },
   );
 };
 

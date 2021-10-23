@@ -61,8 +61,18 @@ userRouter.put('/scrap', async function (req, res) {
     debugscrap(scrapRecipeIdList);
     if (scrapRecipeIdList.indexOf(addScrapRecipeData.id) != -1) {
       debugRedis('Recipe is already in');
-      res.statusMessage = 'This Recipe is Already Added';
-      res.status(400).send();
+      User.updateScrapRecipeIdByUserid(authzRes.auth?.securityId, addScrapRecipeData).then(async (result: any) => {
+        debugscrap('Mongo Result: ' + result.modifiedCount);
+        if (result.modifiedCount) {
+          debugscrap('result: ' + result);
+          res.status(201).json({ put: scrapRecipeIdList });
+        }
+        // token으로 정보를 찾을 수 없음
+        else {
+          errorscrap('Not Found In Mongo');
+          res.status(404).send();
+        }
+      });
     } else {
       debugRedis('Recipe is not in!');
       scrapRecipeIdList.push(addScrapRecipeData.id);
@@ -76,7 +86,7 @@ userRouter.put('/scrap', async function (req, res) {
         // token으로 정보를 찾을 수 없음
         else {
           errorscrap('Not Found In Mongo');
-          res.status(404).send;
+          res.status(404).send();
         }
       });
     }
@@ -164,8 +174,18 @@ userRouter.put('/history', async function (req, res) {
     debughistory(historyRecipeIdList);
     if (historyRecipeIdList.indexOf(addHistoryRecipeData.id) != -1) {
       debugRedis('Recipe is already in');
-      res.statusMessage = 'This Recipe is Already Added';
-      res.status(400).send();
+      User.updateScrapRecipeIdByUserid(authzRes.auth?.securityId, addHistoryRecipeData).then(async (result: any) => {
+        debugscrap('Mongo Result: ' + result.modifiedCount);
+        if (result.modifiedCount) {
+          debugscrap('result: ' + result);
+          res.status(201).json({ put: historyRecipeIdList });
+        }
+        // token으로 정보를 찾을 수 없음
+        else {
+          errorscrap('Not Found In Mongo');
+          res.status(404).send();
+        }
+      });
     } else {
       debugRedis('Recipe is not in!');
       historyRecipeIdList.push(addHistoryRecipeData.id);
@@ -179,7 +199,7 @@ userRouter.put('/history', async function (req, res) {
         // token으로 정보를 찾을 수 없음
         else {
           errorhistory('Not Found In Mongo');
-          res.status(404).send;
+          res.status(404).send();
         }
       });
     }

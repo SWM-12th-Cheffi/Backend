@@ -153,6 +153,14 @@ UserSchema.statics.addScrapRecipeIdByUserid = function (userid: string, scrapRec
   );
 };
 
+// - 좋아요 버튼 /user/scrap put
+UserSchema.statics.updateScrapRecipeIdByUserid = function (userid: string, scrapRecipesIdInfo: any) {
+  return this.updateOne(
+    { userid: userid, 'scrapRecipesIdInfo.id': scrapRecipesIdInfo.id },
+    { $set: { 'scrapRecipesIdInfo.$': scrapRecipesIdInfo } },
+  );
+};
+
 // - 좋아요 버튼 /user/scrap delete
 UserSchema.statics.removeScrapRecipeIdByUserid = function (userid: string, scrapRecipeId: number) {
   return this.updateOne(
@@ -190,6 +198,14 @@ UserSchema.statics.addHistoryRecipeIdByUserid = function (userid: string, histor
   return this.updateOne(
     { userid: userid },
     { $push: { historyRecipesId: Number(historyRecipesIdInfo.id), historyRecipesIdInfo: historyRecipesIdInfo } },
+  );
+};
+
+// - 좋아요 버튼 /user/scrap put
+UserSchema.statics.updateHistoryRecipeIdByUserid = function (userid: string, historyRecipesIdInfo: any) {
+  return this.updateOne(
+    { userid: userid, 'historyRecipesIdInfo.id': historyRecipesIdInfo.id },
+    { $set: { 'historyRecipesIdInfo.$': historyRecipesIdInfo } },
   );
 };
 

@@ -625,6 +625,137 @@ var swaggerJson = {
       },
     },
 
+    '/recipe/info-list': {
+      get: {
+        tags: ['Recipe'],
+        summary: '요청한 id에 해당하는 레시피 데이터 배열 반환',
+        description: '입력한 ids 배열에 맞추어 레시피 데이터를 반환합니다.',
+        consumes: 'application/json',
+        produces: 'application/json',
+        parameters: [
+          {
+            in: 'header',
+            name: 'Authorization',
+            description: '인증 방식과 토큰을 입력해주세요.',
+            required: false,
+            schema: {
+              type: 'string',
+              example: 'Bearer TOTOTOTOOTOTTOOKENENEKENKENKENE',
+            },
+          },
+          {
+            in: 'header',
+            name: 'Platform',
+            description: '인증 플랫폼을 입력해주세요.',
+            required: false,
+            schema: {
+              type: 'string',
+              enum: ['kakao', 'google'],
+            },
+          },
+          {
+            in: 'query',
+            name: 'ids',
+            description: '원하는 레시피 번호를 입력해주세요.',
+            required: true,
+            schema: {
+              type: 'string',
+              example: '1234,2345,3456,4567,5678,1234,2345,3456,4567,5768,2345,3456,4567',
+            },
+          },
+          {
+            in: 'query',
+            name: 'page',
+            description: '원하는 페이지를 입력해주세요. pagination 기능이 있습니다',
+            required: true,
+            schema: {
+              type: 'integer',
+              format: 'int32',
+              example: 1,
+            },
+          },
+          {
+            in: 'query',
+            name: 'step',
+            description: '한번에 보길 원하는 레시피의 개수를 입력해주세요.',
+            required: true,
+            schema: {
+              type: 'integer',
+              format: 'int32',
+              example: 4,
+            },
+          },
+        ],
+        responses: {
+          '200': {
+            description: 'Success',
+            schema: {
+              type: 'object',
+              properties: {
+                recipe: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      size: {
+                        type: 'string',
+                        example: 'asdf',
+                      },
+                      difficulty: {
+                        type: 'string',
+                        example: '',
+                      },
+                      ingredient: {
+                        type: 'array',
+                        items: {
+                          type: 'string',
+                        },
+                      },
+                      _id: {
+                        type: 'string',
+                        example: '1484bddf0f21d67096d7f43',
+                      },
+                      recipeid: {
+                        type: 'integer',
+                        format: 'int32',
+                        example: 5980,
+                      },
+                      title: {
+                        type: 'string',
+                        example: '단호박 스프',
+                      },
+                      scrap: {
+                        type: 'integer',
+                        format: 'int32',
+                        example: 42,
+                      },
+                      time: {
+                        type: 'string',
+                        example: '30분',
+                      },
+                      calories: {
+                        type: 'string',
+                        example: 'asdf',
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          '401': {
+            description: 'Authorization Error',
+          },
+          '404': {
+            description: 'Data not Found',
+          },
+          '500': {
+            description: 'Mongo Error',
+          },
+        },
+      },
+    },
+
     '/recipe/random-list': {
       get: {
         tags: ['Recipe'],

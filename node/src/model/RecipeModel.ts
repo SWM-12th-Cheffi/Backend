@@ -38,7 +38,7 @@ RecipeSchema.statics.getRandomRecipe = function (num: number) {
 };
 
 // 입력받은 레시피 번호 배열로 각 레시피 정보를 받아옴. /recipe/list
-RecipeSchema.statics.getListPossiRP = function (num: number[]) {
+RecipeSchema.statics.getListRecipeInfo = function (num: number[]) {
   return this.find(
     {
       $or: num.map((x) => {

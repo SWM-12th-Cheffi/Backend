@@ -63,15 +63,8 @@ userRouter.put('/scrap', async function (req, res) {
       debugRedis('Recipe is already in');
       User.updateScrapRecipeIdByUserid(authzRes.auth?.securityId, addScrapRecipeData).then(async (result: any) => {
         debugscrap('Mongo Result: ' + result.modifiedCount);
-        if (result.modifiedCount) {
-          debugscrap('result: ' + result);
-          res.status(201).json({ put: scrapRecipeIdList });
-        }
-        // token으로 정보를 찾을 수 없음
-        else {
-          errorscrap('Not Found In Mongo');
-          res.status(404).send();
-        }
+        debugscrap('result: ' + result);
+        res.status(201).json({ put: scrapRecipeIdList });
       });
     } else {
       debugRedis('Recipe is not in!');
@@ -176,15 +169,8 @@ userRouter.put('/history', async function (req, res) {
       debugRedis('Recipe is already in');
       User.updateScrapRecipeIdByUserid(authzRes.auth?.securityId, addHistoryRecipeData).then(async (result: any) => {
         debugscrap('Mongo Result: ' + result.modifiedCount);
-        if (result.modifiedCount) {
-          debugscrap('result: ' + result);
-          res.status(201).json({ put: historyRecipeIdList });
-        }
-        // token으로 정보를 찾을 수 없음
-        else {
-          errorscrap('Not Found In Mongo');
-          res.status(404).send();
-        }
+        debugscrap('result: ' + result);
+        res.status(201).json({ put: historyRecipeIdList });
       });
     } else {
       debugRedis('Recipe is not in!');

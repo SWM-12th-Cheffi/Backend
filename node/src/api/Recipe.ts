@@ -5,6 +5,8 @@ const debugList = require('debug')('cheffi:list');
 const errorList = require('debug')('cheffi:list:error');
 const debuginfo = require('debug')('cheffi:info');
 const errorinfo = require('debug')('cheffi:info:error');
+const debuginfolist = require('debug')('cheffi:infolist');
+const errorinfolist = require('debug')('cheffi:infolist:error');
 const debugrandomlist = require('debug')('cheffi:randomlist');
 const errorrandomlist = require('debug')('cheffi:randomlist:error');
 
@@ -12,7 +14,8 @@ import * as express from 'express';
 import { SortByRecc } from '../function/Python';
 import { IngredElementOfInput, ListOfPossiRP, NumberOfPossiRP } from '../function/Neo4j';
 import Authz from '../function/Authorization';
-import { RefrigerToIngredientList } from '../function/RecipeFunction';
+import { Pagination, RefrigerToIngredientList, SortRecipeInfoByOrder } from '../function/RecipeFunction';
+import e = require('express');
 
 const recipeRouter = express.Router();
 
@@ -84,7 +87,6 @@ recipeRouter.get('/list', async function (req, res) {
           if (listRecipeid.length != 0) {
             // 만들 수 있는 레시피가 있을 때
             //reccRecipeList = listRecipeid.map(Number);
-
             reccReturnObject = await SortByRecc({
               id: listRecipeid,
               like: {
@@ -95,39 +97,18 @@ recipeRouter.get('/list', async function (req, res) {
             });
             debugList(reccReturnObject.data);
             reccRecipeList = reccReturnObject.data.map(Number);
-            Recipe.getListPossiRP(reccRecipeList)
+            Recipe.getListRecipeInfo(reccRecipeList)
               .then(async (resMon: any) => {
-                let resMonObjectbyRecc: any = {};
-                for (let i in resMon) {
-                  resMonObjectbyRecc[resMon[i].recipeid] = resMon[i];
-                }
-                let resMonListbyRecc = [];
-                for (let i in reccRecipeList) {
-                  resMonListbyRecc.push(resMonObjectbyRecc[reccRecipeList[i]]);
-                }
+                let sortedRecipeInfo: any[] = SortRecipeInfoByOrder(resMon, reccRecipeList);
                 let resRedis = await redisHset(
                   'userRecipeList',
                   authzRes.auth?.securityId,
-                  JSON.stringify(resMonListbyRecc),
+                  JSON.stringify(sortedRecipeInfo),
                 );
                 debugRedis('redis: ' + resRedis);
-                let maxPage: number = parseInt(String(resMon.length / step));
-                if (resMon.length % step != 0) maxPage += 1; // maxPage를 계산하는 부분
-                if (nowPage > maxPage) {
-                  // maxPage를 nowPage가 넘으면 안됨
-                  errorList('max Page: ' + maxPage + ', request Page: ' + nowPage);
-                  res.statusMessage = 'max Page: ' + maxPage;
-                  res.status(400).send();
-                } else {
-                  let returnStructure: object = {
-                    recipe: resMonListbyRecc.slice((nowPage - 1) * step, nowPage * step),
-                    //recipe: resMon.slice((nowPage - 1) * step, nowPage * step),
-                    maxPage: maxPage,
-                  };
-                  debugList('Result: ' + returnStructure);
-                  res.statusMessage = 'Save Refriger Data In Mongo';
-                  res.status(201).json(returnStructure);
-                }
+                let sendData: any = Pagination(sortedRecipeInfo, step, nowPage);
+                res.statusMessage = sendData.statusMessage;
+                res.status(sendData.statusCode).json(sendData.return);
               })
               .catch((err: any) => {
                 errorList('Mongo Error: ' + err);
@@ -155,22 +136,10 @@ recipeRouter.get('/list', async function (req, res) {
     } else {
       // nowPage가 1이 아닐 때, 저장된 Redis 레시피 데이터를 출력함
       let resRedis = await redisHget('userRecipeList', authzRes.auth?.securityId);
-      resRedis = JSON.parse(resRedis);
-      let maxPage: number = parseInt(String(resRedis.length / step));
-      if (resRedis.length % step != 0) maxPage += 1;
-      if (nowPage > maxPage) {
-        errorList('max Page: ' + maxPage + ', request Page: ' + nowPage);
-        res.statusMessage = 'max Page: ' + maxPage;
-        res.status(400).send();
-      } else {
-        let returnStructure: object = {
-          recipe: resRedis.slice((nowPage - 1) * step, nowPage * step),
-          maxPage: maxPage,
-        };
-        debugList('Result: ' + JSON.stringify(returnStructure));
-        res.statusMessage = 'Load Recipe In Redis';
-        res.status(201).json(returnStructure);
-      }
+      let sortedRecipeInfo = JSON.parse(resRedis);
+      let sendData: any = Pagination(sortedRecipeInfo, step, nowPage);
+      res.statusMessage = sendData.statusMessage;
+      res.status(sendData.statusCode).json(sendData.return);
     }
   } else {
     // 인증 실패
@@ -206,6 +175,44 @@ recipeRouter.get('/info', async function (req, res) {
       });
   else {
     errorinfo(authzRes.header.message);
+    res.statusMessage = authzRes.header.message;
+    res.status(authzRes.header.status).send();
+  }
+});
+
+// 레시피의 정보를 mongo에서 반환하는 기능
+recipeRouter.get('/info-list', async function (req, res) {
+  debuginfolist('/info-list Api Called');
+  let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
+  let authorizationPlatform: string = String(req.headers['platform']);
+  const authzRes = await Authz(authorizationToken, authorizationPlatform, 0);
+  if (authzRes.header.status == 200) {
+    let ids: number[] = String(req.query.ids).split(',').map(Number);
+    let step: number = Number(req.query.step);
+    let page: number = Number(req.query.page);
+    debuginfolist('Step: ' + String(step) + ' Page: ' + String(page) + ' RecipeIds: ' + String(ids));
+    let maxPage: number = parseInt(String(ids.length / step));
+    if (ids.length % step != 0) maxPage += 1; // maxPage를 계산하는 부분
+    if (page > maxPage) {
+      // maxPage를 nowPage가 넘으면 안됨
+      errorinfolist('max Page: ' + maxPage + ', request Page: ' + page);
+      res.statusMessage = 'max Page: ' + maxPage;
+      res.status(400).json({});
+    } else {
+      let slicedIds: number[] = ids.slice((page - 1) * step, page * step);
+      Recipe.getListRecipeInfo(slicedIds)
+        .then(async (resMon: any) => {
+          let sortedRecipeInfo: any[] = SortRecipeInfoByOrder(resMon, slicedIds);
+          res.statusMessage = 'Success';
+          res.status(200).json(sortedRecipeInfo);
+        })
+        .catch((err: any) => {
+          errorList('Mongo Error: ' + err);
+          res.status(500).send(err);
+        });
+    }
+  } else {
+    errorinfolist(authzRes.header.message);
     res.statusMessage = authzRes.header.message;
     res.status(authzRes.header.status).send();
   }

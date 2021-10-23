@@ -20,15 +20,11 @@ export function GetReccIngred(ingredientList: string[]) {
   let reccIngredList: any = [];
   let num = 0;
   for (let i in count) {
+    // each object index
     for (let j in count[i]) {
-      if (num >= 20) break;
-      if (j in ingredientList) {
-        console.log(j + ' is in');
-      } else {
-        reccIngredList.push({ name: j, category: count[i][j].category });
-        num = num + 1;
-      }
+      if (num >= 20) return reccIngredList;
+      if (!ingredientList.includes(j)) reccIngredList.push({ name: j, category: count[i][j].category });
+      num = num + 1;
     }
   }
-  return reccIngredList;
 }

@@ -283,25 +283,39 @@ userRouter.get('/info', async function (req, res) {
 userRouter.put('/info', async function (req, res) {
   debuginfo('/info put Api Called');
   debuginfo('data: ' + req.body.data);
+  let isContinue: boolean = true;
   let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
   let authorizationPlatform: string = String(req.headers['platform']);
   const authzRes = await Authz(authorizationToken, authorizationPlatform, 2);
-  if (authzRes.header.status == 200)
-    User.initInfoByUserid(authzRes.auth?.securityId, req.body.data).then((result: any) => {
-      // 정상적으로 작업을 마침
-      if (result.matchedCount) {
-        debuginfo('Save Successed');
-        res.statusMessage = 'Save Successed';
-        res.status(201).send();
+  if (authzRes.header.status == 200) {
+    let userField: string[] = ['recipeCount', 'nickname', 'statusMessage', 'photo', 'dislikeIngredient'];
+    let keys: string[] = Object.keys(req.body.data);
+    debuginfo(keys);
+    for (let i in keys) {
+      if (userField.indexOf(keys[i]) == -1) {
+        errorinfo('not in ' + keys[i]);
+        isContinue = false;
+        res.status(400).json({ notAllowDataField: keys[i] });
+        break;
       }
-      // id로 정보를 찾을 수 없음
-      else {
-        errorinfo('Not found');
-        res.statusMessage = 'Cannot Find User';
-        res.status(404).send();
-      }
-    });
-  else {
+    }
+    if (isContinue)
+      User.initInfoByUserid(authzRes.auth?.securityId, req.body.data).then((result: any) => {
+        // 정상적으로 작업을 마침
+        if (result.matchedCount) {
+          debuginfo('Save Successed');
+          res.statusMessage = 'Save Successed';
+          res.status(201).send();
+        }
+        // id로 정보를 찾을 수 없음
+        else {
+          errorinfo('Not found');
+          errorinfo(result);
+          res.statusMessage = 'Cannot Find User';
+          res.status(404).send();
+        }
+      });
+  } else {
     errorinfo(authzRes.header.message);
     errorinfo(JSON.stringify(req.body.data));
     res.statusMessage = authzRes.header.message;

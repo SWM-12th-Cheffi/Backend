@@ -25,8 +25,10 @@ export function GetReccIngred(ingredientList: string[]) {
     // each object index
     for (let j in count[i]) {
       if (num >= 20) return reccIngredList;
-      if (!ingredientList.includes(j)) reccIngredList.push({ name: j, category: count[i][j].category });
-      num = num + 1;
+      if (!ingredientList.includes(j)) {
+        reccIngredList.push({ name: j, category: count[i][j].category });
+        num = num + 1;
+      }
     }
   }
 }

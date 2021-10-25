@@ -198,6 +198,9 @@ var swaggerJson = {
               },
             },
           },
+          '206': {
+            description: '로그인은 되었지만 서버에서 문제가 발생했습니다..',
+          },
           '401': {
             description: '잘못된 입력입니다.',
           },
@@ -954,6 +957,65 @@ var swaggerJson = {
           },
           '500': {
             description: 'Mongo Error',
+          },
+        },
+      },
+    },
+
+    '/user/preference': {
+      put: {
+        tags: ['Info'],
+        summary: 'python Preference-update 함수 호출',
+        description: '추천시스템의 api중 하나인 선호도 업데이트 기능을 실행',
+        consumes: 'application/json',
+        produces: 'application/json',
+        parameters: [
+          {
+            in: 'header',
+            name: 'Authorization',
+            description: '인증 방식과 토큰을 입력해주세요.',
+            required: true,
+            schema: {
+              type: 'string',
+              example: 'Bearer TOTOTOTOOTOTTOOKENENEKENKENKENE',
+            },
+          },
+          {
+            in: 'header',
+            name: 'Platform',
+            description: '인증 플랫폼을 입력해주세요.',
+            required: true,
+            schema: {
+              type: 'string',
+              enum: ['kakao', 'google'],
+            },
+          },
+        ],
+        responses: {
+          '200': {
+            description: 'Python Update Success',
+            schema: {
+              type: 'object',
+              properties: {
+                ingredient: {
+                  type: 'array',
+                  items: {
+                    type: 'object',
+                    properties: {
+                      name: {
+                        type: 'string',
+                      },
+                      category: {
+                        type: 'string',
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+          '500': {
+            description: 'Python Error',
           },
         },
       },

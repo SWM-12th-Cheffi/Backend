@@ -1137,9 +1137,8 @@ var swaggerJson = {
       },
       put: {
         tags: ['Info'],
-        summary: '사용자 정보 초기 설정',
-        description:
-          'Authorization 2 \n 전송 방식: Post \n Input: Header(Token, Platform), Body(data) \n Output: status, info, message',
+        summary: '사용자 정보 설정',
+        description: '사용자 정보의 원하는 field를 업데이트 할 수 있음.',
         consumes: 'application/json',
         produces: 'application/json',
         parameters: [
@@ -1176,15 +1175,19 @@ var swaggerJson = {
                   properties: {
                     nickname: {
                       type: 'string',
-                      exampel: 'exampleNickname',
+                      example: 'nickname example',
+                    },
+                    statusMessage: {
+                      type: 'string',
+                      example: 'statusmessage example',
                     },
                     dislikeIngredient: {
                       type: 'array',
                       items: ['ingre', 'ingre'],
                     },
-                    likeRecipesId: {
-                      type: 'array',
-                      items: [5980, 5989],
+                    photo: {
+                      type: 'string',
+                      example: 'qqwer,qwerqwe,r',
                     },
                   },
                 },
@@ -1196,11 +1199,15 @@ var swaggerJson = {
           '201': {
             description: 'Save Successed',
           },
+          '400': {
+            description:
+              '바꿀 수 없는 필드나 없는 필드가 포함되어있음. json으로 바꿀 수 없는 필드로 판단된 이름을 처음 1개만 반환합니다.',
+          },
           '401': {
             description: 'Authorization Error',
           },
           '404': {
-            description: 'Data not Found',
+            description: '사용자를 찾을 수 없음',
           },
           '500': {
             description: 'Mongo Error',

@@ -288,7 +288,7 @@ userRouter.put('/info', async function (req, res) {
   let authorizationPlatform: string = String(req.headers['platform']);
   const authzRes = await Authz(authorizationToken, authorizationPlatform, 2);
   if (authzRes.header.status == 200) {
-    let userField: string[] = ['recipeCount', 'nickname', 'statusMessage', 'photo', 'dislikeIngredient'];
+    let userField: string[] = ['nickname', 'statusMessage', 'photo', 'dislikeIngredient'];
     let keys: string[] = Object.keys(req.body.data);
     debuginfo(keys);
     for (let i in keys) {

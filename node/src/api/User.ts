@@ -5,6 +5,7 @@ import { GetReccIngred, RefrigerToIngredientList } from '../function/RecipeFunct
 const userRouter = express.Router();
 var User = require('../model/UserModel');
 import Authz from '../function/Authorization';
+import { UpdateUserPreference } from '../function/Python';
 
 const debugRedis = require('debug')('cheffi:redis');
 const debugscrap = require('debug')('cheffi:scrap');
@@ -17,6 +18,8 @@ const debugrefriger = require('debug')('cheffi:refriger');
 const errorrefriger = require('debug')('cheffi:refriger:error');
 const debugingre = require('debug')('cheffi:ingre');
 const erroringre = require('debug')('cheffi:ingre:error');
+const debugPreference = require('debug')('cheffi:preference');
+const errorPreference = require('debug')('cheffi:preference:error');
 
 //redis setting
 const redis = require('redis');
@@ -430,6 +433,36 @@ userRouter.post('/ingre-recc', async function (req, res) {
     erroringre(authzRes.header.message);
     res.statusMessage = authzRes.header.message;
     res.status(authzRes.header.status).send();
+  }
+});
+
+userRouter.put('/preference', async function (req, res) {
+  let authorizationToken: string = String(req.headers['authorization']).split(' ')[1];
+  let authorizationPlatform: string = String(req.headers['platform']);
+  const authzRes = await Authz(authorizationToken, authorizationPlatform, 0);
+  if (authzRes.header.status == 200) {
+    User.getInfoByUserid(authzRes.auth?.securityId).then(async (resMongo: any) => {
+      try {
+        let inputPy = {
+          id: [],
+          like: {
+            history: authzRes.historyRecipesIdInfo,
+            like: authzRes.likeRecipesIdInfo,
+            scrap: authzRes.scrapRecipesIdInfo,
+          },
+        };
+        let resPython = await UpdateUserPreference(inputPy);
+        debugPreference(resPython.data);
+        User.userPreference(authzRes.userid, resPython.data.scrap, resPython.data.like, resPython.data.history);
+        res.statusMessage = 'User Preference Update Success';
+        res.status(200).send();
+      } catch (err) {
+        errorPreference('Error In Python');
+        errorPreference(err);
+        res.statusMessage = 'Error in Python';
+        res.status(500).send(err);
+      }
+    });
   }
 });
 

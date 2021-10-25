@@ -104,13 +104,11 @@ UserSchema.statics.createInfo = function (payload: any) {
 
 // - 초기설정 /user/info put
 UserSchema.statics.initInfoByUserid = function (securityId: String, reqData: any) {
+  console.log(reqData);
   return this.updateOne(
     { userid: securityId },
     {
-      nickname: reqData.nickname,
-      dislikeIngredient: reqData.dislike,
-      likeRecipesId: reqData.like,
-      photo: reqData.photo,
+      $set: reqData,
     },
   );
 };

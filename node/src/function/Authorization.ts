@@ -23,6 +23,8 @@ export default async function Authorization(token: string, platform: string, sec
   switch (security) {
     case -1: // For Login
       let newUser: boolean = false;
+      let isAuthz: boolean = false;
+      let returnStructure: any = {};
       if (platform && platform == 'google') {
         try {
           const authRes = await verify_google(token, true);
@@ -47,19 +49,9 @@ export default async function Authorization(token: string, platform: string, sec
             'EX',
             expirationTime,
           );
+          if (resSet == 'OK') isAuthz = true;
           debugAuth(token + ' redis 저장완료 EX: ' + String(expirationTime) + '(s) ' + resSet + resScrap + resHistory);
-          let inputPy = {
-            id: [],
-            like: {
-              history: authRes.historyRecipesIdInfo,
-              like: authRes.likeRecipesIdInfo,
-              scrap: authRes.scrapRecipesIdInfo,
-            },
-          };
-          let resPython = await UpdateUserPreference(inputPy);
-          debugAuth(resPython.data);
-          User.userPreference(authRes.userid, resPython.data.scrap, resPython.data.like, resPython.data.history);
-          return {
+          returnStructure = {
             header: { status: 201, message: 'Login Success' },
             auth: { newUser: newUser, token: token, platform: platform },
             info: {
@@ -73,11 +65,33 @@ export default async function Authorization(token: string, platform: string, sec
             },
             refriger: authRes.refriger,
           };
+          let inputPy = {
+            id: [],
+            like: {
+              history: authRes.historyRecipesIdInfo,
+              like: authRes.likeRecipesIdInfo,
+              scrap: authRes.scrapRecipesIdInfo,
+            },
+          };
+          let resPython = await UpdateUserPreference(inputPy);
+          debugAuth(resPython.data);
+          User.userPreference(authRes.userid, resPython.data.scrap, resPython.data.like, resPython.data.history);
+          return returnStructure;
           // 데이터 오면 업데이트.
         } catch (err) {
-          errorAuth('Error in Google Authorization');
-          errorAuth(err);
-          return { header: { status: 401, message: 'Token Error' }, auth: {} };
+          if (isAuthz) {
+            // python error
+            errorAuth('Python Error in Google Authorization');
+            errorAuth(err);
+            returnStructure.header.status = 206;
+            returnStructure.header.message = '로그인은 되었지만 파이썬 에러, 서버문제';
+            return returnStructure;
+          } else {
+            errorAuth('Error in Google Authorization');
+            errorAuth(err);
+            returnStructure = { header: { status: 401, message: 'Token Error' }, auth: {} };
+            return returnStructure;
+          }
         }
       } else if (platform && platform == 'kakao') {
         try {
@@ -96,13 +110,6 @@ export default async function Authorization(token: string, platform: string, sec
             'EX',
             expirationTime,
           );
-          let resLike = await redisHset(
-            'like',
-            authRes.userid,
-            JSON.stringify(authRes.likeRecipesId),
-            'EX',
-            expirationTime,
-          );
           let resHistory = await redisHset(
             'history',
             authRes.userid,
@@ -110,21 +117,9 @@ export default async function Authorization(token: string, platform: string, sec
             'EX',
             expirationTime,
           );
-          debugAuth(
-            token + ' redis 저장완료 EX: ' + String(expirationTime) + '(s) ' + resSet + resScrap + resLike + resHistory,
-          );
-          let inputPy = {
-            id: [],
-            like: {
-              history: authRes.historyRecipesIdInfo,
-              like: authRes.likeRecipesIdInfo,
-              scrap: authRes.scrapRecipesIdInfo,
-            },
-          };
-          let resPython = await UpdateUserPreference(inputPy);
-          debugAuth(resPython.data);
-          User.userPreference(authRes.userid, resPython.data.scrap, resPython.data.like, resPython.data.history);
-          return {
+          if (resSet == 'OK') isAuthz = true;
+          debugAuth(token + ' redis 저장완료 EX: ' + String(expirationTime) + '(s) ' + resSet + resScrap + resHistory);
+          returnStructure = {
             header: { status: 201, message: 'Login Success' },
             auth: { newUser: newUser, token: token, platform: platform },
             info: {
@@ -138,10 +133,32 @@ export default async function Authorization(token: string, platform: string, sec
             },
             refriger: authRes.refriger,
           };
+          let inputPy = {
+            id: [],
+            like: {
+              history: authRes.historyRecipesIdInfo,
+              like: authRes.likeRecipesIdInfo,
+              scrap: authRes.scrapRecipesIdInfo,
+            },
+          };
+          let resPython = await UpdateUserPreference(inputPy);
+          debugAuth(resPython.data);
+          User.userPreference(authRes.userid, resPython.data.scrap, resPython.data.like, resPython.data.history);
+          return returnStructure;
         } catch (err) {
-          errorAuth('Error in Kakao Authorization');
-          errorAuth(err);
-          return { header: { status: 401, message: 'Token Error' }, auth: {} };
+          if (isAuthz) {
+            // python error
+            errorAuth('Python Error in Google Authorization');
+            errorAuth(err);
+            returnStructure.header.status = 206;
+            returnStructure.header.message = 'Login Success, But Python Error';
+            return returnStructure;
+          } else {
+            errorAuth('Error in Google Authorization');
+            errorAuth(err);
+            returnStructure = { header: { status: 401, message: 'Token Error' }, auth: {} };
+            return returnStructure;
+          }
         }
       } else {
         errorAuth('Incorrect platform Property');

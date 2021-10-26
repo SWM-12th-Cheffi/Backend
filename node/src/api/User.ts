@@ -460,9 +460,9 @@ userRouter.put('/preference', async function (req, res) {
         let inputPy = {
           id: [],
           like: {
-            history: authzRes.historyRecipesIdInfo,
-            like: authzRes.likeRecipesIdInfo,
-            scrap: authzRes.scrapRecipesIdInfo,
+            history: resMongo.historyRecipesIdInfo,
+            like: resMongo.likeRecipesIdInfo,
+            scrap: resMongo.scrapRecipesIdInfo,
           },
         };
         let resPython = await UpdateUserPreference(inputPy);

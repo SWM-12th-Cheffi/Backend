@@ -63,13 +63,13 @@ export async function ListOfPossiRP(ingreData: string[]) {
   let query: string =
     'MATCH (r:Recipe)<-[:USEDIN]-(i:Ingredient) WITH r, COLLECT(i.name) AS ingredient_col WHERE ALL(ing IN ingredient_col WHERE ing IN [' +
     CoverWithQuotation(ingreData) +
-    ']) RETURN COLLECT(r.id) AS recipe';
+    ']) RETURN COLLECT(toString(r.id)) AS recipe';
   return session
     .readTransaction(function (tx: any) {
       return tx.run(query);
     })
     .then(async function (resNeo: any) {
-      let listOfRecipeid: string[] = resNeo.records[0].get('recipe');
+      let listOfRecipeid: number[] = resNeo.records[0].get('recipe');
       debugneo4j('Func ListOfPossiRP Return');
       session.close();
       return listOfRecipeid;

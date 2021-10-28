@@ -148,13 +148,80 @@ export default async function Authorization(token: string, platform: string, sec
         } catch (err) {
           if (isAuthz) {
             // python error
-            errorAuth('Python Error in Google Authorization');
+            errorAuth('Python Error in Kakao Authorization');
             errorAuth(err);
             returnStructure.header.status = 206;
             returnStructure.header.message = 'Login Success, But Python Error';
             return returnStructure;
           } else {
-            errorAuth('Error in Google Authorization');
+            errorAuth('Error in Kakao Authorization');
+            errorAuth(err);
+            returnStructure = { header: { status: 401, message: 'Token Error' }, auth: {} };
+            return returnStructure;
+          }
+        }
+      } else if (platform && platform == 'apple') {
+        try {
+          const authRes = await verify_apple(token, true);
+          if (Object.entries(authRes).length == 6) newUser = true;
+          else if (Object.entries(authRes).length == 7) newUser = false;
+          else {
+            errorAuth('Mongo Error-2');
+            return { header: { status: 500, message: 'Mongo Error-2' }, auth: {} };
+          }
+          let resSet = await redisSet(token, authRes.userid, 'EX', expirationTime);
+          let resScrap = await redisHset(
+            'scrap',
+            authRes.userid,
+            JSON.stringify(authRes.scrapRecipesId),
+            'EX',
+            expirationTime,
+          );
+          let resHistory = await redisHset(
+            'history',
+            authRes.userid,
+            JSON.stringify(authRes.historyRecipesId),
+            'EX',
+            expirationTime,
+          );
+          if (resSet == 'OK') isAuthz = true;
+          debugAuth(token + ' redis 저장완료 EX: ' + String(expirationTime) + '(s) ' + resSet + resScrap + resHistory);
+          returnStructure = {
+            header: { status: 201, message: 'Login Success' },
+            auth: { newUser: newUser, token: token, platform: platform },
+            info: {
+              recipeCount: authRes.recipeCount,
+              nickname: authRes.nickname,
+              photo: authRes.photo,
+              dislikeIngredient: authRes.dislikeIngredient,
+              scrapRecipesId: authRes.scrapRecipesId,
+              likeRecipesId: authRes.likeRecipesId,
+              historyRecipesId: authRes.historyRecipesId,
+            },
+            refriger: authRes.refriger,
+          };
+          let inputPy = {
+            id: [],
+            like: {
+              history: authRes.historyRecipesIdInfo,
+              like: authRes.likeRecipesIdInfo,
+              scrap: authRes.scrapRecipesIdInfo,
+            },
+          };
+          let resPython = await UpdateUserPreference(inputPy);
+          debugAuth(resPython.data);
+          User.userPreference(authRes.userid, resPython.data.scrap, resPython.data.like, resPython.data.history);
+          return returnStructure;
+        } catch (err) {
+          if (isAuthz) {
+            // python error
+            errorAuth('Python Error in Apple Authorization');
+            errorAuth(err);
+            returnStructure.header.status = 206;
+            returnStructure.header.message = 'Login Success, But Python Error';
+            return returnStructure;
+          } else {
+            errorAuth('Error in Apple Authorization');
             errorAuth(err);
             returnStructure = { header: { status: 401, message: 'Token Error' }, auth: {} };
             return returnStructure;
@@ -168,7 +235,7 @@ export default async function Authorization(token: string, platform: string, sec
       debugAuth('Access Success');
       return { header: { status: 200, message: 'Access Success' } };
     case 1: // Have Already Authorized token
-      if (platform && (platform == 'google' || platform == 'kakao')) {
+      if (platform && (platform == 'google' || platform == 'kakao' || platform == 'apple')) {
         let resRedis = await redisGet(token);
         debugAuth('Redis: ' + resRedis);
         if (!resRedis) {
@@ -204,6 +271,16 @@ export default async function Authorization(token: string, platform: string, sec
       } else if (platform && platform == 'kakao') {
         try {
           const authRes = await verify_kakao(token, false);
+          if (!authRes) throw { response: { status: 404, statusText: "Cant' find Data" } }; // mongo에 데이터가 없을 때
+          debugAuth('Access Success');
+          return { header: { status: 200, message: 'Access Success' }, auth: { securityId: String(authRes.userid) } };
+        } catch (err: any) {
+          errorAuth(err.response.statusText);
+          return { header: { status: err.response.status, message: err.response.statusText } };
+        }
+      } else if (platform && platform == 'apple') {
+        try {
+          const authRes = await verify_apple(token, false);
           if (!authRes) throw { response: { status: 404, statusText: "Cant' find Data" } }; // mongo에 데이터가 없을 때
           debugAuth('Access Success');
           return { header: { status: 200, message: 'Access Success' }, auth: { securityId: String(authRes.userid) } };
@@ -257,6 +334,24 @@ async function verify_kakao(token: string, init: boolean) {
   if (init) {
     // 처음 로그인할 때
     let Userinfo = { userid: userid, platform: 'Kakao', token: securityTk };
+    return User.getInfoByUserid(userid).then((result: object) => {
+      if (!result) return User.createInfo(Userinfo);
+      else return User.updateTokenByUserid(userid, securityTk);
+    });
+  } else {
+    // 이후 권한 확인할 때
+    return User.getInfoByUserid(userid);
+  }
+}
+
+async function verify_apple(token: string, init: boolean) {
+  let userid = token;
+  userid = crypto.createHash('sha512').update(String(userid)).digest('base64');
+  let securityTk = crypto.createHash('sha512').update(String(token)).digest('base64');
+  debugAuth('Apple UserId: ' + userid);
+  if (init) {
+    // 처음 로그인할 때
+    let Userinfo = { userid: userid, platform: 'Apple', token: securityTk };
     return User.getInfoByUserid(userid).then((result: object) => {
       if (!result) return User.createInfo(Userinfo);
       else return User.updateTokenByUserid(userid, securityTk);

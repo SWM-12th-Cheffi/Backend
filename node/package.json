@@ -20,7 +20,8 @@
   "dependencies": {
     "@types/express": "^4.17.13",
     "@types/node": "^16.4.3",
-    "axios": "^0.21.1",
+    "apple-sign-in-rest": "^1.0.3",
+    "axios": "^0.21.4",
     "body-parser": "^1.19.0",
     "console-stamp": "^3.0.3",
     "debug": "^4.3.2",

@@ -6,6 +6,7 @@ var crypto = require('crypto');
 var axios = require('axios');
 var User = require('../model/UserModel');
 import { UpdateUserPreference } from './Python';
+import { AppleSignIn } from 'apple-sign-in-rest';
 
 //redis setting
 const redis = require('redis');
@@ -344,8 +345,18 @@ async function verify_kakao(token: string, init: boolean) {
   }
 }
 
+const appleSignIn = new AppleSignIn({
+  clientId: 'org.reactjs.native.example.Cheffi-frontend',
+  teamId: '77Z6LL52FP',
+  keyIdentifier: '6D7H2MDQP6',
+  privateKey:
+    '-----BEGIN PRIVATE KEY-----\nMIGTAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBHkwdwIBAQQgLbyR6BabVx9zHifS\nB++tcqIALZtPTNNAeHb49MCwmyGgCgYIKoZIzj0DAQehRANCAAQkS948Wdg67SH4\nAylipQIk5rs0QyT70BIh7kPu/LrDvoOuRy09RUUOz74liwWp0HY1DT5tFLo4dJct\npOtAzBcD\n-----END PRIVATE KEY-----',
+});
+
 async function verify_apple(token: string, init: boolean) {
-  let userid = token;
+  console.log('asdfasdf');
+  const claim = await appleSignIn.verifyIdToken(token, {});
+  let userid = claim.sub;
   userid = crypto.createHash('sha512').update(String(userid)).digest('base64');
   let securityTk = crypto.createHash('sha512').update(String(token)).digest('base64');
   debugAuth('Apple UserId: ' + userid);

@@ -84,7 +84,7 @@ export default async function Authorization(token: string, platform: string, sec
             errorAuth('Python Error in Google Authorization');
             errorAuth(err);
             returnStructure.header.status = 206;
-            returnStructure.header.message = '로그인은 되었지만 파이썬 에러, 서버문제';
+            returnStructure.header.message = 'Login Success, But Python Error';
             return returnStructure;
           } else {
             errorAuth('Error in Google Authorization');

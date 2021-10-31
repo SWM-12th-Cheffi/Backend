@@ -288,8 +288,9 @@ userRouter.put('/info', async function (req, res) {
   let authorizationPlatform: string = String(req.headers['platform']);
   const authzRes = await Authz(authorizationToken, authorizationPlatform, 2);
   if (authzRes.header.status == 200) {
-    let userField: string[] = ['nickname', 'statusMessage', 'photo', 'dislikeIngredient'];
+    let userField: string[] = ['nickname', 'statusMessage', 'photo', 'dislikeIngredient', 'problems', 'likeRecipesId'];
     let keys: string[] = Object.keys(req.body.data);
+    let data = req.body.data;
     debuginfo(keys);
     for (let i in keys) {
       if (userField.indexOf(keys[i]) == -1) {
@@ -298,9 +299,18 @@ userRouter.put('/info', async function (req, res) {
         res.status(400).json({ notAllowDataField: keys[i] });
         break;
       }
+      if (keys[i] == 'likeRecipesId') {
+        let tmp = [];
+        for (let i in data.likeRecipesId) {
+          tmp.push({ id: data.likeRecipesId[i], place: 100, rating: 5 });
+        }
+        data.likeRecipesIdInfo = tmp;
+        delete data.likeRecipesId;
+        console.log(tmp);
+      }
     }
     if (isContinue)
-      User.initInfoByUserid(authzRes.auth?.securityId, req.body.data).then((result: any) => {
+      User.initInfoByUserid(authzRes.auth?.securityId, data).then((result: any) => {
         // 정상적으로 작업을 마침
         if (result.matchedCount) {
           debuginfo('Save Successed');

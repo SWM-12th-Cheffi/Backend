@@ -21,10 +21,10 @@ var UserSchema = new Schema(
     dislikeIngredient: { type: Array, require: false },
     scrapRecipesId: { type: Array, require: false },
     scrapRecipesIdInfo: { type: Array, require: false },
-    likeRecipesId: { type: Array, require: false },
     likeRecipesIdInfo: { type: Array, require: false },
     historyRecipesId: { type: Array, require: false },
     historyRecipesIdInfo: { type: Array, require: false },
+    problems: { type: Array, require: false },
     refriger: {
       type: Array,
       require: false,

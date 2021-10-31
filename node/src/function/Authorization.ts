@@ -346,7 +346,7 @@ async function verify_kakao(token: string, init: boolean) {
 }
 
 const appleSignIn = new AppleSignIn({
-  clientId: 'org.reactjs.native.example.Cheffi-frontend',
+  clientId: 'org.reactjs.native.cheffi',
   teamId: '77Z6LL52FP',
   keyIdentifier: '6D7H2MDQP6',
   privateKey:
